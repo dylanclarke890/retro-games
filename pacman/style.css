@@ -1,0 +1,11 @@
+body {
+  background: rgb(19, 30, 41);
+  display: grid;
+  place-items: center;
+}
+
+#play-area {
+  width: 440;
+  height: 560px;
+  background: black;
+}
