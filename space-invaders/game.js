@@ -1,47 +1,7 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 function drawText(text, font, fillStyle, x, y, maxWidth = undefined) {
   if (font) ctx.font = font;
   if (fillStyle) ctx.fillStyle = fillStyle;
   ctx.fillText(text, x, y, maxWidth);
-}
-
-function randUpTo(num, floor = false) {
-  const res = Math.random() * num;
-  return floor ? Math.floor(res) : res;
-}
-
-function isCircleRectColliding(circle, rect) {
-  const distX = Math.abs(circle.x - rect.x - rect.w / 2);
-  const distY = Math.abs(circle.y - rect.y - rect.h / 2);
-  if (distX > rect.w / 2 + circle.r) return false;
-  if (distY > rect.h / 2 + circle.r) return false;
-  if (distX <= rect.w / 2) return true;
-  if (distY <= rect.h / 2) return true;
-  const dx = distX - rect.w / 2;
-  const dy = distY - rect.h / 2;
-  return dx * dx + dy * dy <= circle.r * circle.r;
-}
-
-function isRectRectColliding(first, second) {
-  if (!first || !second) return false;
-  if (
-    !(
-      first.x > second.x + second.w ||
-      first.x + first.w < second.x ||
-      first.y > second.y + second.h ||
-      first.y + first.h < second.y
-    )
-  ) {
-    return true;
-  }
-  return false;
 }
 
 const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
@@ -131,9 +91,7 @@ class Player {
 
     if (this.currentCooldown === 0) {
       if (keyboard.firing) {
-        state.projectiles.push(
-          new Projectile(this.x + this.w / 2, this.y, -10, { enemies: true })
-        );
+        state.projectiles.push(new Projectile(this.x + this.w / 2, this.y, -10, { enemies: true }));
         this.currentCooldown = this.cooldownBetweenShots;
       }
     } else this.currentCooldown--;
@@ -306,8 +264,7 @@ class Shield {
   constructor(x, y) {
     this.parts = [];
     for (let i = 0; i < 6; i++)
-      for (let j = 0; j < 6; j++)
-        this.parts.push(new ShieldPart(x + i * 10, y + j * 10));
+      for (let j = 0; j < 6; j++) this.parts.push(new ShieldPart(x + i * 10, y + j * 10));
   }
 
   draw() {
@@ -359,9 +316,7 @@ const settings = {
   for (let i = 0; i < 5; i++) {
     const row = [];
     for (let j = 0; j < 11; j++) {
-      row.push(
-        new Enemy(j * w + j * gapX + offsetX, i * h + i * gapY + offsetY)
-      );
+      row.push(new Enemy(j * w + j * gapX + offsetX, i * h + i * gapY + offsetY));
     }
     state.enemies.push(new EnemyRow(row));
   }
@@ -401,23 +356,11 @@ function handleGameState() {
 }
 
 function handleLossScreen() {
-  drawText(
-    "Game Over",
-    "40px Arial",
-    "white",
-    canvas.width / 2 - 100,
-    canvas.height / 2 - 150
-  );
+  drawText("Game Over", "40px Arial", "white", canvas.width / 2 - 100, canvas.height / 2 - 150);
 }
 
 function handleWinScreen() {
-  drawText(
-    "You Won",
-    "40px Arial",
-    "white",
-    canvas.width / 2 - 100,
-    canvas.height / 2 - 200
-  );
+  drawText("You Won", "40px Arial", "white", canvas.width / 2 - 100, canvas.height / 2 - 200);
 }
 
 const whereNotDestroyed = (arr) => arr.filter((val) => !val.destroy);

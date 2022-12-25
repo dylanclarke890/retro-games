@@ -1,11 +1,3 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 function drawText(text, font, fillStyle, x, y, maxWidth = undefined) {
   if (font) ctx.font = font;
   if (fillStyle) ctx.fillStyle = fillStyle;
@@ -49,11 +41,9 @@ class Snake {
   constructor() {
     this.speed = settings.segmentSize;
     const x =
-      Math.floor((Math.random() * canvas.width) / settings.segmentSize) *
-      settings.segmentSize;
+      Math.floor((Math.random() * canvas.width) / settings.segmentSize) * settings.segmentSize;
     const y =
-      Math.floor((Math.random() * canvas.height) / settings.segmentSize) *
-      settings.segmentSize;
+      Math.floor((Math.random() * canvas.height) / settings.segmentSize) * settings.segmentSize;
     this.head = new Segment(x, y);
     this.segments = [];
   }
@@ -106,9 +96,7 @@ class Snake {
       this.head.y + this.head.h > canvas.height ||
       this.head.x < 0 ||
       this.head.x + this.head.w > canvas.width ||
-      this.segments.some(
-        (segment) => this.head.x === segment.x && this.head.y === segment.y
-      )
+      this.segments.some((segment) => this.head.x === segment.x && this.head.y === segment.y)
     )
       state.over = true;
   }
@@ -122,11 +110,9 @@ class Snake {
 class Objective {
   constructor() {
     this.x =
-      Math.floor((Math.random() * canvas.width) / settings.segmentSize) *
-      settings.segmentSize;
+      Math.floor((Math.random() * canvas.width) / settings.segmentSize) * settings.segmentSize;
     this.y =
-      Math.floor((Math.random() * canvas.height) / settings.segmentSize) *
-      settings.segmentSize;
+      Math.floor((Math.random() * canvas.height) / settings.segmentSize) * settings.segmentSize;
     this.w = settings.dropSize;
     this.h = settings.dropSize;
   }
@@ -194,10 +180,7 @@ function handleSnake() {
 function handleObjective() {
   if (state.objective === null) state.objective = new Objective();
   state.objective.draw();
-  if (
-    state.objective.y === state.snake.head.y &&
-    state.objective.x === state.snake.head.x
-  ) {
+  if (state.objective.y === state.snake.head.y && state.objective.x === state.snake.head.x) {
     state.objective = null;
     state.snake.addSegment();
     state.score++;
@@ -211,13 +194,7 @@ function handleScore() {
 }
 
 function handleGameOver() {
-  drawText(
-    "GAME OVER",
-    "60px Arial",
-    "yellow",
-    canvas.width / 2 - 200,
-    canvas.height / 2 - 100
-  );
+  drawText("GAME OVER", "60px Arial", "yellow", canvas.width / 2 - 200, canvas.height / 2 - 100);
   drawText(
     `Final Score: ${state.score}`,
     "20px Arial",
@@ -269,13 +246,7 @@ window.addEventListener("resize", () => {
 });
 
 function handleStart() {
-  drawText(
-    "SNAKE",
-    "80px Arial",
-    "yellow",
-    canvas.width / 2 - 150,
-    canvas.height / 2 - 100
-  );
+  drawText("SNAKE", "80px Arial", "yellow", canvas.width / 2 - 150, canvas.height / 2 - 100);
   const { x, y, w, h, hover } = startBtn;
   ctx.fillStyle = hover ? "darkgreen" : "green";
   ctx.fillRect(x, y, w, h);

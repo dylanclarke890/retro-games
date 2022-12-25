@@ -1,47 +1,7 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 function drawText(text, font, fillStyle, x, y, maxWidth = undefined) {
   if (font) ctx.font = font;
   if (fillStyle) ctx.fillStyle = fillStyle;
   ctx.fillText(text, x, y, maxWidth);
-}
-
-function randUpTo(num, floor = false) {
-  const res = Math.random() * num;
-  return floor ? Math.floor(res) : res;
-}
-
-function isCircleRectColliding(circle, rect) {
-  const distX = Math.abs(circle.x - rect.x - rect.w / 2);
-  const distY = Math.abs(circle.y - rect.y - rect.h / 2);
-  if (distX > rect.w / 2 + circle.r) return false;
-  if (distY > rect.h / 2 + circle.r) return false;
-  if (distX <= rect.w / 2) return true;
-  if (distY <= rect.h / 2) return true;
-  const dx = distX - rect.w / 2;
-  const dy = distY - rect.h / 2;
-  return dx * dx + dy * dy <= circle.r * circle.r;
-}
-
-function isRectRectColliding(first, second) {
-  if (!first || !second) return false;
-  if (
-    !(
-      first.x > second.x + second.w ||
-      first.x + first.w < second.x ||
-      first.y > second.y + second.h ||
-      first.y + first.h < second.y
-    )
-  ) {
-    return true;
-  }
-  return false;
 }
 
 const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
@@ -61,10 +21,7 @@ const setMousePosition = (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
   setMousePosition(e);
-  settings.actionButton.hover = isRectRectColliding(
-    mouse,
-    settings.actionButton
-  );
+  settings.actionButton.hover = isRectRectColliding(mouse, settings.actionButton);
 });
 
 window.addEventListener("resize", () => {
@@ -76,8 +33,7 @@ canvas.addEventListener("click", (e) => {
   switch (state.won) {
     case 0:
       const ready = [];
-      const missileSpeed =
-        settings.levels[currentRun.level].missileSpeed.player;
+      const missileSpeed = settings.levels[currentRun.level].missileSpeed.player;
       for (let i = 0; i < state.cannons.length; i++) {
         const cannon = state.cannons[i];
         if (cannon.shotsLeft <= 0) continue;
@@ -262,8 +218,7 @@ const cannon = { w: 20, h: 20 };
 const cannonIncline = { x: 15, y: 40 };
 const hillW = 60;
 const endsOffset = 30;
-const gapsBetweenCannons =
-  (canvas.width - (2 * endsOffset + 6 * cannonIncline.x + 3 * hillW)) / 2;
+const gapsBetweenCannons = (canvas.width - (2 * endsOffset + 6 * cannonIncline.x + 3 * hillW)) / 2;
 const cannonLocations = [];
 cannonLocations[0] = endsOffset + cannonIncline.x + hillW / 2 - cannon.w / 2;
 const cannonGap = hillW + gapsBetweenCannons + cannonIncline.x * 2;
@@ -405,13 +360,7 @@ const settings = {
 
 function handleGameAreaSetup() {
   const { height, width } = canvas;
-  drawText(
-    `Score: ${currentRun.score}`,
-    "30px Arial",
-    "white",
-    width / 2 - 150,
-    50
-  );
+  drawText(`Score: ${currentRun.score}`, "30px Arial", "white", width / 2 - 150, 50);
 
   drawText(
     `x${settings.levels[currentRun.level].scoreMultiplier}`,
@@ -457,8 +406,7 @@ function handleGameAreaSetup() {
 }
 
 function handleEnemyCreation() {
-  const { enemiesAtOnce, totalEnemies, spawnDelay } =
-    settings.levels[currentRun.level];
+  const { enemiesAtOnce, totalEnemies, spawnDelay } = settings.levels[currentRun.level];
   const { current, total } = state.enemies;
   if (current.length === enemiesAtOnce || total === totalEnemies) return;
   if (state.frame > 0 && state.frame % spawnDelay === 0) {
@@ -473,12 +421,7 @@ function handleEnemyCreation() {
       w: targeted.w,
       h: targeted.h,
     };
-    const missile = new Missile(
-      x,
-      y,
-      target,
-      settings.levels[currentRun.level].missileSpeed.enemy
-    );
+    const missile = new Missile(x, y, target, settings.levels[currentRun.level].missileSpeed.enemy);
     state.enemies.current.push(missile);
     state.enemies.total++;
   }
@@ -503,8 +446,7 @@ function handleObjectDrawing() {
     const missile = state.missiles[i];
     missile.update();
     missile.draw();
-    if (missile.destroy)
-      state.explosions.push(new Explosion(missile.x, missile.y));
+    if (missile.destroy) state.explosions.push(new Explosion(missile.x, missile.y));
   }
 
   for (let i = 0; i < state.enemies.current.length; i++) {
@@ -512,8 +454,7 @@ function handleObjectDrawing() {
     enemy.update();
     enemy.draw();
     if (enemy.destroy) {
-      currentRun.score +=
-        10 * settings.levels[currentRun.level].scoreMultiplier;
+      currentRun.score += 10 * settings.levels[currentRun.level].scoreMultiplier;
       state.explosions.push(new Explosion(enemy.x, enemy.y));
     }
   }
@@ -540,13 +481,7 @@ function checkForWin() {
 }
 
 function handleLossScreen() {
-  drawText(
-    "Game Over",
-    "40px Arial",
-    "white",
-    canvas.width / 2 - 100,
-    canvas.height / 2 - 150
-  );
+  drawText("Game Over", "40px Arial", "white", canvas.width / 2 - 100, canvas.height / 2 - 150);
   drawText(
     `Score: ${currentRun.score}`,
     "20px Arial",
@@ -561,27 +496,17 @@ function handleLossScreen() {
     canvas.width / 2 + 100,
     canvas.height / 2 - 100
   );
-  const { x, y, w, h, boxColor, font, fontColor, hover, hoverColor } =
-    settings.actionButton;
+  const { x, y, w, h, boxColor, font, fontColor, hover, hoverColor } = settings.actionButton;
   ctx.fillStyle = hover ? hoverColor : boxColor;
   ctx.fillRect(x, y, w, h);
   drawText("Play Again?", font, fontColor, x + 10, y + 30);
 }
 
 function handleWinScreen() {
-  drawText(
-    "Level Won",
-    "40px Arial",
-    "white",
-    canvas.width / 2 - 100,
-    canvas.height / 2 - 200
-  );
+  drawText("Level Won", "40px Arial", "white", canvas.width / 2 - 100, canvas.height / 2 - 200);
   const scoreMultiplier = settings.levels[currentRun.level].scoreMultiplier;
   const { buildings, ammo } = settings.points;
-  const ammoLeft = state.cannons.reduce(
-    (sum, value) => sum + value.shotsLeft,
-    0
-  );
+  const ammoLeft = state.cannons.reduce((sum, value) => sum + value.shotsLeft, 0);
   const centerOffset = -100;
   drawText(
     "Bonus Score:",
@@ -598,17 +523,14 @@ function handleWinScreen() {
     canvas.height / 2 - 100
   );
   drawText(
-    `Buildings: ${currentRun.buildings.length} * ${
-      scoreMultiplier * buildings
-    }`,
+    `Buildings: ${currentRun.buildings.length} * ${scoreMultiplier * buildings}`,
     "20px Arial",
     "white",
     canvas.width / 2 + centerOffset,
     canvas.height / 2 - 50
   );
 
-  const { x, y, w, h, boxColor, font, fontColor, hover, hoverColor } =
-    settings.actionButton;
+  const { x, y, w, h, boxColor, font, fontColor, hover, hoverColor } = settings.actionButton;
   ctx.fillStyle = hover ? hoverColor : boxColor;
   ctx.fillRect(x, y, w, h);
   drawText("Next Level", font, fontColor, x + 15, y + 30);

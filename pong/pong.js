@@ -208,26 +208,13 @@ PONG.Paddle.Player = class extends PONG.Paddle.Base {
 
 PONG.utils = PONG.utils || {};
 
-PONG.utils.new2dCanvas = function (id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-};
-
 PONG.utils.drawText = function (text, font, fillStyle, x, y, maxWidth = undefined) {
   if (font) ctx.font = font;
   if (fillStyle) ctx.fillStyle = fillStyle;
   ctx.fillText(text, x, y, maxWidth);
 };
 
-PONG.utils.randUpTo = function (num, floor = false) {
-  const res = Math.random() * num;
-  return floor ? Math.floor(res) : res;
-};
-
-const [canvas, ctx] = PONG.utils.new2dCanvas("play-area", 800, 500);
+const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
 
 /********************************************************
  *                  G L O B A L S
@@ -269,8 +256,8 @@ const board = {
     : new PONG.Paddle.Pong(p2StartingSide, aiMaxPaddleSpeed),
   ball: new PONG.Ball({
     // randomly select left/right and up/down as starting directions for the ball
-    x: [DIRECTION.LEFT, DIRECTION.RIGHT][PONG.utils.randUpTo(2, true)],
-    y: [DIRECTION.UP, DIRECTION.DOWN][PONG.utils.randUpTo(2, true)],
+    x: [DIRECTION.LEFT, DIRECTION.RIGHT][randUpTo(2, true)],
+    y: [DIRECTION.UP, DIRECTION.DOWN][randUpTo(2, true)],
   }),
   winningScore: 6,
 };

@@ -1,11 +1,3 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 function drawText(text, font, fillStyle, x, y, maxWidth = undefined) {
   if (font) ctx.font = font;
   if (fillStyle) ctx.fillStyle = fillStyle;
@@ -36,11 +28,6 @@ function fillEllipse(x, y, w, h, fillStyle) {
   ctx.closePath();
 }
 
-function randUpTo(num, floor = false) {
-  const res = Math.random() * num;
-  return floor ? Math.floor(res) : res;
-}
-
 function randXDir() {
   const ran = Math.random();
   return ran > 0.5 ? DIRECTION.LEFT : DIRECTION.RIGHT;
@@ -53,33 +40,6 @@ function randYDir() {
 
 function randTrajectory() {
   return { x: randXDir(), y: randYDir() };
-}
-
-function isCircleRectColliding(circle, rect) {
-  const distX = Math.abs(circle.x - rect.x - rect.w / 2);
-  const distY = Math.abs(circle.y - rect.y - rect.h / 2);
-  if (distX > rect.w / 2 + circle.r) return false;
-  if (distY > rect.h / 2 + circle.r) return false;
-  if (distX <= rect.w / 2) return true;
-  if (distY <= rect.h / 2) return true;
-  const dx = distX - rect.w / 2;
-  const dy = distY - rect.h / 2;
-  return dx * dx + dy * dy <= circle.r * circle.r;
-}
-
-function isRectRectColliding(first, second) {
-  if (!first || !second) return false;
-  if (
-    !(
-      first.x > second.x + second.w ||
-      first.x + first.w < second.x ||
-      first.y > second.y + second.h ||
-      first.y + first.h < second.y
-    )
-  ) {
-    return true;
-  }
-  return false;
 }
 
 class Paddle {
@@ -145,9 +105,7 @@ class Powerup {
           const itemsToAppend = [];
           for (let i = 0; i < state.balls.length; i++) {
             for (let j = 0; j < settings.powerups.multiAmount; j++) {
-              itemsToAppend.push(
-                new Ball(state.balls[i].x, state.balls[i].y, randTrajectory())
-              );
+              itemsToAppend.push(new Ball(state.balls[i].x, state.balls[i].y, randTrajectory()));
             }
           }
           state.balls.push(...itemsToAppend);
@@ -170,13 +128,7 @@ class Powerup {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
     ctx.fill();
-    drawText(
-      POWERUP[this.type],
-      "10px Arial",
-      "yellow",
-      this.x - 10,
-      this.y + 5
-    );
+    drawText(POWERUP[this.type], "10px Arial", "yellow", this.x - 10, this.y + 5);
   }
 }
 
@@ -218,10 +170,8 @@ class Ball {
       this.x = state.paddle.x + state.paddle.w / 2;
       return;
     }
-    const xMovement =
-      this.trajectory.x === DIRECTION.LEFT ? this.speed : -this.speed;
-    const yMovement =
-      this.trajectory.y === DIRECTION.UP ? this.speed : -this.speed;
+    const xMovement = this.trajectory.x === DIRECTION.LEFT ? this.speed : -this.speed;
+    const yMovement = this.trajectory.y === DIRECTION.UP ? this.speed : -this.speed;
     this.x = Math.floor(this.x - xMovement);
     this.y = Math.floor(this.y - yMovement);
     let hasCollided = false;
@@ -250,9 +200,7 @@ class Ball {
       if (Math.random() <= settings.powerups.chance) {
         const powerupTypes = Object.keys(POWERUP);
         const randomType = powerupTypes[randUpTo(powerupTypes.length, true)];
-        state.powerups.push(
-          new Powerup(brick.x + brick.w / 2, brick.y + brick.h / 2, randomType)
-        );
+        state.powerups.push(new Powerup(brick.x + brick.w / 2, brick.y + brick.h / 2, randomType));
       }
       if (this.superDuration > 0) {
         this.superDuration--;
@@ -280,12 +228,9 @@ class Ball {
           this.trajectory.x = DIRECTION.LEFT;
           break;
         default:
-          this.trajectory.y =
-            this.trajectory.y === DIRECTION.UP ? DIRECTION.DOWN : DIRECTION.UP;
+          this.trajectory.y = this.trajectory.y === DIRECTION.UP ? DIRECTION.DOWN : DIRECTION.UP;
           this.trajectory.x =
-            this.trajectory.x === DIRECTION.LEFT
-              ? DIRECTION.RIGHT
-              : DIRECTION.LEFT;
+            this.trajectory.x === DIRECTION.LEFT ? DIRECTION.RIGHT : DIRECTION.LEFT;
           break;
       }
       this.color = "white";
@@ -360,9 +305,7 @@ let currentLevel = 0;
 
 const defaultState = () => ({
   paddle: new Paddle(),
-  balls: [
-    new Ball(canvas.width / 2, canvas.height - 80, { x: randXDir(), y: "U" }),
-  ],
+  balls: [new Ball(canvas.width / 2, canvas.height - 80, { x: randXDir(), y: "U" })],
   started: false,
   over: false,
   powerups: [],
@@ -498,9 +441,7 @@ function handlePowerups() {
     ctx.fillRect(0, state.net.y, canvas.width, 10);
   }
 
-  state.powerups = state.powerups.filter(
-    (p) => !p.collected && p.y < canvas.height
-  );
+  state.powerups = state.powerups.filter((p) => !p.collected && p.y < canvas.height);
 }
 
 function handleBricks() {
@@ -517,32 +458,18 @@ function handleGameState() {
     state.level.lives--;
     state.level.lifeLost = false;
     state.powerups = [];
-    state.balls.push(
-      new Ball(canvas.width / 2, canvas.height - 80, { x: randXDir(), y: "U" })
-    );
+    state.balls.push(new Ball(canvas.width / 2, canvas.height - 80, { x: randXDir(), y: "U" }));
     state.paddle.x = canvas.width / 2 - state.paddle.w / 2;
     state.level.started = false;
     state.over = state.level.lives === 0;
   }
 
   if (!state.level.started)
-    drawText(
-      `Lives: ${state.level.lives}`,
-      "30px Arial",
-      "white",
-      canvas.width / 2 - 30,
-      30
-    );
+    drawText(`Lives: ${state.level.lives}`, "30px Arial", "white", canvas.width / 2 - 30, 30);
 }
 
 function handleStart() {
-  drawText(
-    "BREAKOUT",
-    "80px Arial",
-    "white",
-    canvas.width / 2 - 200,
-    canvas.height / 2 - 100
-  );
+  drawText("BREAKOUT", "80px Arial", "white", canvas.width / 2 - 200, canvas.height / 2 - 100);
   const { x, y, w, h, hover } = startBtn;
   ctx.fillStyle = hover ? "blue" : "lightblue";
   ctx.fillRect(x, y, w, h);
@@ -550,43 +477,19 @@ function handleStart() {
 }
 
 function handleOver() {
-  drawText(
-    "GAME OVER",
-    "80px Arial",
-    "white",
-    canvas.width / 2 - 200,
-    canvas.height / 2 - 100
-  );
+  drawText("GAME OVER", "80px Arial", "white", canvas.width / 2 - 200, canvas.height / 2 - 100);
   const { x, y, w, h, hover } = startBtn;
   ctx.fillStyle = hover ? "blue" : "lightblue";
   ctx.fillRect(x, y, w, h);
-  drawText(
-    "Restart",
-    "20px Arial",
-    hover ? "lightblue" : "blue",
-    x + 20,
-    y + 20
-  );
+  drawText("Restart", "20px Arial", hover ? "lightblue" : "blue", x + 20, y + 20);
 }
 
 function handleLevelWon() {
-  drawText(
-    "YOU WIN!",
-    "80px Arial",
-    "white",
-    canvas.width / 2 - 200,
-    canvas.height / 2 - 100
-  );
+  drawText("YOU WIN!", "80px Arial", "white", canvas.width / 2 - 200, canvas.height / 2 - 100);
   const { x, y, w, h, hover } = startBtn;
   ctx.fillStyle = hover ? "blue" : "lightblue";
   ctx.fillRect(x, y, w, h);
-  drawText(
-    "Next Level",
-    "20px Arial",
-    hover ? "lightblue" : "blue",
-    x + 20,
-    y + 20
-  );
+  drawText("Next Level", "20px Arial", hover ? "lightblue" : "blue", x + 20, y + 20);
 }
 
 (function animate() {

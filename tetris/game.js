@@ -1,11 +1,3 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 const [canvas, ctx] = new2dCanvas("play-area", 600, 600);
 
 const FPS = 60,
@@ -43,9 +35,7 @@ const pressed = {
 
 (function createBoard() {
   const { cols, rows, emptyCellColor } = settings;
-  board = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => emptyCellColor)
-  );
+  board = Array.from({ length: rows }, () => Array.from({ length: cols }, () => emptyCellColor));
 })();
 
 const blockTypes = {
@@ -278,34 +268,20 @@ class Block {
   update() {
     const isIntervalOfKeyboardMovement =
       this.timer % (settings.keyboardMoveInterval * settings.fps) === 0;
-    if (
-      this.timer % this.downInterval === 0 ||
-      (pressed.down && isIntervalOfKeyboardMovement)
-    ) {
+    if (this.timer % this.downInterval === 0 || (pressed.down && isIntervalOfKeyboardMovement)) {
       if (!this.willCollide(0, 1, this.activeTetromino)) this.y++;
       else this.lock();
     }
 
-    if (
-      pressed.right &&
-      isIntervalOfKeyboardMovement &&
-      !this.willCollide(1, 0)
-    )
-      this.x++;
-    if (
-      pressed.left &&
-      isIntervalOfKeyboardMovement &&
-      !this.willCollide(-1, 0)
-    )
-      this.x--;
+    if (pressed.right && isIntervalOfKeyboardMovement && !this.willCollide(1, 0)) this.x++;
+    if (pressed.left && isIntervalOfKeyboardMovement && !this.willCollide(-1, 0)) this.x--;
     this.timer++;
   }
 
   draw() {
     for (let r = 0; r < this.activeTetromino.length; r++)
       for (let c = 0; c < this.activeTetromino[r].length; c++)
-        if (this.activeTetromino[r][c])
-          drawSquare(this.x + c, this.y + r, this.color);
+        if (this.activeTetromino[r][c]) drawSquare(this.x + c, this.y + r, this.color);
   }
 
   drawPreviewAt(x, y) {
@@ -317,11 +293,7 @@ class Block {
   nextRotation() {
     const mod = this.rotations.length;
     const next = this.rotations[(this.currentRotation + 1) % mod];
-    let kick = this.willCollide(0, 0, next)
-      ? this.x > settings.cols / 2
-        ? -1
-        : 1
-      : 0;
+    let kick = this.willCollide(0, 0, next) ? (this.x > settings.cols / 2 ? -1 : 1) : 0;
 
     if (!this.willCollide(kick, 0, next)) {
       this.x += kick;
@@ -336,8 +308,7 @@ class Block {
         if (!piece[r][c]) continue;
         let newX = this.x + c + x;
         let newY = this.y + r + y;
-        if (newX < 0 || newX >= settings.cols || newY >= settings.rows)
-          return true;
+        if (newX < 0 || newX >= settings.cols || newY >= settings.rows) return true;
         if (newY < 0) continue;
         if (board[newY][newX] != settings.emptyCellColor) return true;
       }
@@ -408,8 +379,7 @@ function removeFullRows() {
     if (rowIsFull) {
       for (let y = r; y > 1; y--)
         for (let c = 0; c < settings.cols; c++) board[y][c] = board[y - 1][c];
-      for (let i = 0; i < settings.cols; i++)
-        board[0][i] = settings.emptyCellColor;
+      for (let i = 0; i < settings.cols; i++) board[0][i] = settings.emptyCellColor;
       state.score += 10;
       state.linesCleared++;
       if (state.score > state.best.score) {
@@ -437,11 +407,7 @@ function drawGameInfo() {
 
   ctx.textAlign = "right";
   ctx.fillText(`Best: ${state.best.score}`, canvas.width, scorePos.y);
-  ctx.fillText(
-    `Best: ${state.best.linesCleared}`,
-    canvas.width,
-    scorePos.y + 50
-  );
+  ctx.fillText(`Best: ${state.best.linesCleared}`, canvas.width, scorePos.y + 50);
 
   ctx.textAlign = "left";
   ctx.fillStyle = "white";
@@ -472,12 +438,7 @@ function drawStartScreen() {
     y: canvas.height / 2 - 50,
   };
   ctx.font = "80px Bangers cursive";
-  fillMixedText(
-    multicoloredTitle,
-    pos.x - ctx.measureText("TETRIS").width / 2,
-    pos.y,
-    true
-  );
+  fillMixedText(multicoloredTitle, pos.x - ctx.measureText("TETRIS").width / 2, pos.y, true);
 
   ctx.font = "30px Bangers cursive";
   const text = "space to start";
@@ -499,11 +460,7 @@ function drawStartScreen() {
   ctx.fillStyle = "green";
 
   ctx.textAlign = "center";
-  ctx.fillText(
-    text,
-    settings.boardOffset + (canvas.width - settings.boardOffset) / 2,
-    pos.y + 85
-  );
+  ctx.fillText(text, settings.boardOffset + (canvas.width - settings.boardOffset) / 2, pos.y + 85);
 }
 
 function drawGameOverScreen() {}

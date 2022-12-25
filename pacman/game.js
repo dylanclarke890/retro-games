@@ -1,11 +1,3 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
-}
-
 const [canvas, ctx] = new2dCanvas("play-area", 440, 560);
 
 const pressed = {
@@ -136,8 +128,7 @@ class Player {
   }
 
   update() {
-    const { fps, pacmanMaxMouth, pacmanMouthInterval, pacmanMouthStep } =
-      settings;
+    const { fps, pacmanMaxMouth, pacmanMouthInterval, pacmanMouthStep } = settings;
 
     for (let i = 0; i < ghosts.length; i++) {
       const ghost = ghosts[i];
@@ -230,11 +221,7 @@ class Player {
   willCollideWithABoundary(xv, yv) {
     for (let i = 0; i < boundaries.length; i++)
       if (
-        isCircleRectCollision(
-          { ...this, velocity: { x: xv, y: yv } },
-          boundaries[i],
-          Player.speed
-        )
+        isCircleRectCollision({ ...this, velocity: { x: xv, y: yv } }, boundaries[i], Player.speed)
       )
         return true;
     return false;
@@ -267,8 +254,7 @@ class Ghost {
 
     if (this.scaredTimer > 0) {
       if (this.scaredTimer < fps * ghostScaredFlashBelow) {
-        if (this.scaredTimer % (fps * ghostScaredFlashInterval) === 0)
-          this.blink = !this.blink;
+        if (this.scaredTimer % (fps * ghostScaredFlashInterval) === 0) this.blink = !this.blink;
         ctx.fillStyle = this.blink ? ghostFlashColor : ghostScaredColor;
       } else ctx.fillStyle = ghostScaredColor;
     } else ctx.fillStyle = this.color;
@@ -323,8 +309,7 @@ class Ghost {
         collisions.push("d");
     }
 
-    if (collisions.length > this.prevCollisions.length)
-      this.prevCollisions = collisions;
+    if (collisions.length > this.prevCollisions.length) this.prevCollisions = collisions;
 
     if (JSON.stringify(collisions) !== JSON.stringify(this.prevCollisions)) {
       if (this.velocity.x > 0) this.prevCollisions.push("r");
@@ -332,9 +317,7 @@ class Ghost {
       else if (this.velocity.y > 0) this.prevCollisions.push("d");
       else if (this.velocity.y < 0) this.prevCollisions.push("u");
 
-      const pathways = this.prevCollisions.filter(
-        (c) => !collisions.includes(c)
-      );
+      const pathways = this.prevCollisions.filter((c) => !collisions.includes(c));
 
       const dir = pathways[Math.floor(Math.random() * pathways.length)];
       switch (dir) {
@@ -493,9 +476,7 @@ function newImage(src) {
           boundaries.push(new Boundary(x, y, newImage(assets.pipe.bottomLeft)));
           break;
         case "4":
-          boundaries.push(
-            new Boundary(x, y, newImage(assets.pipe.bottomRight))
-          );
+          boundaries.push(new Boundary(x, y, newImage(assets.pipe.bottomRight)));
           break;
         case "b":
           boundaries.push(new Boundary(x, y, newImage(assets.block)));
@@ -516,24 +497,16 @@ function newImage(src) {
           boundaries.push(new Boundary(x, y, newImage(assets.pipe.cross)));
           break;
         case "5":
-          boundaries.push(
-            new Boundary(x, y, newImage(assets.pipeConnector.top))
-          );
+          boundaries.push(new Boundary(x, y, newImage(assets.pipeConnector.top)));
           break;
         case "6":
-          boundaries.push(
-            new Boundary(x, y, newImage(assets.pipeConnector.right))
-          );
+          boundaries.push(new Boundary(x, y, newImage(assets.pipeConnector.right)));
           break;
         case "7":
-          boundaries.push(
-            new Boundary(x, y, newImage(assets.pipeConnector.bottom))
-          );
+          boundaries.push(new Boundary(x, y, newImage(assets.pipeConnector.bottom)));
           break;
         case "8":
-          boundaries.push(
-            new Boundary(x, y, newImage(assets.pipeConnector.left))
-          );
+          boundaries.push(new Boundary(x, y, newImage(assets.pipeConnector.left)));
           break;
         case ".":
           pellets.push(new Pellet(x + cellSize / 2, y + cellSize / 2));
