@@ -59,7 +59,7 @@ class RetroGame {
     const { width, height } = this.canvas;
     this.ctx.clearRect(0, 0, width, height);
     this.ctx.fillStyle = "black";
-    this.ctx.font = "Arial 20px";
+    this.ctx.font = "80px Bangers cursive";
     this.ctx.fillText(this.frameNumber, 200, 100);
   }
 

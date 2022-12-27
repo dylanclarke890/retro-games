@@ -1,9 +1,23 @@
-function new2dCanvas(id, width, height) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  canvas.width = width;
-  canvas.height = height;
-  return [canvas, ctx];
+function loadScript(srcUrl, isAsync = true, type = "text/javascript") {
+  return new Promise((resolve, reject) => {
+    try {
+      const scriptElement = document.createElement("script");
+      scriptElement.addEventListener("load", () => resolve({ status: true }));
+      scriptElement.addEventListener("error", () =>
+        reject({
+          status: false,
+          message: `Failed to load the script ${srcUrl}`,
+        })
+      );
+      scriptElement.type = type;
+      scriptElement.async = isAsync;
+      scriptElement.src = srcUrl;
+
+      document.body.appendChild(scriptElement);
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 function randUpTo(num, floor = false) {
