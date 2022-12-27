@@ -1,18 +1,6 @@
 class GameLoop {
   constructor(scope) {
-    // Set up an object to contain our alternating FPS calculations
-    this.cycles = {
-      new: {
-        frameCount: 0,
-        startTime: before,
-        sinceStart: 0,
-      },
-      old: {
-        frameCount: 0,
-        startTime: before,
-        sineStart: 0,
-      },
-    };
+    this.scope = scope;
     // Alternating Frame Rate vars
     this.resetInterval = 5;
     this.resetState = "new";
@@ -20,6 +8,19 @@ class GameLoop {
     this.fpsInterval = 1000 / this.targetFps;
     this.actualFps = 0;
     this.before = performance.now();
+    // Set up an object to contain our alternating FPS calculations
+    this.cycles = {
+      new: {
+        frameCount: 0,
+        startTime: this.before,
+        sinceStart: 0,
+      },
+      old: {
+        frameCount: 0,
+        startTime: this.before,
+        sinceStart: 0,
+      },
+    };
 
     this.main();
   }
@@ -27,11 +28,11 @@ class GameLoop {
   main(tframe) {
     // setting to `stopLoop` so animation can be stopped via
     // `window.cancelAnimationFrame( loop.stopLoop )`
-    this.stopLoop = requestAnimationFrame(this.main);
+    this.stopLoop = requestAnimationFrame((t) => this.main(t));
 
     // How long ago since last loop?
     const now = tframe,
-      elapsed = now - before;
+      elapsed = now - this.before;
 
     // If it's been at least our desired interval, render
     if (elapsed > this.fpsInterval) {
@@ -48,7 +49,7 @@ class GameLoop {
       }
 
       // Choose the correct FPS calculation, then update the exposed fps value
-      const activeCycle = cycles[resetState];
+      const activeCycle = cycles[this.resetState];
       this.actualFps =
         Math.round((1000 / (activeCycle.sinceStart / activeCycle.frameCount)) * 100) / 100;
 
@@ -70,9 +71,9 @@ class GameLoop {
       }
 
       // Update the game state
-      scope.state = scope.update(now);
+      this.scope.state = this.scope.update(now);
       // Render the next frame
-      scope.render();
+      this.scope.render();
     }
   }
 }
