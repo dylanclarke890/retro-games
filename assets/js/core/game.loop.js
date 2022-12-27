@@ -63,13 +63,13 @@ class GameLoop {
       // reset it to 0 and flag our alternate calculation to be active
       // for the next series of animations.
       if (activeCycle.frameCount > targetResetInterval) {
-        cycles[resetState].frameCount = 0;
-        cycles[resetState].startTime = now;
-        cycles[resetState].sinceStart = 0;
+        cycles[this.resetState].frameCount = 0;
+        cycles[this.resetState].startTime = now;
+        cycles[this.resetState].sinceStart = 0;
 
         this.resetState = this.resetState === "new" ? "old" : "new";
       }
-
+      this.scope.fps = this.actualFps;
       // Update the game state
       this.scope.state = this.scope.update(now);
       // Render the next frame

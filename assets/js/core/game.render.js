@@ -10,7 +10,8 @@ function gameRender(scope) {
     // Displaying FPS.
     if (scope.constants.showFps) {
       scope.ctx.fillStyle = "#ff0";
-      scope.ctx.fillText("FPS", w - 100, 50);
+      scope.ctx.font = "12px Arial";
+      scope.ctx.fillText(`FPS ${scope.fps}`, w - 60, 20);
     }
 
     if (scope.state.hasOwnProperty("entities")) {
