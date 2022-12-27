@@ -11,6 +11,9 @@ class RetroGame {
   /** @type {number} */
   #fpsInterval;
 
+  /** @type {number} */
+  #lastFrame;
+
   /** @type {boolean} */
   #stopped;
 
@@ -18,7 +21,8 @@ class RetroGame {
     Object.assign(this, defaults, opts);
     this.#fpsInterval = 1000 / this.fps;
     this.#stopped = false;
-    this.lastFrame = 0;
+    this.#lastFrame = 0;
+    this.frameNumber = 0;
     this.#setupCanvas();
   }
 
@@ -35,7 +39,7 @@ class RetroGame {
   }
 
   start() {
-    this.lastFrame = performance.now();
+    this.#lastFrame = performance.now();
     this.#animationLoop(0);
   }
 
@@ -43,11 +47,20 @@ class RetroGame {
     if (this.#stopped) return;
 
     requestAnimationFrame((t) => this.#animationLoop(t));
-    const elapsed = currentTime - this.lastFrame;
+    const elapsed = currentTime - this.#lastFrame;
     if (elapsed > this.#fpsInterval) {
-      this.lastFrame = currentTime - (elapsed % this.#fpsInterval);
-      // update();
+      this.#lastFrame = currentTime - (elapsed % this.#fpsInterval);
+      this.frameNumber++;
+      this.update();
     }
+  }
+
+  update() {
+    const { width, height } = this.canvas;
+    this.ctx.clearRect(0, 0, width, height);
+    this.ctx.fillStyle = "black";
+    this.ctx.font = "Arial 20px";
+    this.ctx.fillText(this.frameNumber, 200, 100);
   }
 
   stop() {
