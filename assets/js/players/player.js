@@ -7,7 +7,7 @@ class Player {
     this.h = 25;
     this.state = {
       position: { x, y },
-      moveSpeed: 1.5,
+      moveSpeed: 4,
     };
     this.keys = new KeyPressEvents();
   }
@@ -22,5 +22,8 @@ class Player {
     if (this.keys.isPressed.right) this.state.position.x += this.state.moveSpeed;
     if (this.keys.isPressed.up) this.state.position.y -= this.state.moveSpeed;
     if (this.keys.isPressed.down) this.state.position.y += this.state.moveSpeed;
+
+    this.state.position.x = this.state.position.x.boundary(0, this.scope.constants.w - this.w);
+    this.state.position.y = this.state.position.y.boundary(0, this.scope.constants.h - this.h);
   }
 }
