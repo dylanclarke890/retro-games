@@ -1,12 +1,8 @@
 //#region performance.now()
 
-const moduleLoadTime = process && process.hrtime ? process.hrtime.bigint() : Date.now();
-
+const moduleLoadTime = Date.now();
 const now = () => {
   if (performance && performance.now) return performance.now();
-  else if (process && process.hrtime)
-    return (Number(process.hrtime.bigint()) - moduleLoadTime) / 1e6;
-
   return Date.now() - moduleLoadTime;
 };
 

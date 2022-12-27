@@ -7,7 +7,7 @@ class GameLoop {
     this.targetFps = scope.constants.targetFps;
     this.fpsInterval = 1000 / this.targetFps;
     this.actualFps = 0;
-    this.before = performance.now();
+    this.before = now();
     // Set up an object to contain our alternating FPS calculations
     this.cycles = {
       new: {
@@ -22,18 +22,28 @@ class GameLoop {
       },
     };
 
+    this.loopStartedAt = now();
+    this.currentFrameStart = -1;
+    this.lastFrameStart = -1;
+    this.lastFrameEnd = -1;
+
     this.main();
   }
 
+  #frameStart = (time) => {
+    this.lastFrameStart = this.currentFrameStart;
+    this.currentFrameStart = time;
+    this.lastFrameEnd = time;
+  };
+
+  #getDeltaTime = () => this.lastFrameEnd - this.lastFrameStart;
+
   main(tframe) {
-    // setting to `stopLoop` so animation can be stopped via
-    // `window.cancelAnimationFrame( loop.stopLoop )`
-    this.stopLoop = requestAnimationFrame((t) => this.main(t));
+    this.#frameStart(tframe);
+    this.stopLoop = raf((t) => this.main(t));
 
-    // How long ago since last loop?
     const now = tframe,
-      elapsed = now - this.before;
-
+      elapsed = this.#getDeltaTime();
     // If it's been at least our desired interval, render
     if (elapsed > this.fpsInterval) {
       // Set before = now for next frame, also adjust for
