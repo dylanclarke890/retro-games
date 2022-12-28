@@ -5,12 +5,12 @@ class GameLoop {
     this.targetFps = scope.constants.targetFps;
     this.fpsInterval = 1000 / this.targetFps;
 
-    this.loopStartedAt = now();
     this.uptime = -1;
     this.currentFrameStart = -1;
     this.lastFrameStart = -1;
     this.lastFrameEnd = -1;
     this.actualFps = -1;
+    this.fpsTracker = new AverageFPSTracker();
 
     this.rafId = -1;
     this.stopped = false;
@@ -28,21 +28,23 @@ class GameLoop {
   #getCurrentFps = () => Math.round(1000 / (this.lastFrameEnd - this.lastFrameStart));
 
   start() {
-    this.main(now());
+    const currentTime = now();
+    this.main(currentTime);
+    this.loopStartedAt = currentTime;
   }
 
-  main(tframe) {
-    if (this.stopped) caf(this.rafId);
-    this.#frameStart(tframe);
+  main(timestamp) {
+    if (this.stopped) return caf(this.rafId);
+    this.#frameStart(timestamp);
     this.rafId = raf((t) => this.main(t));
-    const elapsed = this.#getDeltaTime();
+
     this.uptime = this.#getUptimeTime();
+    const elapsed = this.#getDeltaTime();
+    if (elapsed < this.fpsInterval) return; // this line is currently causing skipped frames.
 
-    if (elapsed < this.fpsInterval) return;
-
-    this.actualFps = this.#getCurrentFps();
-    this.scope.fps = this.actualFps;
-    this.scope.state = this.scope.updater.update(tframe);
+    this.fpsTracker.push(this.#getCurrentFps());
+    this.scope.fps = this.fpsTracker.averageFps;
+    this.scope.state = this.scope.updater.update(timestamp);
     this.scope.renderer.render();
   }
 

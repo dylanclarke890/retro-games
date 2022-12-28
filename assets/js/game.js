@@ -19,6 +19,9 @@ class Game {
     this.renderer = new GameRenderer(this);
     this.loop = new GameLoop(this);
     this.loop.start();
+
+    const stopBtn = document.getElementById("stop");
+    stopBtn.addEventListener("click", () => this.loop.stop());
   }
 }
 
