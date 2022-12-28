@@ -15,9 +15,10 @@ class Game {
     this.state.entities = this.state.entities || {};
     this.state.entities.player = new Player(this, this.constants.w / 2, this.constants.h - 100);
     
-    this.update = gameUpdate(this);
-    this.render = gameRender(this);
+    this.updater = new GameUpdater(this);
+    this.renderer = new GameRenderer(this);
     this.loop = new GameLoop(this);
+    this.loop.start();
   }
 }
 

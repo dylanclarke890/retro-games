@@ -12,7 +12,8 @@ class GameLoop {
     this.lastFrameEnd = -1;
     this.actualFps = -1;
 
-    this.main();
+    this.rafId = -1;
+    this.stopped = false;
   }
 
   #frameStart = (time) => {
@@ -26,9 +27,14 @@ class GameLoop {
 
   #getCurrentFps = () => Math.round(1000 / (this.lastFrameEnd - this.lastFrameStart));
 
+  start() {
+    this.main(now());
+  }
+
   main(tframe) {
+    if (this.stopped) caf(this.rafId);
     this.#frameStart(tframe);
-    this.stopLoop = raf((t) => this.main(t));
+    this.rafId = raf((t) => this.main(t));
     const elapsed = this.#getDeltaTime();
     this.uptime = this.#getUptimeTime();
 
@@ -36,7 +42,11 @@ class GameLoop {
 
     this.actualFps = this.#getCurrentFps();
     this.scope.fps = this.actualFps;
-    this.scope.state = this.scope.update(tframe);
-    this.scope.render();
+    this.scope.state = this.scope.updater.update(tframe);
+    this.scope.renderer.render();
+  }
+
+  stop() {
+    this.stopped = true;
   }
 }

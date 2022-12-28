@@ -1,8 +1,15 @@
-function gameRender(scope) {
-  const { w, h } = scope.constants;
-  return function render() {
+class GameRenderer {
+  constructor(scope) {
+    this.scope = scope;
+  }
+
+  render() {
+    const scope = this.scope;
+    const { w, h } = scope.constants;
+
     scope.ctx.clearRect(0, 0, w, h);
 
+    // Example text
     scope.ctx.font = "32px Arial";
     scope.ctx.fillStyle = "#fff";
     scope.ctx.fillText("It's dangerous to travel this route alone.", 5, 50);
@@ -20,5 +27,5 @@ function gameRender(scope) {
         entities[entity].render();
       }
     }
-  };
+  }
 }

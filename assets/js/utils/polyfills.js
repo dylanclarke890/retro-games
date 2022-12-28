@@ -24,11 +24,7 @@ function requestFixedTick(cb, fps = 60) {
     setTimeout(() => {
       const stack = QUEUE.slice(0);
       QUEUE.length = 0;
-      for (let i = 0; i < stack.length; i++) {
-        if (!stack[i].cancelled) {
-          stack[i].callback(last);
-        }
-      }
+      for (let i = 0; i < stack.length; i++) if (!stack[i].cancelled) stack[i].callback(last);
     }, next);
   }
 
