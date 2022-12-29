@@ -32,11 +32,12 @@ class Stats {
   constructor({ domElementStyles, appendTo } = {}) {
     this.domElementStyles = domElementStyles;
     this.appendTo = appendTo;
-    this.DOMElements = {};
     this.#setup();
   }
 
   #setup() {
+    this.DOMElements = {};
+
     const parent = document.createElement("div");
     this.#assignStyles(parent, {
       fontFamily: "Helvetica, Arial, sans-serif",
@@ -72,46 +73,6 @@ class Stats {
     this.now = performance.now();
     this.last = this.now;
     this.lastFrame = this.now;
-  }
-
-  update() {
-    const { ms, fps, mem } = this.DOMElements;
-    this.framesThisSec++;
-    this.now = performance.now();
-    const msValue = Math.round(now - last);
-    this.minMs = Math.min(this.minMs, msValue);
-    this.maxMs = Math.max(this.maxMs, msValue);
-    this.#drawPanelData(
-      ms.data.data,
-      Math.min(30, 30 - (msValue / 200) * 30),
-      Stats.colorSchemes.ms
-    );
-    ms.text.innerHTML = `<strong>${msValue} MS</strong>(${this.minMs}-${this.maxMs})`;
-    ms.ctx.putImageData(ms.data, 0, 0);
-    this.last = this.now;
-    const aSecondHasPassed = this.now > this.lastFrame + 1000;
-    if (aSecondHasPassed) {
-      const fpsValue = Math.round((this.framesThisSec * 1000) / (this.now - this.lastFrame));
-      this.minFps = Math.min(this.minFps, fpsValue);
-      this.maxFps = Math.max(this.maxFps, fpsValue);
-      this.#drawPanelData(
-        fps.data.data,
-        Math.min(30, 30 - (fpsValue / 100) * 30),
-        Stats.colorSchemes.fps
-      );
-      fps.text.innerHTML = `<strong>${fpsValue} FPS</strong> (${this.minFps}-${this.maxFps})`;
-      fps.ctx.putImageData(fps.data, 0, 0);
-      if (this.maxPanels === 3) {
-        const memValue = Math.round(performance.memory.usedJSHeapSize * 9.54e-7);
-        this.minMem = Math.min(this.minMem, memValue);
-        this.maxMem = Math.max(this.maxMem, memValue);
-        this.#drawPanelData(mem.data.data, Math.min(30, 30 - memValue / 2), Stats.colorSchemes.mem);
-        mem.text.innerHTML = `<strong>${memValue} MEM</strong> (${this.minMem}-${this.maxMem})`;
-        mem.ctx.putImageData(mem.data, 0, 0);
-      }
-      this.lastFrame = now;
-      this.framesThisSec = 0;
-    }
   }
 
   #assignStyles(element, styles) {
@@ -216,6 +177,46 @@ class Stats {
         break;
       default:
         throw Error("Panel index out of range.");
+    }
+  }
+
+  update() {
+    const { ms, fps, mem } = this.DOMElements;
+    this.framesThisSec++;
+    this.now = performance.now();
+    const msValue = Math.round(now - last);
+    this.minMs = Math.min(this.minMs, msValue);
+    this.maxMs = Math.max(this.maxMs, msValue);
+    this.#drawPanelData(
+      ms.data.data,
+      Math.min(30, 30 - (msValue / 200) * 30),
+      Stats.colorSchemes.ms
+    );
+    ms.text.innerHTML = `<strong>${msValue} MS</strong>(${this.minMs}-${this.maxMs})`;
+    ms.ctx.putImageData(ms.data, 0, 0);
+    this.last = this.now;
+    const aSecondHasPassed = this.now > this.lastFrame + 1000;
+    if (aSecondHasPassed) {
+      const fpsValue = Math.round((this.framesThisSec * 1000) / (this.now - this.lastFrame));
+      this.minFps = Math.min(this.minFps, fpsValue);
+      this.maxFps = Math.max(this.maxFps, fpsValue);
+      this.#drawPanelData(
+        fps.data.data,
+        Math.min(30, 30 - (fpsValue / 100) * 30),
+        Stats.colorSchemes.fps
+      );
+      fps.text.innerHTML = `<strong>${fpsValue} FPS</strong> (${this.minFps}-${this.maxFps})`;
+      fps.ctx.putImageData(fps.data, 0, 0);
+      if (this.maxPanels === 3) {
+        const memValue = Math.round(performance.memory.usedJSHeapSize * 9.54e-7);
+        this.minMem = Math.min(this.minMem, memValue);
+        this.maxMem = Math.max(this.maxMem, memValue);
+        this.#drawPanelData(mem.data.data, Math.min(30, 30 - memValue / 2), Stats.colorSchemes.mem);
+        mem.text.innerHTML = `<strong>${memValue} MEM</strong> (${this.minMem}-${this.maxMem})`;
+        mem.ctx.putImageData(mem.data, 0, 0);
+      }
+      this.lastFrame = now;
+      this.framesThisSec = 0;
     }
   }
 }
