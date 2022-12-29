@@ -1,4 +1,8 @@
 class GameLoop {
+  #rafId = -1;
+  #lastFrame = -1;
+  #stopped = false;
+
   constructor(scope) {
     this.scope = scope;
 
@@ -8,9 +12,9 @@ class GameLoop {
     this.lastFrame = -1;
 
     if (this.scope.constants.showDebugStats) {
-      const viewport = this.scope.viewport;
-      const statsPositionX = viewport.offsetLeft + viewport.offsetWidth - Stats.containerWidth;
-      const statsPositionY = viewport.offsetTop + viewport.offsetHeight - Stats.containerHeight;
+      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.scope.viewport;
+      const statsPositionX = offsetLeft + offsetWidth - Stats.containerWidth;
+      const statsPositionY = offsetTop + offsetHeight - Stats.containerHeight;
       this.stats = new Stats({
         target: document.body,
         containerElementStyles: {
@@ -20,8 +24,6 @@ class GameLoop {
         },
       });
     }
-    this.rafId = -1;
-    this.stopped = false;
   }
 
   start() {
@@ -29,12 +31,12 @@ class GameLoop {
   }
 
   main(timestamp) {
-    if (this.stopped) return caf(this.rafId);
-    this.rafId = raf((t) => this.main(t));
+    if (this.#stopped) return caf(this.#rafId);
+    this.#rafId = raf((t) => this.main(t));
 
-    const elapsed = timestamp - this.lastFrame;
+    const elapsed = timestamp - this.#lastFrame;
     if (elapsed < this.fpsInterval) return;
-    this.lastFrame = timestamp - (elapsed % this.fpsInterval);
+    this.#lastFrame = timestamp - (elapsed % this.fpsInterval);
 
     this.scope.state = this.scope.updater.update(timestamp);
     this.scope.renderer.render();
@@ -42,6 +44,6 @@ class GameLoop {
   }
 
   stop() {
-    this.stopped = true;
+    this.#stopped = true;
   }
 }
