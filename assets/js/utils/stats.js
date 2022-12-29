@@ -1,4 +1,4 @@
-class ColorScheme {
+class PanelColorScheme {
   constructor(bg, fg) {
     this.bg = bg;
     this.fg = fg;
@@ -19,23 +19,24 @@ class Stats {
   static containerWidth = 80;
   static containerHeight = 50;
   static colorSchemes = {
-    fps: new ColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
-    ms: new ColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
-    mem: new ColorScheme(new Color(48, 16, 26), new Color(255, 0, 128)),
+    fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
+    ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
+    mem: new PanelColorScheme(new Color(48, 16, 26), new Color(255, 0, 128)),
   };
 
+  #target = null;
+  #DOMElements = {};
+  #containerElementStyles = [];
   #currentPanelIndex = 0;
   #maxPanels = 2;
 
-  constructor({ domElementStyles, appendTo } = {}) {
-    this.domElementStyles = domElementStyles;
-    this.appendTo = appendTo;
+  constructor({ containerElementStyles, target } = {}) {
+    this.#containerElementStyles = containerElementStyles;
+    this.#target = target;
     this.#setup();
   }
 
   #setup() {
-    this.DOMElements = {};
-
     const parent = document.createElement("div");
     this.#assignStyles(parent, {
       fontFamily: "Helvetica, Arial, sans-serif",
@@ -47,9 +48,9 @@ class Stats {
       cursor: "pointer",
     });
     parent.addEventListener("click", () => this.#nextPanel());
-    if (this.domElementStyles) this.#assignStyles(parent, this.domElementStyles);
-    if (this.appendTo) this.appendTo.appendChild(parent);
-    this.DOMElements.parent = parent;
+    if (this.#containerElementStyles) this.#assignStyles(parent, this.#containerElementStyles);
+    if (this.#target) this.#target.appendChild(parent);
+    this.#DOMElements.parent = parent;
 
     this.#createPanel("fps", true);
     this.#createPanel("ms", false);
@@ -102,7 +103,7 @@ class Stats {
     }
   }
 
-  #panelContainer(panelColor, display, appendTo) {
+  #panelContainer(panelColor, display, target) {
     const div = document.createElement("div");
     this.#assignStyles(div, {
       backgroundColor: `rgb(${Math.floor(Stats.colorSchemes[panelColor].bg.r / 2)},${Math.floor(
@@ -113,27 +114,27 @@ class Stats {
       height: `${Stats.containerHeight}px`,
       boxSizing: "border-box",
     });
-    appendTo.appendChild(div);
+    target.appendChild(div);
     return div;
   }
 
-  #panelText(panelType, appendTo) {
+  #panelText(panelType, target) {
     const div = document.createElement("div");
     div.innerHTML = `<strong>${panelType.toUpperCase()}</strong>`;
     this.#assignStyles(div, {
       color: `rgb(${Stats.colorSchemes[panelType].fg.r},${Stats.colorSchemes[panelType].fg.g},${Stats.colorSchemes[panelType].fg.b})`,
       margin: "0px 0px 1px 3px",
     });
-    appendTo.appendChild(div);
+    target.appendChild(div);
     return div;
   }
 
-  #panelCanvas(bgColor, appendTo) {
+  #panelCanvas(bgColor, target) {
     const canv = document.createElement("canvas");
     canv.width = Stats.panelWidth;
     canv.height = Stats.panelHeight;
     this.#assignStyles(canv, { display: "block", marginLeft: "3px" });
-    appendTo.appendChild(canv);
+    target.appendChild(canv);
 
     const ctx = canv.getContext("2d");
     ctx.fillStyle = `rgb(${bgColor.r},${bgColor.g},${bgColor.b})`;
@@ -145,17 +146,17 @@ class Stats {
 
   #createPanel(name, isFirst) {
     const display = isFirst ? "block" : "none";
-    const div = this.#panelContainer(name, display, this.DOMElements.parent);
-    this.DOMElements[name] = {};
-    this.DOMElements[name].div = div;
-    this.DOMElements[name].text = this.#panelText(name, div);
+    const div = this.#panelContainer(name, display, this.#DOMElements.parent);
+    this.#DOMElements[name] = {};
+    this.#DOMElements[name].div = div;
+    this.#DOMElements[name].text = this.#panelText(name, div);
     const [ctx, data] = this.#panelCanvas(Stats.colorSchemes[name].bg, div);
-    this.DOMElements[name].ctx = ctx;
-    this.DOMElements[name].data = data;
+    this.#DOMElements[name].ctx = ctx;
+    this.#DOMElements[name].data = data;
   }
 
   #nextPanel() {
-    const { fps, ms, mem } = this.DOMElements;
+    const { fps, ms, mem } = this.#DOMElements;
     this.#currentPanelIndex =
       ++this.#currentPanelIndex == this.#maxPanels ? 0 : this.#currentPanelIndex;
 
@@ -179,7 +180,7 @@ class Stats {
   }
 
   update() {
-    const { ms, fps, mem } = this.DOMElements;
+    const { ms, fps, mem } = this.#DOMElements;
     this.now = performance.now();
     this.framesThisSec++;
 

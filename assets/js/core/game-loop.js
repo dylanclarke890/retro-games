@@ -12,8 +12,8 @@ class GameLoop {
       const statsPositionX = viewport.offsetLeft + viewport.offsetWidth - Stats.containerWidth;
       const statsPositionY = viewport.offsetTop + viewport.offsetHeight - Stats.containerHeight;
       this.stats = new Stats({
-        appendTo: document.body,
-        domElementStyles: {
+        target: document.body,
+        containerElementStyles: {
           position: "absolute",
           left: statsPositionX + "px",
           top: statsPositionY + "px",
