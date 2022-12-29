@@ -13,12 +13,6 @@ class Color {
   }
 }
 
-function assignStyles(element, styles) {
-  for (const styleName in styles) {
-    element.style[styleName] = styles[styleName];
-  }
-}
-
 class Stats {
   static panelWidth = 74;
   static panelHeight = 30;
@@ -41,11 +35,11 @@ class Stats {
     this.appendTo = appendTo;
     this.DOMElements = {};
 
-    this.setup();
+    this.#setup();
   }
-  setup() {
+  #setup() {
     const parent = document.createElement("div");
-    assignStyles(parent, {
+    this.#assignStyles(parent, {
       fontFamily: "Helvetica, Arial, sans-serif",
       textAlign: "left",
       fontSize: "9px",
@@ -57,21 +51,33 @@ class Stats {
     parent.addEventListener("click", this.nextPanel);
     this.DOMElements.parent = parent;
 
-    this.fpsDiv = this.panelContainer("fps", "block", parent);
-    const fpsText = this.panelText("fps", this.fpsDiv);
-    const [fpsCtx, fpsData] = this.panelCanvas(this.fpsDiv, this.colorSchemes.fps.bg);
+    let ctx, data;
 
-    this.msDiv = this.panelContainer("ms", "none", parent);
-    const msText = this.panelText("ms", this.msDiv);
-    const [msCtx, msData] = this.panelCanvas(this.msDiv, this.colorSchemes.ms.bg);
+    this.DOMElements.fps = {};
+    this.DOMElements.fps.div = this.panelContainer("fps", "block", parent);
+    this.DOMElements.fps.text = this.panelText("fps", this.DOMElements.fps.div);
+    [ctx, data] = this.panelCanvas(this.DOMElements.fps.div, this.colorSchemes.fps.bg);
+    this.DOMElements.fps.ctx = ctx;
+    this.DOMElements.fps.data = data;
+
+    this.DOMElements.ms = {};
+    this.DOMElements.ms.div = this.panelContainer("ms", "none", parent);
+    this.DOMElements.ms.text = this.panelText("ms", this.DOMElements.ms.div);
+    [ctx, data] = this.panelCanvas(this.DOMElements.ms.div, this.colorSchemes.ms.bg);
+    this.DOMElements.ms.ctx = ctx;
+    this.DOMElements.ms.data = data;
 
     try {
-      if (performance && performance.memory.totalJSHeapSize) this.maxPanels = 3;
+      if (performance && performance.memory.totalJSHeapSize) {
+        this.maxPanels = 3;
+        this.DOMElements.mem = {};
+        this.DOMElements.mem.div = this.panelContainer("mem", "none", parent);
+        this.DOMElements.mem.text = this.panelText("mem", this.DOMElements.mem.div);
+        [ctx, data] = this.panelCanvas(this.DOMElements.mem.div, this.colorSchemes.mem.bg);
+        this.DOMElements.mem.ctx = ctx;
+        this.DOMElements.mem.data = data;
+      }
     } catch (ex) {}
-
-    this.memDiv = this.panelContainer("mem", "none", parent);
-    const memText = this.panelText("mem", this.memDiv);
-    const [memCtx, memData] = this.panelCanvas(this.memDiv, this.colorSchemes.mem.bg);
 
     if (domElementStyles) assignStyles(parent, domElementStyles);
     if (appendTo) appendTo.appendChild(parent);
@@ -86,8 +92,6 @@ class Stats {
     this.now = performance.now();
     this.last = this.now;
     this.lastFrame = this.now;
-
-    this.domElement = parent;
   }
 
   update() {
@@ -117,6 +121,12 @@ class Stats {
       }
       lastFrame = now;
       framesThisSec = 0;
+    }
+  }
+
+  #assignStyles(element, styles) {
+    for (const styleName in styles) {
+      element.style[styleName] = styles[styleName];
     }
   }
 
