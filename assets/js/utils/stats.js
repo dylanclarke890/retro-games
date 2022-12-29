@@ -75,33 +75,33 @@ class Stats {
   }
 
   #assignStyles(element, styles) {
-    for (const styleName in styles) {
-      element.style[styleName] = styles[styleName];
-    }
+    for (const styleName in styles) element.style[styleName] = styles[styleName];
   }
 
   #drawPanelData(data, minVal, colorScheme) {
     const width = Stats.panelWidth;
     const height = Stats.panelHeight;
 
+    // moving existing data across one "column"
     for (let i = 0; i < height; i++)
       for (let j = 0; j < width - 1; j++) {
-        const L = (j + i * width) * 4;
-        data[L] = data[L + 4];
-        data[L + 1] = data[L + 5];
-        data[L + 2] = data[L + 6];
+        const currentByte = (j + i * width) * 4;
+        data[currentByte] = data[currentByte + 4];
+        data[currentByte + 1] = data[currentByte + 5];
+        data[currentByte + 2] = data[currentByte + 6];
       }
 
+    // filling in "column" with new data.
     for (let i = 0; i < height; i++) {
-      const L = (width - 1 + i * width) * 4;
+      const currentByte = (width - 1 + i * width) * 4;
       if (i < minVal) {
-        data[L] = colorScheme.bg.r;
-        data[L + 1] = colorScheme.bg.g;
-        data[L + 2] = colorScheme.bg.b;
+        data[currentByte] = colorScheme.bg.r;
+        data[currentByte + 1] = colorScheme.bg.g;
+        data[currentByte + 2] = colorScheme.bg.b;
       } else {
-        data[L] = colorScheme.fg.r;
-        data[L + 1] = colorScheme.fg.g;
-        data[L + 2] = colorScheme.fg.b;
+        data[currentByte] = colorScheme.fg.r;
+        data[currentByte + 1] = colorScheme.fg.g;
+        data[currentByte + 2] = colorScheme.fg.b;
       }
     }
   }
