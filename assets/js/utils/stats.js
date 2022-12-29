@@ -14,10 +14,10 @@ class Color {
 }
 
 class Stats {
-  static panelWidth = 74;
-  static panelHeight = 30;
-  static containerWidth = 80;
-  static containerHeight = 50;
+  static panelWidth = 106;
+  static panelHeight = 40;
+  static containerWidth = 110;
+  static containerHeight = 60;
   static colorSchemes = {
     fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
     ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
@@ -81,16 +81,19 @@ class Stats {
   }
 
   #drawPanelData(data, minVal, colorScheme) {
-    for (let i = 0; i < 30; i++)
-      for (let j = 0; j < 73; j++) {
-        const L = (j + i * 74) * 4;
+    const width = Stats.panelWidth;
+    const height = Stats.panelHeight;
+
+    for (let i = 0; i < height; i++)
+      for (let j = 0; j < width - 1; j++) {
+        const L = (j + i * width) * 4;
         data[L] = data[L + 4];
         data[L + 1] = data[L + 5];
         data[L + 2] = data[L + 6];
       }
 
-    for (let i = 0; i < 30; i++) {
-      const L = (73 + i * 74) * 4;
+    for (let i = 0; i < height; i++) {
+      const L = (width - 1 + i * width) * 4;
       if (i < minVal) {
         data[L] = colorScheme.bg.r;
         data[L + 1] = colorScheme.bg.g;
