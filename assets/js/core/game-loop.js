@@ -2,55 +2,43 @@ class GameLoop {
   constructor(scope) {
     this.scope = scope;
 
+    // FPS properties
     this.targetFps = scope.constants.targetFps;
     this.fpsInterval = 1000 / this.targetFps;
+    this.lastFrame = -1;
 
-    this.uptime = -1;
-    this.currentFrameStart = -1;
-    this.lastFrameStart = -1;
-    this.lastFrameEnd = -1;
-    this.actualFps = -1;
-    this.fpsTracker = new AverageFPSTracker();
-
+    if (this.scope.constants.showDebugStats) {
+      const viewport = this.scope.viewport;
+      const statsPositionX = viewport.offsetLeft + viewport.offsetWidth - Stats.containerWidth;
+      const statsPositionY = viewport.offsetTop + viewport.offsetHeight - Stats.containerHeight;
+      this.stats = new Stats({
+        appendTo: document.body,
+        domElementStyles: {
+          position: "absolute",
+          left: statsPositionX + "px",
+          top: statsPositionY + "px",
+        },
+      });
+    }
     this.rafId = -1;
     this.stopped = false;
   }
 
-  #frameStart = (time) => {
-    this.lastFrameStart = this.currentFrameStart;
-    this.currentFrameStart = time;
-    this.lastFrameEnd = time;
-  };
-
-  #getDeltaTime = () => this.lastFrameEnd - this.lastFrameStart;
-  #getUptimeTime = () => now() - this.loopStartedAt;
-
-  #getCurrentFps = () => Math.round(1000 / (this.lastFrameEnd - this.lastFrameStart));
-
   start() {
-    const currentTime = now();
-    this.main(currentTime);
-    this.loopStartedAt = currentTime;
+    this.main(now());
   }
 
   main(timestamp) {
     if (this.stopped) return caf(this.rafId);
-
-    this.#frameStart(timestamp);
     this.rafId = raf((t) => this.main(t));
-    this.uptime = this.#getUptimeTime();
-    // FIXME!
-    // const elapsed = this.#getDeltaTime();
-    // this line is currently causing skipped frames.
-    // if (elapsed < this.fpsInterval) {
-    //   this.fpsTracker.push(0);
-    //   return;
-    // }
 
-    this.fpsTracker.push(this.#getCurrentFps());
-    this.scope.fps = this.fpsTracker.averageFps;
+    const elapsed = timestamp - this.lastFrame;
+    if (elapsed < this.fpsInterval) return;
+    this.lastFrame = timestamp - (elapsed % this.fpsInterval);
+
     this.scope.state = this.scope.updater.update(timestamp);
     this.scope.renderer.render();
+    if (this.scope.constants.showDebugStats) this.stats.update();
   }
 
   stop() {

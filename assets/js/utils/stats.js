@@ -20,6 +20,10 @@ function assignStyles(element, styles) {
 }
 
 class Stats {
+  static panelWidth = 74;
+  static panelHeight = 30;
+  static containerWidth = 80;
+  static containerHeight = 50;
   currentPanelIndex = 0;
   maxPanels = 2;
   colorSchemes = {
@@ -36,26 +40,27 @@ class Stats {
       textAlign: "left",
       fontSize: "9px",
       opacity: "0.9",
-      width: "80px",
+      width: `${Stats.containerWidth}px`,
+      height: `${Stats.containerHeight}px`,
       cursor: "pointer",
     });
     parent.addEventListener("click", this.nextPanel, false);
 
     this.fpsDiv = this.panelContainer("fps", "block", parent);
-    const fpsText = this.panelText("fps", fpsDiv);
-    const [fpsCtx, fpsData] = this.panelCanvas(fpsDiv, this.colorSchemes.fps.bg);
+    const fpsText = this.panelText("fps", this.fpsDiv);
+    const [fpsCtx, fpsData] = this.panelCanvas(this.fpsDiv, this.colorSchemes.fps.bg);
 
     this.msDiv = this.panelContainer("ms", "none", parent);
-    const msText = this.panelText("ms", msDiv);
-    const [msCtx, msData] = this.panelCanvas(msDiv, this.colorSchemes.ms.bg);
+    const msText = this.panelText("ms", this.msDiv);
+    const [msCtx, msData] = this.panelCanvas(this.msDiv, this.colorSchemes.ms.bg);
 
     try {
       if (performance && performance.memory.totalJSHeapSize) this.maxPanels = 3;
     } catch (ex) {}
 
     this.memDiv = this.panelContainer("mem", "none", parent);
-    const memText = this.panelText("mem", memDiv);
-    const [memCtx, memData] = this.panelCanvas(memDiv, this.colorSchemes.mem.bg);
+    const memText = this.panelText("mem", this.memDiv);
+    const [memCtx, memData] = this.panelCanvas(this.memDiv, this.colorSchemes.mem.bg);
 
     const { domElementStyles, appendTo } = settings;
     if (domElementStyles) assignStyles(parent, domElementStyles);
@@ -136,6 +141,8 @@ class Stats {
       )},${Math.floor(this.colorSchemes[panelColor].bg.b / 2)})`,
       padding: "2px 0px 3px 0px",
       display,
+      height: `${Stats.containerHeight}px`,
+      boxSizing: "border-box",
     });
     appendTo.appendChild(div);
     return div;
@@ -154,8 +161,8 @@ class Stats {
 
   panelCanvas = (appendTo, bgColor) => {
     const canv = document.createElement("canvas");
-    canv.width = 74;
-    canv.height = 30;
+    canv.width = Stats.panelWidth;
+    canv.height = Stats.panelHeight;
     assignStyles(canv, { display: "block", marginLeft: "3px" });
     appendTo.appendChild(canv);
 

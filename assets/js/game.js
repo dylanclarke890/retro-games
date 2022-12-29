@@ -1,10 +1,10 @@
 class Game {
-  constructor(w, h, targetFps, showFps) {
+  constructor(w, h, targetFps, showDebugStats) {
     this.constants = {
       w,
       h,
       targetFps,
-      showFps,
+      showDebugStats,
     };
     this.state = {};
 
@@ -12,7 +12,7 @@ class Game {
     this.ctx = this.viewport.getContext("2d");
     document.body.insertBefore(this.viewport, document.body.firstChild);
 
-    this.state.entities = this.state.entities || {};
+    this.state.entities = {};
     this.state.entities.player = new Player(this, this.constants.w / 2, this.constants.h - 100);
 
     this.updater = new GameUpdater(this);
