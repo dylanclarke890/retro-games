@@ -1,5 +1,4 @@
 function getPixelRatio(context) {
-  console.log("Determining pixel ratio.");
   const backingStores = [
     "backingStorePixelRatio",
     "webkitBackingStorePixelRatio",
@@ -17,7 +16,6 @@ function getPixelRatio(context) {
 }
 
 function generateCanvas(w, h) {
-  console.log("Generating canvas.");
   const canvas = document.createElement("canvas"),
     ctx = canvas.getContext("2d");
   const ratio = getPixelRatio(ctx);
