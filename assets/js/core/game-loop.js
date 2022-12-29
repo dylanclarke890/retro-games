@@ -35,12 +35,17 @@ class GameLoop {
 
   main(timestamp) {
     if (this.stopped) return caf(this.rafId);
+
     this.#frameStart(timestamp);
     this.rafId = raf((t) => this.main(t));
-
     this.uptime = this.#getUptimeTime();
-    const elapsed = this.#getDeltaTime();
-    if (elapsed < this.fpsInterval) return; // this line is currently causing skipped frames.
+    // FIXME!
+    // const elapsed = this.#getDeltaTime();
+    // this line is currently causing skipped frames.
+    // if (elapsed < this.fpsInterval) {
+    //   this.fpsTracker.push(0);
+    //   return;
+    // }
 
     this.fpsTracker.push(this.#getCurrentFps());
     this.scope.fps = this.fpsTracker.averageFps;

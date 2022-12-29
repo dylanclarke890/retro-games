@@ -5,7 +5,7 @@ Number.prototype.boundary = function (min, max) {
 
 class AverageFPSTracker {
   // 50 seems to be the min needed to get an accurate number.
-  constructor(maxEntriesAtOneTime = 50) {
+  constructor(maxEntriesAtOneTime = 100) {
     this.entries = [];
     this.maxEntries = maxEntriesAtOneTime;
   }
