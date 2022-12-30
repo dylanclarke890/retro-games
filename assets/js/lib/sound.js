@@ -53,12 +53,11 @@ class SoundManager {
         this.loadHTML5Audio(path, multiChannel, loadCallback);
   }
 
-  loadWebAudio(path, multiChannel, loadCallback) {
-    // Path to the soundfile with the right extension (.ogg or .mp3)
-    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
-
+  loadWebAudio(path, _multiChannel, loadCallback) {
     if (this.clips[path]) return this.clips[path];
 
+    // Path to the soundfile with the right extension (.ogg or .mp3)
+    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
     const audioSource = new ig.Sound.WebAudioSource();
     this.clips[path] = audioSource;
 
@@ -66,15 +65,15 @@ class SoundManager {
     request.open("GET", realPath, true);
     request.responseType = "arraybuffer";
 
-    request.onload = (ev) => {
+    request.onload = (event) => {
       this.audioContext.decodeAudioData(
         request.response,
-        function (buffer) {
+        (buffer) => {
           audioSource.buffer = buffer;
-          if (loadCallback) loadCallback(path, true, ev);
+          if (loadCallback) loadCallback(path, true, event);
         },
-        (ev) => {
-          if (loadCallback) loadCallback(path, false, ev);
+        (event) => {
+          if (loadCallback) loadCallback(path, false, event);
         }
       );
     };
@@ -87,20 +86,18 @@ class SoundManager {
   }
 
   loadHTML5Audio(path, multiChannel, loadCallback) {
-    // Path to the soundfile with the right extension (.ogg or .mp3)
-    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
-
     // Sound file already loaded?
     if (this.clips[path]) {
       // Loaded as WebAudio, but now requested as HTML5 Audio? Probably Music?
-      if (this.clips[path] instanceof ig.Sound.WebAudioSource) {
-        return this.clips[path];
-      }
+      if (this.clips[path] instanceof ig.Sound.WebAudioSource) return this.clips[path]; // TODO
 
       // Only loaded as single channel and now requested as multichannel?
+      // TODO
       if (multiChannel && this.clips[path].length < ig.Sound.channels) {
-        for (var i = this.clips[path].length; i < ig.Sound.channels; i++) {
-          var a = new Audio(realPath);
+        // Path to the soundfile with the right extension (.ogg or .mp3)
+        const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
+        for (let i = this.clips[path].length; i < ig.Sound.channels; i++) {
+          const a = new Audio(realPath);
           a.load();
           this.clips[path].push(a);
         }
@@ -108,7 +105,7 @@ class SoundManager {
       return this.clips[path][0];
     }
 
-    var clip = new Audio(realPath);
+    const clip = new Audio(realPath);
     if (loadCallback) {
       // The canplaythrough event is dispatched when the browser determines
       // that the sound can be played without interuption, provided the
@@ -116,11 +113,8 @@ class SoundManager {
       // Mobile browsers stubbornly refuse to preload HTML5, so we simply
       // ignore the canplaythrough event and immediately "fake" a successful
       // load callback
-      if (ig.ua.mobile) {
-        setTimeout(function () {
-          loadCallback(path, true, null);
-        }, 0);
-      } else {
+      if (ig.ua.mobile) setTimeout(() => loadCallback(path, true, null), 0); // TODO
+      else {
         clip.addEventListener(
           "canplaythrough",
           function cb(ev) {
@@ -129,27 +123,21 @@ class SoundManager {
           },
           false
         );
-
-        clip.addEventListener(
-          "error",
-          function (ev) {
-            loadCallback(path, false, ev);
-          },
-          false
-        );
+        clip.addEventListener("error", (ev) => loadCallback(path, false, ev), false);
       }
     }
     clip.preload = "auto";
     clip.load();
 
     this.clips[path] = [clip];
-    if (multiChannel) {
-      for (var i = 1; i < ig.Sound.channels; i++) {
-        var a = new Audio(realPath);
+    if (multiChannel)
+      for (let i = 1; i < ig.Sound.channels; i++) {
+        // TODO
+        const a = new Audio(realPath);
         a.load();
         this.clips[path].push(a);
       }
-    }
+
     return clip;
   }
 
