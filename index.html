@@ -21,6 +21,7 @@
     <button id="stop">Stop Animating</button>
     <!-- #region LIB -->
     <script src="assets/js/lib/vendor-attributes.js"></script>
+    <script src="assets/js/lib/user-agent.js"></script>
     <script src="assets/js/lib/polyfills.js"></script>
     <script src="assets/js/lib/native-object-extensions.js"></script>
     <script src="assets/js/lib/events.js"></script>
@@ -42,6 +43,11 @@
 
     <!-- #region GAME -->
     <script src="assets/js/game.js"></script>
+    <script src="assets/js/core/runner.js"></script>
     <!-- #endregion GAME -->
+
+    <script type="text/javascript">
+      const runner = new GameRunner();
+    </script>
   </body>
 </html>
