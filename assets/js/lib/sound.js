@@ -164,25 +164,25 @@ class Music {
   currentTrack = null;
   currentIndex = 0;
   random = false;
-
   #volume = 1;
   #loop = false;
   #fadeInterval = 0;
   #fadeTimer = null;
-  _endedCallbackBound = null;
 
-  constructor() {
-    this._endedCallbackBound = this.#endedCallback.bind(this);
+  get loop() {
+    // TODO - do we need the other methods?
+    return {
+      get: () => this.getLooping(),
+      set: (value) => this.setLooping(value),
+    };
+  }
 
-    Object.defineProperty(this, "volume", {
-      get: this.getVolume.bind(this),
-      set: this.setVolume.bind(this),
-    });
-
-    Object.defineProperty(this, "loop", {
-      get: this.getLooping.bind(this),
-      set: this.setLooping.bind(this),
-    });
+  get volume() {
+    // TODO - do we need the other methods?
+    return {
+      get: () => this.getVolume(),
+      set: (value) => this.setVolume(value),
+    };
   }
 
   add(music, name) {
@@ -202,7 +202,7 @@ class Music {
 
     track.loop = this.#loop;
     track.volume = this.#volume;
-    track.addEventListener("ended", this._endedCallbackBound, false); // TODO
+    track.addEventListener("ended", () => this.#endedCallback, false); // TODO
     this.tracks.push(track);
 
     if (name) this.namedTracks[name] = track;
@@ -265,7 +265,7 @@ class Music {
     if (!this.currentTrack) return;
     clearInterval(this.#fadeInterval);
     this.#fadeTimer = new Timer(time);
-    this.#fadeInterval = setInterval(this.#fadeStep.bind(this), 50); // TODO
+    this.#fadeInterval = setInterval(() => this.#fadeStep(), 50); // TODO
   }
 
   #fadeStep() {
@@ -307,13 +307,15 @@ class Sound {
   constructor(path, multiChannel) {
     this.path = path;
     this.multiChannel = multiChannel !== false;
-
-    Object.defineProperty(this, "loop", {
-      get: this.getLooping.bind(this),
-      set: this.setLooping.bind(this),
-    });
-
     this.load();
+  }
+
+  get loop() {
+    // TODO - do we need the other methods?
+    return {
+      get: () => this.getLooping(),
+      set: (value) => this.setLooping(value),
+    };
   }
 
   getLooping() {
@@ -358,36 +360,37 @@ class WebAudioSource {
   sources = [];
   gain = null;
   buffer = null;
-  _loop = false;
+  #loop = false;
 
   constructor() {
     this.gain = ig.soundManager.audioContext.createGain(); // TODO
     this.gain.connect(ig.soundManager.audioContext.destination);
+  }
 
-    Object.defineProperty(this, "loop", {
-      get: this.getLooping.bind(this),
-      set: this.setLooping.bind(this),
-    });
+  get loop() {
+    // TODO - do we need the other methods?
+    return {
+      get: () => this.getLooping(),
+      set: (value) => this.setLooping(value),
+    };
+  }
 
-    Object.defineProperty(this, "volume", {
-      get: this.getVolume.bind(this),
-      set: this.setVolume.bind(this),
-    });
+  get volume() {
+    // TODO - do we need the other methods?
+    return {
+      get: () => this.getVolume(),
+      set: (value) => this.setVolume(value),
+    };
   }
 
   play() {
     if (!this.buffer) return;
-
     const source = ig.soundManager.audioContext.createBufferSource(); // TODO
     source.buffer = this.buffer;
     source.connect(this.gain);
-    source.loop = this._loop;
-
-    // Add this new source to our sources array and remove it again
-    // later when it has finished playing.
-    this.sources.push(source);
-    source.onended = () => this.sources.erase(source);
-
+    source.loop = this.#loop;
+    this.sources.push(source); // Add this new source to our sources array
+    source.onended = () => this.sources.erase(source); // remove it when it has finished playing.
     source.start(0);
   }
 
@@ -400,12 +403,11 @@ class WebAudioSource {
   }
 
   getLooping() {
-    return this._loop;
+    return this.#loop;
   }
 
   setLooping(loop) {
-    this._loop = loop;
-
+    this.#loop = loop;
     for (let i = 0; i < this.sources.length; i++) this.sources[i].loop = loop;
   }
 
