@@ -1,6 +1,3 @@
-const imageCache = {};
-let drawCount = 0;
-
 class Image {
   data = null;
   width = 0;
@@ -16,10 +13,6 @@ class Image {
     this.load();
   }
 
-  staticInstantiate(path) {
-    return imageCache[path] || null;
-  }
-
   load(loadCallback) {
     if (this.loaded) {
       if (loadCallback) loadCallback(this.path, true);
@@ -32,7 +25,7 @@ class Image {
       this.data.src = this.path;
     } else scope.addResource(this);
 
-    imageCache[this.path] = this;
+    this.scope.cacheImage(this.path, this);
   }
 
   reload() {
@@ -90,33 +83,35 @@ class Image {
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
 
-    const scale = this.scope.constants.scale;
+    const scope = this.scope;
+    const scale = scope.constants.scale;
     sourceX = sourceX ? sourceX * scale : 0;
     sourceY = sourceY ? sourceY * scale : 0;
     width = (width ? width : this.width) * scale;
     height = (height ? height : this.height) * scale;
 
-    this.scope.ctx.drawImage(
+    scope.ctx.drawImage(
       this.data,
       sourceX,
       sourceY,
       width,
       height,
-      ig.system.getDrawPos(targetX), // TODO
-      ig.system.getDrawPos(targetY),
+      scope.renderer.drawMode(targetX),
+      scope.renderer.drawMode(targetY),
       width,
       height
     );
 
-    drawCount++;
+    scope.imageDrawn();
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
     tileHeight = tileHeight ? tileHeight : tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const scale = this.scope.constants.scale,
-      ctx = this.scope.ctx;
+    const scope = this.scope,
+      scale = scope.constants.scale,
+      ctx = scope.ctx;
     const tileWidthScaled = Math.floor(tileWidth * scale);
     const tileHeightScaled = Math.floor(tileHeight * scale);
 
@@ -133,13 +128,13 @@ class Image {
       Math.floor((tile * tileWidth) / this.width) * tileHeight * scale,
       tileWidthScaled,
       tileHeightScaled,
-      ig.system.getDrawPos(targetX) * scaleX - (flipX ? tileWidthScaled : 0), // TODO
-      ig.system.getDrawPos(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
+      scope.renderer.drawMode(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
+      scope.renderer.drawMode(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
       tileWidthScaled,
       tileHeightScaled
     );
 
     if (flipX || flipY) ctx.restore();
-    drawCount++;
+    scope.imageDrawn();
   }
 }

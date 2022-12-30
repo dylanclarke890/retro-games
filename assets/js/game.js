@@ -1,5 +1,7 @@
 class Game {
   #resources = [];
+  #imageCache = {};
+  #drawCount = 0;
 
   constructor({ w, h, targetFps, showDebugStats } = {}) {
     this.state = {};
@@ -23,17 +25,32 @@ class Game {
 
     this.updater = new GameUpdater(this);
     this.renderer = new GameRenderer(this);
-    this.loop = new GameLoop(this);
+
+    if (this.constants.scale !== 1) this.renderer.scaleMode = this.renderer.SCALE.CRISP;
+    this.renderer.scaleMode(this.ctx);
 
     const stopBtn = document.getElementById("stop");
     stopBtn.addEventListener("click", () => this.loop.stop());
 
-    this.ready = true;
+    this.loop = new GameLoop(this);
     this.loop.start();
+    this.ready = true;
   }
 
   addResource(resource) {
     this.#resources.push(resource);
+  }
+
+  imageDrawn() {
+    this.#drawCount++;
+  }
+
+  get totalImagesDrawn() {
+    return this.#drawCount;
+  }
+
+  cacheImage(key, image) {
+    this.#imageCache[key] = image;
   }
 }
 
