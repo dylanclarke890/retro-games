@@ -4,26 +4,28 @@ class SoundManager {
   format = null;
 
   constructor() {
+    VendorAttributes.normalise(window, "AudioContext");
+
     // Quick sanity check if the Browser supports the Audio tag
-    if (Sound.enabled || !window.Audio) {
-      Sound.enabled = false; // TODO
+    if (!Sound.enabled || !window.Audio) {
+      Sound.enabled = false;
       return;
     }
 
     // Probe sound formats and determine the file extension to load
     const probe = new Audio();
-    for (let i = 0; i < ig.Sound.use.length; i++) {
-      const format = ig.Sound.use[i]; // TODO
+    for (let i = 0; i < Sound.use.length; i++) {
+      const format = Sound.use[i];
       if (!probe.canPlayType(format.mime)) continue;
       this.format = format;
       break;
     }
 
     // No compatible format found? -> Disable sound
-    if (!this.format) ig.Sound.enabled = false; // TODO
+    if (!this.format) Sound.enabled = false;
 
     // Create WebAudio Context
-    if (Sound.enabled && ig.Sound.useWebAudio) {
+    if (Sound.enabled && Sound.useWebAudio) {
       // TODO
       this.audioContext = new AudioContext();
       this.boundWebAudioUnlock = this.unlockWebAudio.bind(this);
@@ -46,7 +48,7 @@ class SoundManager {
   }
 
   load(path, multiChannel, loadCallback) {
-    return multiChannel && ig.Sound.useWebAudio
+    return multiChannel && Sound.useWebAudio
       ? // Requested as Multichannel and we're using WebAudio?
         this.loadWebAudio(path, multiChannel, loadCallback)
       : // Oldschool HTML5 Audio - always used for Music
@@ -58,7 +60,7 @@ class SoundManager {
 
     // Path to the soundfile with the right extension (.ogg or .mp3)
     const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
-    const audioSource = new ig.Sound.WebAudioSource();
+    const audioSource = new WebAudioSource();
     this.clips[path] = audioSource;
 
     const request = new XMLHttpRequest();
@@ -89,14 +91,14 @@ class SoundManager {
     // Sound file already loaded?
     if (this.clips[path]) {
       // Loaded as WebAudio, but now requested as HTML5 Audio? Probably Music?
-      if (this.clips[path] instanceof ig.Sound.WebAudioSource) return this.clips[path]; // TODO
+      if (this.clips[path] instanceof WebAudioSource) return this.clips[path]; // TODO
 
       // Only loaded as single channel and now requested as multichannel?
       // TODO
-      if (multiChannel && this.clips[path].length < ig.Sound.channels) {
+      if (multiChannel && this.clips[path].length < Sound.channels) {
         // Path to the soundfile with the right extension (.ogg or .mp3)
         const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
-        for (let i = this.clips[path].length; i < ig.Sound.channels; i++) {
+        for (let i = this.clips[path].length; i < Sound.channels; i++) {
           const a = new Audio(realPath);
           a.load();
           this.clips[path].push(a);
@@ -131,7 +133,7 @@ class SoundManager {
 
     this.clips[path] = [clip];
     if (multiChannel)
-      for (let i = 1; i < ig.Sound.channels; i++) {
+      for (let i = 1; i < Sound.channels; i++) {
         // TODO
         const a = new Audio(realPath);
         a.load();
@@ -145,7 +147,7 @@ class SoundManager {
     // Find and return a channel that is not currently playing
     const channels = this.clips[path];
     // Is this a WebAudio source? We only ever have one for each Sound
-    if (channels && channels instanceof ig.Sound.WebAudioSource) return channels; // TODO
+    if (channels && channels instanceof WebAudioSource) return channels; // TODO
     // Oldschool HTML5 Audio - find a channel that's not currently
     // playing or, if all are playing, rewind one
     for (let i = 0, clip; (clip = channels[i++]); ) {
@@ -169,10 +171,10 @@ class Music {
   currentIndex = 0;
   random = false;
 
-  _volume = 1;
-  _loop = false;
-  _fadeInterval = 0;
-  _fadeTimer = null;
+  #volume = 1;
+  #loop = false;
+  #fadeInterval = 0;
+  #fadeTimer = null;
   _endedCallbackBound = null;
 
   constructor() {
@@ -190,37 +192,31 @@ class Music {
   }
 
   add(music, name) {
-    if (!ig.Sound.enabled)
-      // TODO
-      return;
-
-    const path = music instanceof ig.Sound ? music.path : music; // TODO
-
+    if (!Sound.enabled) return;
+    const path = music instanceof Sound ? music.path : music;
     const track = ig.soundManager.load(path, false); // TODO
 
     // Did we get a WebAudio Source? This is suboptimal; Music should be loaded
-    // as HTML5 Audio so it can be streamed TODO
-    if (track instanceof ig.Sound.WebAudioSource) {
+    // as HTML5 Audio so it can be streamed
+    if (track instanceof WebAudioSource) {
       // Since this error will likely occur at game start, we stop the game
       // to not produce any more errors.
-      ig.system.stopRunLoop();
-      throw new Error(`
-      Sound '${path}' loaded as MultiChannel but used for music. Set the multiChannel param to false when loading.`);
+      throw new Error(
+        `Sound '${path}' loaded as MultiChannel but used for music. Set the multiChannel param to false when loading.`
+      );
     }
 
-    track.loop = this._loop;
-    track.volume = this._volume;
-    track.addEventListener("ended", this._endedCallbackBound, false);
+    track.loop = this.#loop;
+    track.volume = this.#volume;
+    track.addEventListener("ended", this._endedCallbackBound, false); // TODO
     this.tracks.push(track);
 
     if (name) this.namedTracks[name] = track;
-
     if (!this.currentTrack) this.currentTrack = track;
   }
 
   next() {
     if (!this.tracks.length) return;
-
     this.stop();
     this.currentIndex = this.random
       ? Math.floor(Math.random() * this.tracks.length)
@@ -231,13 +227,11 @@ class Music {
 
   pause() {
     if (!this.currentTrack) return;
-
     this.currentTrack.pause();
   }
 
   stop() {
     if (!this.currentTrack) return;
-
     this.currentTrack.pause();
     this.currentTrack.currentTime = 0;
   }
@@ -256,49 +250,60 @@ class Music {
   }
 
   getLooping() {
-    return this._loop;
+    return this.#loop;
   }
 
   setLooping(l) {
-    this._loop = l;
+    this.#loop = l;
     for (let i in this.tracks) this.tracks[i].loop = l;
   }
 
   getVolume() {
-    return this._volume;
+    return this.#volume;
   }
 
   setVolume(v) {
-    this._volume = v.limit(0, 1);
-    for (let i in this.tracks) this.tracks[i].volume = this._volume;
+    this.#volume = v.constrain(0, 1);
+    for (let i in this.tracks) this.tracks[i].volume = this.#volume;
   }
 
   fadeOut(time) {
     if (!this.currentTrack) return;
-    clearInterval(this._fadeInterval);
-    this._fadeTimer = new ig.Timer(time);
-    this._fadeInterval = setInterval(this.#fadeStep.bind(this), 50); // TODO
+    clearInterval(this.#fadeInterval);
+    this.#fadeTimer = new Timer(time);
+    this.#fadeInterval = setInterval(this.#fadeStep.bind(this), 50); // TODO
   }
 
   #fadeStep() {
     const v =
-      this._fadeTimer.delta().map(-this._fadeTimer.target, 0, 1, 0).limit(0, 1) * this._volume;
+      this.#fadeTimer.delta().map(-this.#fadeTimer.target, 0, 1, 0).limit(0, 1) * this.#volume;
 
     if (v <= 0.01) {
       this.stop();
-      this.currentTrack.volume = this._volume;
-      clearInterval(this._fadeInterval);
+      this.currentTrack.volume = this.#volume;
+      clearInterval(this.#fadeInterval);
     } else this.currentTrack.volume = v;
   }
 
   #endedCallback() {
-    if (this._loop) this.play();
+    if (this.#loop) this.play();
     else this.next();
   }
 }
 
 class Sound {
+  static FORMAT = {
+    MP3: { ext: "mp3", mime: "audio/mpeg" },
+    M4A: { ext: "m4a", mime: "audio/mp4; codecs=mp4a.40.2" },
+    OGG: { ext: "ogg", mime: "audio/ogg; codecs=vorbis" },
+    WEBM: { ext: "webm", mime: "audio/webm; codecs=vorbis" },
+    CAF: { ext: "caf", mime: "audio/x-caf" },
+  };
   static enabled = true;
+  static use = [Sound.FORMAT.OGG, Sound.FORMAT.MP3];
+  static useWebAudio = !!window.AudioContext;
+  static channels = 4;
+
   path = "";
   volume = 1;
   currentClip = null;
@@ -362,7 +367,7 @@ class WebAudioSource {
   _loop = false;
 
   constructor() {
-    this.gain = ig.soundManager.audioContext.createGain();
+    this.gain = ig.soundManager.audioContext.createGain(); // TODO
     this.gain.connect(ig.soundManager.audioContext.destination);
 
     Object.defineProperty(this, "loop", {
@@ -418,16 +423,3 @@ class WebAudioSource {
     this.gain.gain.value = volume;
   }
 }
-
-ig.Sound.FORMAT = {
-  MP3: { ext: "mp3", mime: "audio/mpeg" },
-  M4A: { ext: "m4a", mime: "audio/mp4; codecs=mp4a.40.2" },
-  OGG: { ext: "ogg", mime: "audio/ogg; codecs=vorbis" },
-  WEBM: { ext: "webm", mime: "audio/webm; codecs=vorbis" },
-  CAF: { ext: "caf", mime: "audio/x-caf" },
-};
-ig.Sound.use = [ig.Sound.FORMAT.OGG, ig.Sound.FORMAT.MP3];
-ig.Sound.channels = 4;
-ig.Sound.enabled = true;
-ig.normalizeVendorAttribute(window, "AudioContext");
-ig.Sound.useWebAudio = !!window.AudioContext;
