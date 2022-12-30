@@ -83,10 +83,22 @@ class NativeExtensions {
           target[sourceKey] = srcValue;
         else {
           if (!target[sourceKey] || typeof target[sourceKey] !== "object")
-            target[sourceKey] = srcValue instanceof Array ? [] : {};
-          extend(target[sourceKey], srcValue);
+            target[sourceKey] = Array.isArray(srcValue) ? [] : {};
+          NativeExtensions.extend(target[sourceKey], srcValue);
         }
       }
     return target;
+  }
+
+  static copy(object) {
+    if (!object || typeof object !== "object" || object instanceof HTMLElement) return object;
+    if (Array.isArray(object)) {
+      const copied = [];
+      for (let i = 0, l = object.length; i < l; i++) copied[i] = NativeExtensions.copy(object[i]);
+      return copied;
+    }
+    const copied = {};
+    for (let i in object) copied[i] = NativeExtensions.copy(object[i]);
+    return copied;
   }
 }
