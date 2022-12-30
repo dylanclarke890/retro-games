@@ -162,21 +162,21 @@ class SoundManager {
   }
 }
 
-ig.Music = ig.Class.extend({
-  tracks: [],
-  namedTracks: {},
-  currentTrack: null,
-  currentIndex: 0,
-  random: false,
+class Music {
+  tracks = [];
+  namedTracks = {};
+  currentTrack = null;
+  currentIndex = 0;
+  random = false;
 
-  _volume: 1,
-  _loop: false,
-  _fadeInterval: 0,
-  _fadeTimer: null,
-  _endedCallbackBound: null,
+  _volume = 1;
+  _loop = false;
+  _fadeInterval = 0;
+  _fadeTimer = null;
+  _endedCallbackBound = null;
 
-  init: function () {
-    this._endedCallbackBound = this._endedCallback.bind(this);
+  constructor() {
+    this._endedCallbackBound = this.#endedCallback.bind(this);
 
     Object.defineProperty(this, "volume", {
       get: this.getVolume.bind(this),
@@ -187,29 +187,25 @@ ig.Music = ig.Class.extend({
       get: this.getLooping.bind(this),
       set: this.setLooping.bind(this),
     });
-  },
+  }
 
-  add: function (music, name) {
-    if (!ig.Sound.enabled) {
+  add(music, name) {
+    if (!ig.Sound.enabled)
+      // TODO
       return;
-    }
 
-    var path = music instanceof ig.Sound ? music.path : music;
+    const path = music instanceof ig.Sound ? music.path : music; // TODO
 
-    var track = ig.soundManager.load(path, false);
+    const track = ig.soundManager.load(path, false); // TODO
 
     // Did we get a WebAudio Source? This is suboptimal; Music should be loaded
-    // as HTML5 Audio so it can be streamed
+    // as HTML5 Audio so it can be streamed TODO
     if (track instanceof ig.Sound.WebAudioSource) {
       // Since this error will likely occur at game start, we stop the game
       // to not produce any more errors.
       ig.system.stopRunLoop();
-      throw (
-        "Sound '" +
-        path +
-        "' loaded as Multichannel but used for Music. " +
-        "Set the multiChannel param to false when loading, e.g.: new ig.Sound(path, false)"
-      );
+      throw new Error(`
+      Sound '${path}' loaded as MultiChannel but used for music. Set the multiChannel param to false when loading.`);
     }
 
     track.loop = this._loop;
@@ -217,19 +213,13 @@ ig.Music = ig.Class.extend({
     track.addEventListener("ended", this._endedCallbackBound, false);
     this.tracks.push(track);
 
-    if (name) {
-      this.namedTracks[name] = track;
-    }
+    if (name) this.namedTracks[name] = track;
 
-    if (!this.currentTrack) {
-      this.currentTrack = track;
-    }
-  },
+    if (!this.currentTrack) this.currentTrack = track;
+  }
 
-  next: function () {
-    if (!this.tracks.length) {
-      return;
-    }
+  next() {
+    if (!this.tracks.length) return;
 
     this.stop();
     this.currentIndex = this.random
@@ -237,91 +227,75 @@ ig.Music = ig.Class.extend({
       : (this.currentIndex + 1) % this.tracks.length;
     this.currentTrack = this.tracks[this.currentIndex];
     this.play();
-  },
+  }
 
-  pause: function () {
-    if (!this.currentTrack) {
-      return;
-    }
+  pause() {
+    if (!this.currentTrack) return;
+
     this.currentTrack.pause();
-  },
+  }
 
-  stop: function () {
-    if (!this.currentTrack) {
-      return;
-    }
+  stop() {
+    if (!this.currentTrack) return;
+
     this.currentTrack.pause();
     this.currentTrack.currentTime = 0;
-  },
+  }
 
-  play: function (name) {
+  play(name) {
     // If a name was provided, stop playing the current track (if any)
     // and play the named track
     if (name && this.namedTracks[name]) {
-      var newTrack = this.namedTracks[name];
-      if (newTrack != this.currentTrack) {
+      const newTrack = this.namedTracks[name];
+      if (newTrack !== this.currentTrack) {
         this.stop();
         this.currentTrack = newTrack;
       }
-    } else if (!this.currentTrack) {
-      return;
-    }
+    } else if (!this.currentTrack) return;
     this.currentTrack.play();
-  },
+  }
 
-  getLooping: function () {
+  getLooping() {
     return this._loop;
-  },
+  }
 
-  setLooping: function (l) {
+  setLooping(l) {
     this._loop = l;
-    for (var i in this.tracks) {
-      this.tracks[i].loop = l;
-    }
-  },
+    for (let i in this.tracks) this.tracks[i].loop = l;
+  }
 
-  getVolume: function () {
+  getVolume() {
     return this._volume;
-  },
+  }
 
-  setVolume: function (v) {
+  setVolume(v) {
     this._volume = v.limit(0, 1);
-    for (var i in this.tracks) {
-      this.tracks[i].volume = this._volume;
-    }
-  },
+    for (let i in this.tracks) this.tracks[i].volume = this._volume;
+  }
 
-  fadeOut: function (time) {
-    if (!this.currentTrack) {
-      return;
-    }
-
+  fadeOut(time) {
+    if (!this.currentTrack) return;
     clearInterval(this._fadeInterval);
     this._fadeTimer = new ig.Timer(time);
-    this._fadeInterval = setInterval(this._fadeStep.bind(this), 50);
-  },
+    this._fadeInterval = setInterval(this.#fadeStep.bind(this), 50); // TODO
+  }
 
-  _fadeStep: function () {
-    var v =
+  #fadeStep() {
+    const v =
       this._fadeTimer.delta().map(-this._fadeTimer.target, 0, 1, 0).limit(0, 1) * this._volume;
 
     if (v <= 0.01) {
       this.stop();
       this.currentTrack.volume = this._volume;
       clearInterval(this._fadeInterval);
-    } else {
-      this.currentTrack.volume = v;
-    }
-  },
+    } else this.currentTrack.volume = v;
+  }
 
-  _endedCallback: function () {
-    if (this._loop) {
-      this.play();
-    } else {
-      this.next();
-    }
-  },
-});
+  #endedCallback() {
+    if (this._loop) this.play();
+    else this.next();
+  }
+}
 
 class Sound {
   static enabled = true;
@@ -413,11 +387,8 @@ ig.Sound.WebAudioSource = ig.Class.extend({
 
     // Add this new source to our sources array and remove it again
     // later when it has finished playing.
-    var that = this;
     this.sources.push(source);
-    source.onended = function () {
-      that.sources.erase(source);
-    };
+    source.onended = () => this.sources.erase(source);
 
     source.start(0);
   },
