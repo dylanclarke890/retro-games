@@ -355,13 +355,13 @@ class Sound {
   }
 }
 
-ig.Sound.WebAudioSource = ig.Class.extend({
-  sources: [],
-  gain: null,
-  buffer: null,
-  _loop: false,
+class WebAudioSource {
+  sources = [];
+  gain = null;
+  buffer = null;
+  _loop = false;
 
-  init: function () {
+  constructor() {
     this.gain = ig.soundManager.audioContext.createGain();
     this.gain.connect(ig.soundManager.audioContext.destination);
 
@@ -374,13 +374,12 @@ ig.Sound.WebAudioSource = ig.Class.extend({
       get: this.getVolume.bind(this),
       set: this.setVolume.bind(this),
     });
-  },
+  }
 
-  play: function () {
-    if (!this.buffer) {
-      return;
-    }
-    var source = ig.soundManager.audioContext.createBufferSource();
+  play() {
+    if (!this.buffer) return;
+
+    const source = ig.soundManager.audioContext.createBufferSource(); // TODO
     source.buffer = this.buffer;
     source.connect(this.gain);
     source.loop = this._loop;
@@ -391,36 +390,34 @@ ig.Sound.WebAudioSource = ig.Class.extend({
     source.onended = () => this.sources.erase(source);
 
     source.start(0);
-  },
+  }
 
-  pause: function () {
-    for (var i = 0; i < this.sources.length; i++) {
+  pause() {
+    for (let i = 0; i < this.sources.length; i++) {
       try {
         this.sources[i].stop();
       } catch (err) {}
     }
-  },
+  }
 
-  getLooping: function () {
+  getLooping() {
     return this._loop;
-  },
+  }
 
-  setLooping: function (loop) {
+  setLooping(loop) {
     this._loop = loop;
 
-    for (var i = 0; i < this.sources.length; i++) {
-      this.sources[i].loop = loop;
-    }
-  },
+    for (let i = 0; i < this.sources.length; i++) this.sources[i].loop = loop;
+  }
 
-  getVolume: function () {
+  getVolume() {
     return this.gain.gain.value;
-  },
+  }
 
-  setVolume: function (volume) {
+  setVolume(volume) {
     this.gain.gain.value = volume;
-  },
-});
+  }
+}
 
 ig.Sound.FORMAT = {
   MP3: { ext: "mp3", mime: "audio/mpeg" },
@@ -431,5 +428,6 @@ ig.Sound.FORMAT = {
 };
 ig.Sound.use = [ig.Sound.FORMAT.OGG, ig.Sound.FORMAT.MP3];
 ig.Sound.channels = 4;
+ig.Sound.enabled = true;
 ig.normalizeVendorAttribute(window, "AudioContext");
 ig.Sound.useWebAudio = !!window.AudioContext;
