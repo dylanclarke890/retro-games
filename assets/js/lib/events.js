@@ -151,6 +151,8 @@ class InputEvents {
     PERIOD: 190,
   };
 
+  #userAgent = null;
+
   bindings = {};
   actions = {};
   presses = {};
@@ -164,7 +166,7 @@ class InputEvents {
   accel = { x: 0, y: 0, z: 0 };
 
   constructor() {
-    this.userAgent = UserAgent.info;
+    this.#userAgent = UserAgent.info;
   }
 
   // TODO
@@ -178,7 +180,7 @@ class InputEvents {
     ig.system.canvas.addEventListener("mouseup", this.keyup.bind(this), false);
     ig.system.canvas.addEventListener("mousemove", this.mousemove.bind(this), false);
 
-    if (this.userAgent.device.touchDevice) {
+    if (this.#userAgent.device.touchDevice) {
       // Standard
       ig.system.canvas.addEventListener("touchstart", this.keydown.bind(this), false);
       ig.system.canvas.addEventListener("touchend", this.keyup.bind(this), false);
@@ -248,7 +250,7 @@ class InputEvents {
 
     // Focus window element for mouse clicks. Prevents issues when
     // running the game in an iframe.
-    if (code < 0 && !this.userAgent.device.mobile) window.focus();
+    if (code < 0 && !this.#userAgent.device.mobile) window.focus();
     if (event.type == "touchstart" || event.type == "mousedown") this.mousemove(event);
 
     const action = this.bindings[code];
