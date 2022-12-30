@@ -5,11 +5,10 @@ class GameUpdater {
 
   update(tframe) {
     const scope = this.scope;
-    const state = scope.state || {};
-    if (state.hasOwnProperty("entities")) {
-      const entities = state.entities;
-      for (let entity in entities) entities[entity].update();
-    }
+
+    // Calling entity render methods
+    if (scope.state["entities"] !== undefined)
+      for (let entity in scope.state.entities) scope.state.entities[entity].update();
 
     return state;
   }
