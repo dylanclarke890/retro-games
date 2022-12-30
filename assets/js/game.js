@@ -1,16 +1,19 @@
 class Game {
-  constructor(w, h, targetFps, showDebugStats) {
+  constructor({ w, h, targetFps, showDebugStats } = {}) {
+    this.state = {};
+
+    const [ctx, scale] = GameRenderer.newRenderContext(w, h);
+    this.ctx = ctx;
+    this.viewport = ctx.canvas;
+    document.body.insertBefore(this.viewport, document.body.firstChild);
+
     this.constants = {
       w,
       h,
       targetFps,
       showDebugStats,
+      scale,
     };
-    this.state = {};
-
-    this.viewport = generateCanvas(w, h);
-    this.ctx = this.viewport.getContext("2d");
-    document.body.insertBefore(this.viewport, document.body.firstChild);
 
     this.state.entities = {};
     this.state.entities.player = new Player(this, this.constants.w / 2, this.constants.h - 100);
@@ -25,4 +28,4 @@ class Game {
   }
 }
 
-window.game = new Game(800, 600, 60, true);
+window.game = new Game({ w: 800, h: 600, targetFps: 60, showDebugStats: true });

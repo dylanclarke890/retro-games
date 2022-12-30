@@ -10,6 +10,6 @@ class GameUpdater {
     if (scope.state["entities"] !== undefined)
       for (let entity in scope.state.entities) scope.state.entities[entity].update();
 
-    return state;
+    return scope.state;
   }
 }
