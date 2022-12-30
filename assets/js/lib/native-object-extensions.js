@@ -101,4 +101,14 @@ class NativeExtensions {
     for (let i in object) copied[i] = NativeExtensions.copy(object[i]);
     return copied;
   }
+
+  static ksort(object) {
+    if (!object || typeof object !== "object") return [];
+    const keys = [],
+      values = [];
+    for (let i in object) keys.push(i);
+    keys.sort();
+    for (let i = 0; i < keys.length; i++) values.push(object[keys[i]]);
+    return values;
+  }
 }
