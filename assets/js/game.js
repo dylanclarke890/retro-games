@@ -1,6 +1,7 @@
 class Game {
   constructor({ w, h, targetFps, showDebugStats } = {}) {
     this.state = {};
+    this.ready = false;
 
     const [ctx, scale] = GameRenderer.newRenderContext(w, h);
     this.ctx = ctx;
@@ -21,10 +22,13 @@ class Game {
     this.updater = new GameUpdater(this);
     this.renderer = new GameRenderer(this);
     this.loop = new GameLoop(this);
-    this.loop.start();
 
     const stopBtn = document.getElementById("stop");
     stopBtn.addEventListener("click", () => this.loop.stop());
+
+    this.ready = true;
+    this.loop.start();
+
   }
 }
 

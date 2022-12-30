@@ -10,7 +10,8 @@ class Image {
   loadCallback = (_path, _loadingWasSuccessful) => {};
   path = "";
 
-  constructor(path) {
+  constructor(scope, path) {
+    this.scope = scope;
     this.path = path;
     this.load();
   }
@@ -23,11 +24,11 @@ class Image {
     if (this.loaded) {
       if (loadCallback) loadCallback(this.path, true);
       return;
-    } else if (!this.loaded /*&& !Game.Ready - TODO*/) {
+    } else if (!this.loaded && !this.scope.ready) {
       this.loadCallback = loadCallback || null;
       this.data = new Image();
-      this.data.onload = this.onload.bind(this.onload);
-      this.data.onerror = this.onerror.bind(this.onerror);
+      this.data.onload = this.onload.bind(this);
+      this.data.onerror = this.onerror.bind(this);
       this.data.src = this.path;
     } //else ig.addResource(this); TODO
 
@@ -37,7 +38,7 @@ class Image {
   reload() {
     this.loaded = false;
     this.data = new Image();
-    this.data.onload = this.onload.bind(this.onload);
+    this.data.onload = this.onload.bind(this);
     this.data.src = this.path + "?" + Date.now();
   }
 
@@ -45,7 +46,8 @@ class Image {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
-    // if (system.scale != 1) this.resize(system.scale); TODO
+    if (this.scope.constants.scale != 1) this.resize();
+    TODO;
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
@@ -59,9 +61,9 @@ class Image {
    * The original image is drawn into an offscreen canvas of the same size
    * and copied into another offscreen canvas with the new size.
    * The scaled offscreen canvas becomes the image (data) of this object.*/
-  resize(scale) {
-    // TODO!
-    const origPixels = ig.getImagePixels(this.data, 0, 0, this.width, this.height);
+  resize() {
+    const scale = this.scope.constants.scale;
+    const origPixels = ig.getImagePixels(this.data, 0, 0, this.width, this.height); // TODO 
 
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
@@ -89,19 +91,19 @@ class Image {
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
 
-    const scale = ig.system.scale; // TODO
+    const scale = this.scope.constants.scale;
     sourceX = sourceX ? sourceX * scale : 0;
     sourceY = sourceY ? sourceY * scale : 0;
     width = (width ? width : this.width) * scale;
     height = (height ? height : this.height) * scale;
 
-    ig.system.context.drawImage(
+    this.scope.ctx.drawImage(
       this.data,
       sourceX,
       sourceY,
       width,
       height,
-      ig.system.getDrawPos(targetX),
+      ig.system.getDrawPos(targetX), // TODO
       ig.system.getDrawPos(targetY),
       width,
       height
@@ -114,7 +116,8 @@ class Image {
     tileHeight = tileHeight ? tileHeight : tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const scale = ig.system.scale; // TODO
+    const scale = this.scope.constants.scale,
+      ctx = this.scope.ctx;
     const tileWidthScaled = Math.floor(tileWidth * scale);
     const tileHeightScaled = Math.floor(tileHeight * scale);
 
@@ -122,22 +125,22 @@ class Image {
     const scaleY = flipY ? -1 : 1;
 
     if (flipX || flipY) {
-      ig.system.context.save();
-      ig.system.context.scale(scaleX, scaleY);
+      ctx.save();
+      ctx.scale(scaleX, scaleY);
     }
-    ig.system.context.drawImage(
+    ctx.drawImage(
       this.data,
       (Math.floor(tile * tileWidth) % this.width) * scale,
       Math.floor((tile * tileWidth) / this.width) * tileHeight * scale,
       tileWidthScaled,
       tileHeightScaled,
-      ig.system.getDrawPos(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
+      ig.system.getDrawPos(targetX) * scaleX - (flipX ? tileWidthScaled : 0), // TODO
       ig.system.getDrawPos(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
       tileWidthScaled,
       tileHeightScaled
     );
 
-    if (flipX || flipY) ig.system.context.restore();
+    if (flipX || flipY) ctx.restore();
     drawCount++;
   }
 }
