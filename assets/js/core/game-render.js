@@ -1,4 +1,8 @@
 class GameRenderer {
+  scale = 1; // TODO!
+  drawMode = this.DRAW.SMOOTH;
+  scaleMode = this.SCALE.SMOOTH;
+
   constructor(scope) {
     this.scope = scope;
   }
@@ -24,5 +28,33 @@ class GameRenderer {
       scope.ctx.fillStyle = "#fff";
       scope.ctx.fillRect(0, 0, w, h);
     } else this.scope.ctx.clearRect(0, 0, w, h);
+  }
+
+  get DRAW() {
+    return {
+      AUTHENTIC: (p) => Math.round(p) * this.scale,
+      SMOOTH: (p) => Math.round(p * this.scale),
+      SUBPIXEL: (p) => p * this.scale,
+    };
+  }
+
+  get SCALE() {
+    return {
+      CRISP: function (ctx) {
+        const canvas = ctx.canvas;
+        // TODO: setVendorAttribute(ctx, "imageSmoothingEnabled", false);
+        canvas.style.imageRendering = "-moz-crisp-edges";
+        canvas.style.imageRendering = "-o-crisp-edges";
+        canvas.style.imageRendering = "-webkit-optimize-contrast";
+        canvas.style.imageRendering = "crisp-edges";
+        canvas.style.msInterpolationMode = "nearest-neighbor"; // No effect on Canvas :/
+      },
+      SMOOTH: function (ctx) {
+        const canvas = ctx.canvas;
+        // TODO: setVendorAttribute(ctx, "imageSmoothingEnabled", true);
+        canvas.style.imageRendering = "";
+        canvas.style.msInterpolationMode = "";
+      },
+    };
   }
 }
