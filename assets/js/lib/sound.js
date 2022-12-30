@@ -5,6 +5,7 @@ class SoundManager {
 
   constructor() {
     VendorAttributes.normalise(window, "AudioContext");
+    this.userAgent = UserAgent.info;
 
     // Quick sanity check if the Browser supports the Audio tag
     if (!Sound.enabled || !window.Audio) {
@@ -28,38 +29,33 @@ class SoundManager {
     if (Sound.enabled && Sound.useWebAudio) {
       // TODO
       this.audioContext = new AudioContext();
-      this.boundWebAudioUnlock = this.unlockWebAudio.bind(this);
-      ig.system.canvas.addEventListener("touchstart", this.boundWebAudioUnlock, false);
-      ig.system.canvas.addEventListener("mousedown", this.boundWebAudioUnlock, false);
+      ig.system.canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
+      ig.system.canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
     }
   }
 
   unlockWebAudio() {
-    ig.system.canvas.removeEventListener("touchstart", this.boundWebAudioUnlock, false); // TODO
-    ig.system.canvas.removeEventListener("mousedown", this.boundWebAudioUnlock, false);
+    ig.system.canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false); // TODO
+    ig.system.canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
 
-    // create empty buffer
-    const buffer = this.audioContext.createBuffer(1, 1, 22050);
-    const source = this.audioContext.createBufferSource(); // TODO
+    const buffer = this.audioContext.createBuffer(1, 1, 22050); // create empty buffer
+    const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
-
     source.connect(this.audioContext.destination);
     source.start(0);
   }
 
   load(path, multiChannel, loadCallback) {
     return multiChannel && Sound.useWebAudio
-      ? // Requested as Multichannel and we're using WebAudio?
-        this.loadWebAudio(path, multiChannel, loadCallback)
-      : // Oldschool HTML5 Audio - always used for Music
-        this.loadHTML5Audio(path, multiChannel, loadCallback);
+      ? this.loadWebAudio(path, multiChannel, loadCallback) // Requested as MultiChannel and we're using WebAudio.
+      : this.loadHTML5Audio(path, multiChannel, loadCallback); // old-school HTML5 Audio - always used for Music.
   }
 
   loadWebAudio(path, _multiChannel, loadCallback) {
     if (this.clips[path]) return this.clips[path];
 
     // Path to the soundfile with the right extension (.ogg or .mp3)
-    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
+    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
     const audioSource = new WebAudioSource();
     this.clips[path] = audioSource;
 
@@ -91,10 +87,9 @@ class SoundManager {
     // Sound file already loaded?
     if (this.clips[path]) {
       // Loaded as WebAudio, but now requested as HTML5 Audio? Probably Music?
-      if (this.clips[path] instanceof WebAudioSource) return this.clips[path]; // TODO
+      if (this.clips[path] instanceof WebAudioSource) return this.clips[path];
 
       // Only loaded as single channel and now requested as multichannel?
-      // TODO
       if (multiChannel && this.clips[path].length < Sound.channels) {
         // Path to the soundfile with the right extension (.ogg or .mp3)
         const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
@@ -115,7 +110,7 @@ class SoundManager {
       // Mobile browsers stubbornly refuse to preload HTML5, so we simply
       // ignore the canplaythrough event and immediately "fake" a successful
       // load callback
-      if (ig.ua.mobile) setTimeout(() => loadCallback(path, true, null), 0); // TODO
+      if (this.userAgent.device.mobile) setTimeout(() => loadCallback(path, true, null), 0);
       else {
         clip.addEventListener(
           "canplaythrough",
@@ -134,7 +129,6 @@ class SoundManager {
     this.clips[path] = [clip];
     if (multiChannel)
       for (let i = 1; i < Sound.channels; i++) {
-        // TODO
         const a = new Audio(realPath);
         a.load();
         this.clips[path].push(a);
@@ -147,7 +141,7 @@ class SoundManager {
     // Find and return a channel that is not currently playing
     const channels = this.clips[path];
     // Is this a WebAudio source? We only ever have one for each Sound
-    if (channels && channels instanceof WebAudioSource) return channels; // TODO
+    if (channels && channels instanceof WebAudioSource) return channels;
     // Oldschool HTML5 Audio - find a channel that's not currently
     // playing or, if all are playing, rewind one
     for (let i = 0, clip; (clip = channels[i++]); ) {
