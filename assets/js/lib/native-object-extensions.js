@@ -73,3 +73,20 @@ Function.prototype.bind =
 
     return fBound;
   };
+
+class NativeExtensions {
+  static extend(/** @type {Object} */ target, /** @type {Object[]} */ ...sources) {
+    for (let source of sources)
+      for (let sourceKey in source) {
+        const srcValue = source[sourceKey];
+        if (typeof srcValue !== "object" || srcValue instanceof HTMLElement || srcValue === null)
+          target[sourceKey] = srcValue;
+        else {
+          if (!target[sourceKey] || typeof target[sourceKey] !== "object")
+            target[sourceKey] = srcValue instanceof Array ? [] : {};
+          extend(target[sourceKey], srcValue);
+        }
+      }
+    return target;
+  }
+}
