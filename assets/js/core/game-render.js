@@ -29,7 +29,7 @@ class GameRenderer {
   /** Gets the proper pixel ratio by dividing the device ratio by the backing ratio. */
   static getPixelRatio(ctx) {
     const deviceRatio = devicePixelRatio;
-    const backingRatio = Vendor.getAttribute(ctx, "backingStorePixelRatio") || 1;
+    const backingRatio = VendorAttributes.get(ctx, "backingStorePixelRatio") || 1;
     return deviceRatio / backingRatio;
   }
 
@@ -40,7 +40,7 @@ class GameRenderer {
     this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
 
     const ratio = GameRenderer.getPixelRatio(ctx);
-    Vendor.normalizeAttribute(ctx, "getImageDataHD");
+    VendorAttributes.normalize(ctx, "getImageDataHD");
 
     const realWidth = image.width / ratio,
       realHeight = image.height / ratio;
@@ -90,7 +90,7 @@ class GameRenderer {
     return {
       CRISP: function (ctx) {
         const canvas = ctx.canvas;
-        Vendor.setAttribute(ctx, "imageSmoothingEnabled", false);
+        VendorAttributes.set(ctx, "imageSmoothingEnabled", false);
         canvas.style.imageRendering = "-moz-crisp-edges";
         canvas.style.imageRendering = "-o-crisp-edges";
         canvas.style.imageRendering = "-webkit-optimize-contrast";
@@ -99,7 +99,7 @@ class GameRenderer {
       },
       SMOOTH: function (ctx) {
         const canvas = ctx.canvas;
-        Vendor.setAttribute(ctx, "imageSmoothingEnabled", true);
+        VendorAttributes.set(ctx, "imageSmoothingEnabled", true);
         canvas.style.imageRendering = "";
         canvas.style.msInterpolationMode = "";
       },
