@@ -1,5 +1,6 @@
 class Player extends Entity {
   constructor(scope, x, y) {
+    super();
     this.scope = scope;
     this.x = x;
     this.y = y;
