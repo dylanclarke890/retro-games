@@ -78,7 +78,7 @@ class GameRenderer {
     return {
       CRISP: function (ctx) {
         const canvas = ctx.canvas;
-        // TODO: setVendorAttribute(ctx, "imageSmoothingEnabled", false);
+        Vendor.setAttribute(ctx, "imageSmoothingEnabled", false);
         canvas.style.imageRendering = "-moz-crisp-edges";
         canvas.style.imageRendering = "-o-crisp-edges";
         canvas.style.imageRendering = "-webkit-optimize-contrast";
@@ -87,7 +87,7 @@ class GameRenderer {
       },
       SMOOTH: function (ctx) {
         const canvas = ctx.canvas;
-        // TODO: setVendorAttribute(ctx, "imageSmoothingEnabled", true);
+        Vendor.setAttribute(ctx, "imageSmoothingEnabled", true);
         canvas.style.imageRendering = "";
         canvas.style.msInterpolationMode = "";
       },
