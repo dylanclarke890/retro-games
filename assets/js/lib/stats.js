@@ -29,6 +29,7 @@ class Stats {
   #containerElementStyles = [];
   #currentPanelIndex = 0;
   #maxPanels = 2;
+  #firstUpdate = true;
 
   constructor({ containerElementStyles, target } = {}) {
     this.#containerElementStyles = containerElementStyles;
@@ -183,6 +184,15 @@ class Stats {
   }
 
   update() {
+    if (this.#firstUpdate) {
+      // Wait for the stats to "warm up" then reset the minimum fps and ms
+      // as they will always display 0 as the minimum otherwise.
+      this.#firstUpdate = false;
+      setTimeout(() => {
+        this.minFps = this.maxFps;
+        this.minMs = this.maxMs;
+      }, 2000);
+    }
     const { ms, fps, mem } = this.#DOMElements;
     this.now = performance.now();
     this.framesThisSec++;
