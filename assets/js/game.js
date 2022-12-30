@@ -1,4 +1,6 @@
 class Game {
+  #resources = [];
+
   constructor({ w, h, targetFps, showDebugStats } = {}) {
     this.state = {};
     this.ready = false;
@@ -28,7 +30,10 @@ class Game {
 
     this.ready = true;
     this.loop.start();
+  }
 
+  addResource(resource) {
+    this.#resources.push(resource);
   }
 }
 

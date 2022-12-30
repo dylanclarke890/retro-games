@@ -26,21 +26,33 @@ class GameRenderer {
     return [ctx, ratio];
   }
 
+  /** Gets the proper pixel ratio by dividing the device ratio by the backing ratio. */
   static getPixelRatio(ctx) {
-    const backingStores = [
-      "backingStorePixelRatio",
-      "webkitBackingStorePixelRatio",
-      "mozBackingStorePixelRatio",
-      "msBackingStorePixelRatio",
-      "oBackingStorePixelRatio",
-    ];
     const deviceRatio = devicePixelRatio;
-    const backingRatio = backingStores.reduce((_, curr) =>
-      ctx.hasOwnProperty(curr) ? ctx[curr] : 1
-    );
-
-    // Get the proper pixel ratio by dividing the device ratio by the backing ratio.
+    const backingRatio = Vendor.getAttribute(ctx, "backingStorePixelRatio") || 1;
     return deviceRatio / backingRatio;
+  }
+
+  /** Normalizes getImageData to extract the real, actual pixels from an image. */
+  getImagePixels(image, x, y, width, height) {
+    const [ctx, _] = GameRenderer.newRenderContext(image.width, image.height, 1);
+    const canvas = ctx.canvas;
+    this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
+
+    const ratio = GameRenderer.getPixelRatio(ctx);
+    Vendor.normalizeAttribute(ctx, "getImageDataHD");
+
+    const realWidth = image.width / ratio,
+      realHeight = image.height / ratio;
+
+    canvas.width = Math.ceil(realWidth);
+    canvas.height = Math.ceil(realHeight);
+
+    ctx.drawImage(image, 0, 0, realWidth, realHeight);
+
+    return ratio === 1
+      ? ctx.getImageData(x, y, width, height)
+      : ctx.getImageDataHD(x, y, width, height);
   }
 
   render() {

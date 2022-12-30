@@ -27,10 +27,10 @@ class Image {
     } else if (!this.loaded && !this.scope.ready) {
       this.loadCallback = loadCallback || null;
       this.data = new Image();
-      this.data.onload = this.onload.bind(this);
-      this.data.onerror = this.onerror.bind(this);
+      this.data.onload = this.onload;
+      this.data.onerror = this.onerror;
       this.data.src = this.path;
-    } //else ig.addResource(this); TODO
+    } else scope.addResource(this);
 
     imageCache[this.path] = this;
   }
@@ -38,7 +38,7 @@ class Image {
   reload() {
     this.loaded = false;
     this.data = new Image();
-    this.data.onload = this.onload.bind(this);
+    this.data.onload = this.onload;
     this.data.src = this.path + "?" + Date.now();
   }
 
@@ -47,7 +47,6 @@ class Image {
     this.height = this.data.height;
     this.loaded = true;
     if (this.scope.constants.scale != 1) this.resize();
-    TODO;
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
@@ -56,14 +55,14 @@ class Image {
     if (this.loadCallback) this.loadCallback(this.path, false);
   }
 
-  /** Nearest-Neighbor scaling
+  /** Nearest-Neighbor scaling:
    *
    * The original image is drawn into an offscreen canvas of the same size
    * and copied into another offscreen canvas with the new size.
    * The scaled offscreen canvas becomes the image (data) of this object.*/
   resize() {
     const scale = this.scope.constants.scale;
-    const origPixels = ig.getImagePixels(this.data, 0, 0, this.width, this.height); // TODO 
+    const origPixels = this.scope.renderer.getImagePixels(this.data, 0, 0, this.width, this.height);
 
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
