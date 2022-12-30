@@ -1,45 +1,48 @@
-Entity = ig.Class.extend({
-  id: 0,
-  settings: {},
+class Entity {
+  static #lastId = 0;
 
-  size: { x: 16, y: 16 },
-  offset: { x: 0, y: 0 },
+  id = 0;
+  settings = {};
 
-  pos: { x: 0, y: 0 },
-  last: { x: 0, y: 0 },
-  vel: { x: 0, y: 0 },
-  accel: { x: 0, y: 0 },
-  friction: { x: 0, y: 0 },
-  maxVel: { x: 100, y: 100 },
-  zIndex: 0,
-  gravityFactor: 1,
-  standing: false,
-  bounciness: 0,
-  minBounceVelocity: 40,
+  size = { x: 16, y: 16 };
+  offset = { x: 0, y: 0 };
 
-  anims: {},
-  animSheet: null,
-  currentAnim: null,
-  health: 10,
+  pos = { x: 0, y: 0 };
+  last = { x: 0, y: 0 };
+  vel = { x: 0, y: 0 };
+  accel = { x: 0, y: 0 };
+  friction = { x: 0, y: 0 };
+  maxVel = { x: 100, y: 100 };
+  zIndex = 0;
+  gravityFactor = 1;
+  standing = false;
+  bounciness = 0;
+  minBounceVelocity = 40;
 
-  type: 0, // TYPE.NONE
-  checkAgainst: 0, // TYPE.NONE
-  collides: 0, // COLLIDES.NEVER
+  anims = {};
+  animSheet = null;
+  currentAnim = null;
+  health = 10;
 
-  _killed: false,
+  type = 0; // TYPE.NONE
+  checkAgainst = 0; // TYPE.NONE
+  collides = 0; // COLLIDES.NEVER
 
-  slopeStanding: { min: (44).toRad(), max: (136).toRad() },
+  #killed = false;
 
-  init: function (x, y, settings) {
-    this.id = ++ig.Entity._lastId;
+  slopeStanding = { min: (44).toRad(), max: (136).toRad() };
+
+  constructor(x, y, settings) {
+    this.id = ++Entity.#lastId;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;
 
-    ig.merge(this, settings);
-  },
+    NativeExtensions.extend(this, settings);
+  }
 
-  reset: function (x, y, settings) {
-    var proto = this.constructor.prototype;
+  reset(x, y, settings) {
+    // TODO: Add default settings property
+    const proto = this.constructor.prototype;
     this.pos.x = x;
     this.pos.y = y;
     this.last.x = x;
@@ -49,161 +52,139 @@ Entity = ig.Class.extend({
     this.accel.x = proto.accel.x;
     this.accel.y = proto.accel.y;
     this.health = proto.health;
-    this._killed = proto._killed;
+    this.#killed = proto._killed;
     this.standing = proto.standing;
 
     this.type = proto.type;
     this.checkAgainst = proto.checkAgainst;
     this.collides = proto.collides;
 
-    ig.merge(this, settings);
-  },
+    NativeExtensions.extend(this, settings);
+  }
 
-  addAnim: function (name, frameTime, sequence, stop) {
-    if (!this.animSheet) {
-      throw "No animSheet to add the animation " + name + " to.";
-    }
-    var a = new ig.Animation(this.animSheet, frameTime, sequence, stop);
-    this.anims[name] = a;
-    if (!this.currentAnim) {
-      this.currentAnim = a;
-    }
+  addAnim(name, frameTime, sequence, stop) {
+    if (!this.animSheet) throw new Error(`No animSheet to add the animation ${name} to.`);
+    const animation = new GameAnimation(this.animSheet, frameTime, sequence, stop);
+    this.anims[name] = animation;
+    if (!this.currentAnim) this.currentAnim = animation;
+    return animation;
+  }
 
-    return a;
-  },
-
-  update: function () {
+  update() {
     this.last.x = this.pos.x;
     this.last.y = this.pos.y;
-    this.vel.y += ig.game.gravity * ig.system.tick * this.gravityFactor;
+    this.vel.y += ig.game.gravity * ig.system.tick * this.gravityFactor; // TODO
 
     this.vel.x = this.getNewVelocity(this.vel.x, this.accel.x, this.friction.x, this.maxVel.x);
     this.vel.y = this.getNewVelocity(this.vel.y, this.accel.y, this.friction.y, this.maxVel.y);
 
     // movement & collision
-    var mx = this.vel.x * ig.system.tick;
-    var my = this.vel.y * ig.system.tick;
-    var res = ig.game.collisionMap.trace(this.pos.x, this.pos.y, mx, my, this.size.x, this.size.y);
+    const mx = this.vel.x * ig.system.tick; // TODO
+    const my = this.vel.y * ig.system.tick;
+    const res = ig.game.collisionMap.trace(
+      this.pos.x,
+      this.pos.y,
+      mx,
+      my,
+      this.size.x,
+      this.size.y
+    ); // TODO
     this.handleMovementTrace(res);
+    if (this.currentAnim) this.currentAnim.update();
+  }
 
-    if (this.currentAnim) {
-      this.currentAnim.update();
-    }
-  },
-
-  getNewVelocity: function (vel, accel, friction, max) {
-    if (accel) {
-      return (vel + accel * ig.system.tick).limit(-max, max);
-    } else if (friction) {
-      var delta = friction * ig.system.tick;
-
-      if (vel - delta > 0) {
-        return vel - delta;
-      } else if (vel + delta < 0) {
-        return vel + delta;
-      } else {
-        return 0;
-      }
+  getNewVelocity(vel, accel, friction, max) {
+    if (accel) return (vel + accel * ig.system.tick).limit(-max, max);
+    else if (friction) {
+      const delta = friction * ig.system.tick;
+      if (vel - delta > 0) return vel - delta;
+      else if (vel + delta < 0) return vel + delta;
+      else return 0;
     }
     return vel.limit(-max, max);
-  },
+  }
 
-  handleMovementTrace: function (res) {
+  handleMovementTrace(res) {
     this.standing = false;
 
     if (res.collision.y) {
-      if (this.bounciness > 0 && Math.abs(this.vel.y) > this.minBounceVelocity) {
+      if (this.bounciness > 0 && Math.abs(this.vel.y) > this.minBounceVelocity)
         this.vel.y *= -this.bounciness;
-      } else {
-        if (this.vel.y > 0) {
-          this.standing = true;
-        }
+      else {
+        if (this.vel.y > 0) this.standing = true;
         this.vel.y = 0;
       }
     }
     if (res.collision.x) {
-      if (this.bounciness > 0 && Math.abs(this.vel.x) > this.minBounceVelocity) {
+      if (this.bounciness > 0 && Math.abs(this.vel.x) > this.minBounceVelocity)
         this.vel.x *= -this.bounciness;
-      } else {
-        this.vel.x = 0;
-      }
+      else this.vel.x = 0;
     }
     if (res.collision.slope) {
-      var s = res.collision.slope;
-
+      const slope = res.collision.slope;
       if (this.bounciness > 0) {
-        var proj = this.vel.x * s.nx + this.vel.y * s.ny;
-
-        this.vel.x = (this.vel.x - s.nx * proj * 2) * this.bounciness;
-        this.vel.y = (this.vel.y - s.ny * proj * 2) * this.bounciness;
+        const proj = this.vel.x * slope.nx + this.vel.y * slope.ny;
+        this.vel.x = (this.vel.x - slope.nx * proj * 2) * this.bounciness;
+        this.vel.y = (this.vel.y - slope.ny * proj * 2) * this.bounciness;
       } else {
-        var lengthSquared = s.x * s.x + s.y * s.y;
-        var dot = (this.vel.x * s.x + this.vel.y * s.y) / lengthSquared;
-
-        this.vel.x = s.x * dot;
-        this.vel.y = s.y * dot;
-
-        var angle = Math.atan2(s.x, s.y);
-        if (angle > this.slopeStanding.min && angle < this.slopeStanding.max) {
-          this.standing = true;
-        }
+        const lengthSquared = slope.x * slope.x + slope.y * slope.y;
+        const dot = (this.vel.x * slope.x + this.vel.y * slope.y) / lengthSquared;
+        this.vel.x = slope.x * dot;
+        this.vel.y = slope.y * dot;
+        const angle = Math.atan2(slope.x, slope.y);
+        if (angle > this.slopeStanding.min && angle < this.slopeStanding.max) this.standing = true;
       }
     }
 
     this.pos = res.pos;
-  },
+  }
 
-  draw: function () {
-    if (this.currentAnim) {
-      this.currentAnim.draw(
-        this.pos.x - this.offset.x - ig.game._rscreen.x,
-        this.pos.y - this.offset.y - ig.game._rscreen.y
-      );
-    }
-  },
+  draw() {
+    if (!this.currentAnim) return;
 
-  kill: function () {
-    ig.game.removeEntity(this);
-  },
+    this.currentAnim.draw(
+      this.pos.x - this.offset.x - ig.game._rscreen.x, // TODO
+      this.pos.y - this.offset.y - ig.game._rscreen.y
+    );
+  }
 
-  receiveDamage: function (amount, from) {
+  kill() {
+    ig.game.removeEntity(this); // TODO
+  }
+
+  receiveDamage(amount, from) {
+    // TODO
     this.health -= amount;
-    if (this.health <= 0) {
-      this.kill();
-    }
-  },
+    if (this.health <= 0) this.kill();
+  }
 
-  touches: function (other) {
+  touches(other) {
     return !(
       this.pos.x >= other.pos.x + other.size.x ||
       this.pos.x + this.size.x <= other.pos.x ||
       this.pos.y >= other.pos.y + other.size.y ||
       this.pos.y + this.size.y <= other.pos.y
     );
-  },
+  }
 
-  distanceTo: function (other) {
-    var xd = this.pos.x + this.size.x / 2 - (other.pos.x + other.size.x / 2);
-    var yd = this.pos.y + this.size.y / 2 - (other.pos.y + other.size.y / 2);
+  distanceTo(other) {
+    const xd = this.pos.x + this.size.x / 2 - (other.pos.x + other.size.x / 2);
+    const yd = this.pos.y + this.size.y / 2 - (other.pos.y + other.size.y / 2);
     return Math.sqrt(xd * xd + yd * yd);
-  },
+  }
 
-  angleTo: function (other) {
+  angleTo(other) {
     return Math.atan2(
       other.pos.y + other.size.y / 2 - (this.pos.y + this.size.y / 2),
       other.pos.x + other.size.x / 2 - (this.pos.x + this.size.x / 2)
     );
-  },
+  }
 
-  check: function (other) {},
-  collideWith: function (other, axis) {},
-  ready: function () {},
-  erase: function () {},
-});
-
-// Last used entity id; incremented with each spawned entity
-
-ig.Entity._lastId = 0;
+  check(other) {}
+  collideWith(other, axis) {}
+  ready() {}
+  erase() {}
+}
 
 // Collision Types - Determine if and how entities collide with each other
 
