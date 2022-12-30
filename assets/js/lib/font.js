@@ -18,12 +18,12 @@ class Font extends GameImage {
     this.height -= 2; // last 2 lines contain no visual data
   }
 
-  isMultiline(text) {
+  #isMultiline(text) {
     return text.indexOf("\n") !== -1;
   }
 
   widthForString(text) {
-    if (this.isMultiline(text)) {
+    if (this.#isMultiline(text)) {
       const lines = text.split("\n");
       let width = 0;
       for (let i = 0; i < lines.length; i++) width = Math.max(width, this.#widthForLine(lines[i]));
@@ -47,44 +47,35 @@ class Font extends GameImage {
 
   draw(text, x, y, align) {
     if (typeof text !== "string") text = text.toString();
-    if (this.isMultiline(text)) {
+    if (this.#isMultiline(text)) {
       const lines = text.split("\n");
       const lineHeight = this.heightForString(text);
       for (let i = 0; i < lines.length; i++) this.draw(lines[i], x, y + i * lineHeight, align);
       return;
     }
 
-    if (align == ig.Font.ALIGN.RIGHT || align == ig.Font.ALIGN.CENTER) {
-      var width = this.#widthForLine(text);
-      x -= align == ig.Font.ALIGN.CENTER ? width / 2 : width;
-    }
+    const width = this.#widthForLine(text);
+    if (align === Font.ALIGN.CENTER) x -= width / 2;
+    else if (align === Font.ALIGN.RIGHT) x -= width;
 
-    if (this.alpha !== 1) {
-      ig.system.context.globalAlpha = this.alpha;
-    }
+    // TODO
+    if (this.alpha !== 1) ig.system.context.globalAlpha = this.alpha;
 
-    for (var i = 0; i < text.length; i++) {
-      var c = text.charCodeAt(i);
-      x += this._drawChar(c - this.firstChar, x, y);
-    }
+    for (let i = 0; i < text.length; i++)
+      x += this.#drawChar(text.charCodeAt(i) - this.firstChar, x, y);
 
-    if (this.alpha !== 1) {
-      ig.system.context.globalAlpha = 1;
-    }
-    ig.Image.drawCount += text.length;
+    if (this.alpha !== 1) ig.system.context.globalAlpha = 1;
+    // ig.Image.drawCount += text.length; TODO
   }
 
-  _drawChar(c, targetX, targetY) {
-    if (!this.loaded || c < 0 || c >= this.indices.length) {
-      return 0;
-    }
+  #drawChar(char, targetX, targetY) {
+    if (!this.loaded || char < 0 || char >= this.indices.length) return 0;
 
-    var scale = ig.system.scale;
-
-    var charX = this.indices[c] * scale;
-    var charY = 0;
-    var charWidth = this.widthMap[c] * scale;
-    var charHeight = this.height * scale;
+    const scale = ig.system.scale; // TODO
+    const charX = this.indices[char] * scale;
+    const charY = 0;
+    const charWidth = this.widthMap[char] * scale;
+    const charHeight = this.height * scale;
 
     ig.system.context.drawImage(
       this.data,
@@ -98,7 +89,7 @@ class Font extends GameImage {
       charHeight
     );
 
-    return this.widthMap[c] + this.letterSpacing;
+    return this.widthMap[char] + this.letterSpacing;
   }
 
   #loadMetrics(image) {
@@ -109,14 +100,13 @@ class Font extends GameImage {
     this.widthMap = [];
     this.indices = [];
 
-    var px = ig.getImagePixels(image, 0, image.height - 1, image.width, 1);
+    const px = ig.getImagePixels(image, 0, image.height - 1, image.width, 1); // TODO
 
-    var currentWidth = 0;
-    for (var x = 0; x < image.width; x++) {
-      var index = x * 4 + 3; // alpha component of this pixel
-      if (px.data[index] > 127) {
-        currentWidth++;
-      } else if (px.data[index] < 128 && currentWidth) {
+    let currentWidth = 0;
+    for (let x = 0; x < image.width; x++) {
+      const index = x * 4 + 3; // alpha component of this pixel
+      if (px.data[index] > 127) currentWidth++;
+      else if (px.data[index] < 128 && currentWidth) {
         this.widthMap.push(currentWidth);
         this.indices.push(x - currentWidth);
         currentWidth = 0;
