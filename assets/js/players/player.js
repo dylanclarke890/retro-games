@@ -1,4 +1,4 @@
-class Player {
+class Player extends Entity {
   constructor(scope, x, y) {
     this.scope = scope;
     this.x = x;
