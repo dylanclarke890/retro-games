@@ -4,28 +4,25 @@ class GameRenderer {
   }
 
   render() {
-    const scope = this.scope;
-    const { w, h } = scope.constants;
+    this.clear();
 
-    scope.ctx.clearRect(0, 0, w, h);
+    const scope = this.scope;
 
     // Example text
     scope.ctx.font = "32px Arial";
     scope.ctx.fillStyle = "#fff";
     scope.ctx.fillText("It's dangerous to travel this route alone.", 5, 50);
 
-    // Displaying FPS.
-    if (scope.constants.showFps) {
-      scope.ctx.fillStyle = "#ff0";
-      scope.ctx.font = "12px Arial";
-      scope.ctx.fillText(`FPS ${scope.fps}`, w - 60, 20);
-    }
+    // Calling entity render methods
+    if (scope.state["entities"] !== undefined)
+      for (let entity in scope.state.entities) scope.state.entities[entity].render();
+  }
 
-    if (scope.state.hasOwnProperty("entities")) {
-      const entities = scope.state.entities;
-      for (let entity in entities) {
-        entities[entity].render();
-      }
-    }
+  clear(color) {
+    const { w, h } = this.scope.constants;
+    if (color) {
+      scope.ctx.fillStyle = "#fff";
+      scope.ctx.fillRect(0, 0, w, h);
+    } else this.scope.ctx.clearRect(0, 0, w, h);
   }
 }
