@@ -245,9 +245,89 @@ class CollisionMap extends GameMap {
   lastSlope = 1;
   tiledef = null;
 
+  /** Default Slope Tile definition. Each tile is defined by an array of 5 vars:
+   * - 4 for the line in tile coordinates (0 -- 1)
+   * - 1 specifing whether the tile is 'filled' behind the line or not
+   * @example [ x1, y1, x2, y2, solid ]. */
+  static get defaultTileDef() {
+    // Defining 'half', 'one third' and 'two thirds' as vars  makes it a bit
+    // easier to read... I hope.
+    const H = 1 / 2,
+      N = 1 / 3,
+      M = 2 / 3,
+      SOLID = true,
+      NON_SOLID = false;
+    return {
+      /* 15 NE */ 5: [0, 1, 1, M, SOLID],
+      6: [0, M, 1, N, SOLID],
+      7: [0, N, 1, 0, SOLID],
+      /* 22 NE */ 3: [0, 1, 1, H, SOLID],
+      4: [0, H, 1, 0, SOLID],
+      /* 45 NE */ 2: [0, 1, 1, 0, SOLID],
+      /* 67 NE */ 10: [H, 1, 1, 0, SOLID],
+      21: [0, 1, H, 0, SOLID],
+      /* 75 NE */ 32: [M, 1, 1, 0, SOLID],
+      43: [N, 1, M, 0, SOLID],
+      54: [0, 1, N, 0, SOLID],
+
+      /* 15 SE */ 27: [0, 0, 1, N, SOLID],
+      28: [0, N, 1, M, SOLID],
+      29: [0, M, 1, 1, SOLID],
+      /* 22 SE */ 25: [0, 0, 1, H, SOLID],
+      26: [0, H, 1, 1, SOLID],
+      /* 45 SE */ 24: [0, 0, 1, 1, SOLID],
+      /* 67 SE */ 11: [0, 0, H, 1, SOLID],
+      22: [H, 0, 1, 1, SOLID],
+      /* 75 SE */ 33: [0, 0, N, 1, SOLID],
+      44: [N, 0, M, 1, SOLID],
+      55: [M, 0, 1, 1, SOLID],
+
+      /* 15 NW */ 16: [1, N, 0, 0, SOLID],
+      17: [1, M, 0, N, SOLID],
+      18: [1, 1, 0, M, SOLID],
+      /* 22 NW */ 14: [1, H, 0, 0, SOLID],
+      15: [1, 1, 0, H, SOLID],
+      /* 45 NW */ 13: [1, 1, 0, 0, SOLID],
+      /* 67 NW */ 8: [H, 1, 0, 0, SOLID],
+      19: [1, 1, H, 0, SOLID],
+      /* 75 NW */ 30: [N, 1, 0, 0, SOLID],
+      41: [M, 1, N, 0, SOLID],
+      52: [1, 1, M, 0, SOLID],
+
+      /* 15 SW */ 38: [1, M, 0, 1, SOLID],
+      39: [1, N, 0, M, SOLID],
+      40: [1, 0, 0, N, SOLID],
+      /* 22 SW */ 36: [1, H, 0, 1, SOLID],
+      37: [1, 0, 0, H, SOLID],
+      /* 45 SW */ 35: [1, 0, 0, 1, SOLID],
+      /* 67 SW */ 9: [1, 0, H, 1, SOLID],
+      20: [H, 0, 0, 1, SOLID],
+      /* 75 SW */ 31: [1, 0, M, 1, SOLID],
+      42: [M, 0, N, 1, SOLID],
+      53: [N, 0, 0, 1, SOLID],
+
+      /* Go N  */ 12: [0, 0, 1, 0, NON_SOLID],
+      /* Go S  */ 23: [1, 1, 0, 1, NON_SOLID],
+      /* Go E  */ 34: [1, 0, 1, 1, NON_SOLID],
+      /* Go W  */ 45: [0, 1, 0, 0, NON_SOLID],
+    };
+  }
+
+  static get staticNoCollision() {
+    return {
+      trace: function (x, y, vx, vy) {
+        return {
+          collision: { x: false, y: false, slope: false },
+          pos: { x: x + vx, y: y + vy },
+          tile: { x: 0, y: 0 },
+        };
+      },
+    };
+  }
+
   constructor(tilesize, data, tiledef) {
     super(tilesize, data);
-    this.tiledef = tiledef || ig.CollisionMap.defaultTileDef;
+    this.tiledef = tiledef || CollisionMap.defaultTileDef;
     for (let t in this.tiledef) if (t | (0 > this.lastSlope)) this.lastSlope = t | 0;
   }
 
@@ -428,84 +508,3 @@ class CollisionMap extends GameMap {
     return true;
   }
 }
-
-// Default Slope Tile definition. Each tile is defined by an array of 5 vars:
-// - 4 for the line in tile coordinates (0 -- 1)
-// - 1 specifing whether the tile is 'filled' behind the line or not
-// [ x1, y1, x2, y2, solid ]
-
-// Defining 'half', 'one third' and 'two thirds' as vars  makes it a bit
-// easier to read... I hope.
-var H = 1 / 2,
-  N = 1 / 3,
-  M = 2 / 3,
-  SOLID = true,
-  NON_SOLID = false;
-
-ig.CollisionMap.defaultTileDef = {
-  /* 15 NE */ 5: [0, 1, 1, M, SOLID],
-  6: [0, M, 1, N, SOLID],
-  7: [0, N, 1, 0, SOLID],
-  /* 22 NE */ 3: [0, 1, 1, H, SOLID],
-  4: [0, H, 1, 0, SOLID],
-  /* 45 NE */ 2: [0, 1, 1, 0, SOLID],
-  /* 67 NE */ 10: [H, 1, 1, 0, SOLID],
-  21: [0, 1, H, 0, SOLID],
-  /* 75 NE */ 32: [M, 1, 1, 0, SOLID],
-  43: [N, 1, M, 0, SOLID],
-  54: [0, 1, N, 0, SOLID],
-
-  /* 15 SE */ 27: [0, 0, 1, N, SOLID],
-  28: [0, N, 1, M, SOLID],
-  29: [0, M, 1, 1, SOLID],
-  /* 22 SE */ 25: [0, 0, 1, H, SOLID],
-  26: [0, H, 1, 1, SOLID],
-  /* 45 SE */ 24: [0, 0, 1, 1, SOLID],
-  /* 67 SE */ 11: [0, 0, H, 1, SOLID],
-  22: [H, 0, 1, 1, SOLID],
-  /* 75 SE */ 33: [0, 0, N, 1, SOLID],
-  44: [N, 0, M, 1, SOLID],
-  55: [M, 0, 1, 1, SOLID],
-
-  /* 15 NW */ 16: [1, N, 0, 0, SOLID],
-  17: [1, M, 0, N, SOLID],
-  18: [1, 1, 0, M, SOLID],
-  /* 22 NW */ 14: [1, H, 0, 0, SOLID],
-  15: [1, 1, 0, H, SOLID],
-  /* 45 NW */ 13: [1, 1, 0, 0, SOLID],
-  /* 67 NW */ 8: [H, 1, 0, 0, SOLID],
-  19: [1, 1, H, 0, SOLID],
-  /* 75 NW */ 30: [N, 1, 0, 0, SOLID],
-  41: [M, 1, N, 0, SOLID],
-  52: [1, 1, M, 0, SOLID],
-
-  /* 15 SW */ 38: [1, M, 0, 1, SOLID],
-  39: [1, N, 0, M, SOLID],
-  40: [1, 0, 0, N, SOLID],
-  /* 22 SW */ 36: [1, H, 0, 1, SOLID],
-  37: [1, 0, 0, H, SOLID],
-  /* 45 SW */ 35: [1, 0, 0, 1, SOLID],
-  /* 67 SW */ 9: [1, 0, H, 1, SOLID],
-  20: [H, 0, 0, 1, SOLID],
-  /* 75 SW */ 31: [1, 0, M, 1, SOLID],
-  42: [M, 0, N, 1, SOLID],
-  53: [N, 0, 0, 1, SOLID],
-
-  /* Go N  */ 12: [0, 0, 1, 0, NON_SOLID],
-  /* Go S  */ 23: [1, 1, 0, 1, NON_SOLID],
-  /* Go E  */ 34: [1, 0, 1, 1, NON_SOLID],
-  /* Go W  */ 45: [0, 1, 0, 0, NON_SOLID],
-
-  // Now that was fun!
-};
-
-// Static Dummy CollisionMap; never collides
-ig.CollisionMap.staticNoCollision = {
-  trace: function (x, y, vx, vy) {
-    return {
-      collision: { x: false, y: false, slope: false },
-      pos: { x: x + vx, y: y + vy },
-      tile: { x: 0, y: 0 },
-    };
-  },
-};
