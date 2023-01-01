@@ -54,4 +54,4 @@ class Game {
   }
 }
 
-window.game = new Game({ w: 800, h: 600, targetFps: 60, showDebugStats: true });
+// window.game = new Game({ w: 800, h: 600, targetFps: 60, showDebugStats: true });

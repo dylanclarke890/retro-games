@@ -44,6 +44,7 @@ class Entity {
   checkAgainst = Entity.TYPE.NONE;
   collides = Entity.COLLIDES.NEVER;
   slopeStanding = { min: (44).toRad(), max: (136).toRad() };
+  killed = false;
 
   constructor(x, y, settings) {
     this.id = ++Entity.#lastId;
