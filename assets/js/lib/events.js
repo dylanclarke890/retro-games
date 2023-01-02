@@ -165,33 +165,34 @@ class InputEvents {
   mouse = { x: 0, y: 0 };
   accel = { x: 0, y: 0, z: 0 };
 
-  constructor() {
+  constructor({ system } = {}) {
+    if (!system) throw new Error("System is required");
     this.#userAgent = UserAgent.info;
   }
 
-  // TODO
   initMouse() {
     if (this.isUsingMouse) return;
     this.isUsingMouse = true;
-    ig.system.canvas.addEventListener("wheel", this.mousewheel.bind(this), false);
+    const canvas = this.system.canvas;
 
-    ig.system.canvas.addEventListener("contextmenu", this.contextmenu.bind(this), false);
-    ig.system.canvas.addEventListener("mousedown", this.keydown.bind(this), false);
-    ig.system.canvas.addEventListener("mouseup", this.keyup.bind(this), false);
-    ig.system.canvas.addEventListener("mousemove", this.mousemove.bind(this), false);
+    canvas.addEventListener("wheel", (e) => this.mousewheel(e), false);
+    canvas.addEventListener("contextmenu", (e) => this.contextmenu(e), false);
+    canvas.addEventListener("mousedown", (e) => this.keydown(e), false);
+    canvas.addEventListener("mouseup", (e) => this.keyup(e), false);
+    canvas.addEventListener("mousemove", (e) => this.mousemove(e), false);
 
     if (this.#userAgent.device.touchDevice) {
       // Standard
-      ig.system.canvas.addEventListener("touchstart", this.keydown.bind(this), false);
-      ig.system.canvas.addEventListener("touchend", this.keyup.bind(this), false);
-      ig.system.canvas.addEventListener("touchcancel", this.keyup.bind(this), false);
-      ig.system.canvas.addEventListener("touchmove", this.mousemove.bind(this), false);
+      canvas.addEventListener("touchstart", (e) => this.keydown(e), false);
+      canvas.addEventListener("touchend", (e) => this.keyup(e), false);
+      canvas.addEventListener("touchcancel", (e) => this.keyup(e), false);
+      canvas.addEventListener("touchmove", (e) => this.mousemove(e), false);
 
       // MS
-      ig.system.canvas.addEventListener("MSPointerDown", this.keydown.bind(this), false);
-      ig.system.canvas.addEventListener("MSPointerUp", this.keyup.bind(this), false);
-      ig.system.canvas.addEventListener("MSPointerMove", this.mousemove.bind(this), false);
-      ig.system.canvas.style.msTouchAction = "none";
+      canvas.addEventListener("MSPointerDown", (e) => this.keydown(e), false);
+      canvas.addEventListener("MSPointerUp", (e) => this.keyup(e), false);
+      canvas.addEventListener("MSPointerMove", (e) => this.mousemove(e), false);
+      canvas.style.msTouchAction = "none";
     }
   }
 
@@ -222,11 +223,12 @@ class InputEvents {
 
   // TODO
   mousemove(event) {
-    const internalWidth = ig.system.canvas.offsetWidth || ig.system.realWidth;
-    const scale = ig.system.scale * (internalWidth / ig.system.realWidth);
+    const system = this.system;
+    const internalWidth = system.canvas.offsetWidth || system.realWidth;
+    const scale = system.scale * (internalWidth / system.realWidth);
 
     let pos = { left: 0, top: 0 };
-    if (ig.system.canvas.getBoundingClientRect) pos = ig.system.canvas.getBoundingClientRect();
+    if (system.canvas.getBoundingClientRect) pos = system.canvas.getBoundingClientRect();
     const ev = event.touches ? event.touches[0] : event;
     this.mouse.x = (ev.clientX - pos.left) / scale;
     this.mouse.y = (ev.clientY - pos.top) / scale;
@@ -240,11 +242,11 @@ class InputEvents {
 
   keydown(event) {
     const tag = event.target.tagName;
-    if (tag == "INPUT" || tag == "TEXTAREA") return;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
     const code =
-      event.type == "keydown"
+      event.type === "keydown"
         ? event.keyCode
-        : event.button == 2
+        : event.button === 2
         ? InputEvents.KEY.MOUSE2
         : InputEvents.KEY.MOUSE1;
 
@@ -264,12 +266,13 @@ class InputEvents {
   }
 
   keyup(event) {
+    // TODO: private function checking for input into text box.
     const tag = event.target.tagName;
-    if (tag == "INPUT" || tag == "TEXTAREA") return;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
     const code =
-      event.type == "keyup"
+      event.type === "keyup"
         ? event.keyCode
-        : event.button == 2
+        : event.button === 2
         ? InputEvents.KEY.MOUSE2
         : InputEvents.KEY.MOUSE1;
 

@@ -14,6 +14,7 @@ class Color {
 }
 
 class Stats {
+  // TODO: Check
   static panelWidth = 106;
   static panelHeight = 40;
   static containerWidth = 110;

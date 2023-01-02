@@ -1,5 +1,5 @@
 //#region performance.now()
-
+// TODO
 const moduleLoadTime = Date.now();
 const now = () => {
   if (performance && performance.now) return performance.now();

@@ -17,14 +17,13 @@ class GameRunner {
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.mediaFactory = new MediaFactory({ system: this.system });
-    this.font = this.mediaFactory.createFont(font);
+    this.inputEvents = new InputEvents({ system: this.system });
     this.soundManager = new SoundManager(this);
-    this.inputEvents = new InputEvents();
-
+    this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.userAgent = UserAgent.info;
+    this.font = this.mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;
 
-    this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.ready = true;
 
     this.loader = new (loaderClass ?? GameLoader)({
