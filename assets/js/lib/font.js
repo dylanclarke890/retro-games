@@ -55,8 +55,6 @@ class Font {
     // }
 
     if (align !== Font.ALIGN.LEFT) {
-      const canvasWidth = this.system.canvas.offsetWidth;
-      console.log(canvasWidth);
       const textWidth = this.sizeOfText(text).width;
       if (align === Font.ALIGN.CENTER) {
         x -= textWidth / 2;

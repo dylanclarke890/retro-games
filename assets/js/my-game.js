@@ -26,7 +26,7 @@ const runner = new GameRunner({
   showDebugStats: true,
   font: {
     name: "FontFamily Bitter",
-    path: "https://fonts.gstatic.com/s/bitter/v7/HEpP8tJXlWaYHimsnXgfCOvvDin1pK8aKteLpeZ5c0A.woff2",
+    path: "./assets/fonts/arcade-classic.TTF",
   },
 });
 
