@@ -28,7 +28,6 @@ class GameRunner {
 
     this.loader = new (loaderClass ?? GameLoader)({
       runner: this,
-      system: this.system,
       gameClass,
       resources: this.resources,
     });
