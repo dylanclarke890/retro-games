@@ -2,10 +2,12 @@ class SoundManager {
   clips = {};
   volume = 1;
   format = null;
+  #runner = null;
 
-  constructor() {
-    VendorAttributes.normalise(window, "AudioContext");
-    this.userAgent = UserAgent.info;
+  constructor(runner) {
+    this.#runner = runner;
+    VendorAttributes.normalize(window, "AudioContext");
+    this.#userAgent = UserAgent.info;
 
     // Quick sanity check if the Browser supports the Audio tag
     if (!Sound.enabled || !window.Audio) {
@@ -27,17 +29,17 @@ class SoundManager {
 
     // Create WebAudio Context
     if (Sound.enabled && Sound.useWebAudio) {
-      // TODO
       this.audioContext = new AudioContext();
-      ig.system.canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
-      ig.system.canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
+      const canvas = this.#runner.system.canvas;
+      canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
+      canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
     }
   }
 
   unlockWebAudio() {
-    ig.system.canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false); // TODO
-    ig.system.canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
-
+    const canvas = this.#runner.system.canvas;
+    canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false);
+    canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
     const buffer = this.audioContext.createBuffer(1, 1, 22050); // create empty buffer
     const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
@@ -110,7 +112,7 @@ class SoundManager {
       // Mobile browsers stubbornly refuse to preload HTML5, so we simply
       // ignore the canplaythrough event and immediately "fake" a successful
       // load callback
-      if (this.userAgent.device.mobile) setTimeout(() => loadCallback(path, true, null), 0);
+      if (this.#userAgent.device.mobile) setTimeout(() => loadCallback(path, true, null), 0);
       else {
         clip.addEventListener(
           "canplaythrough",
@@ -265,7 +267,7 @@ class Music {
     if (!this.currentTrack) return;
     clearInterval(this.#fadeInterval);
     this.#fadeTimer = new Timer(time);
-    this.#fadeInterval = setInterval(() => this.#fadeStep(), 50); // TODO
+    this.#fadeInterval = setInterval(() => this.#fadeStep(), 50); // TODO - Check this
   }
 
   #fadeStep() {
@@ -333,7 +335,7 @@ class Sound {
       return;
     }
 
-    if (ig.ready)
+    if (this.ready)
       // TODO
       ig.soundManager.load(this.path, this.multiChannel, loadCallback); // TODO
     else ig.addResource(this); // TODO
