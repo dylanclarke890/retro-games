@@ -1,7 +1,8 @@
 class SoundManager {
   clips = {};
-  volume = 1;
+  static volume = 1;
   format = null;
+  #userAgent = null;
   #runner = null;
 
   constructor(runner) {
@@ -345,7 +346,7 @@ class Sound {
     if (!Sound.enabled) return;
 
     this.currentClip = ig.soundManager.get(this.path); // TODO
-    this.currentClip.loop = this._loop;
+    this.currentClip.loop = this.#loop;
     this.currentClip.volume = ig.soundManager.volume * this.volume;
     this.currentClip.play();
   }

@@ -1,28 +1,31 @@
 class GameLoader {
-  resources = [];
-
   gameClass = null;
   status = 0;
   done = false;
 
-  _unloaded = [];
-  _drawStatus = 0;
-  _intervalId = 0;
+  drawStatus = 0;
+  #resources = [];
+  #unloaded = [];
+  #intervalId = 0;
 
   constructor(gameClass, resources) {
+    // TODO: Replace Game in error message with name of BaseGame class, check for instanceof Game not AltGame.
+    if (!gameClass) throw new Error("Please pass the class type of the game to load");
+    if (!(gameClass.prototype instanceof AltGame))
+      throw new Error("Please pass a class that has derived from the 'Game' class.");
     this.gameClass = gameClass;
-    this.resources = resources;
-    for (let i = 0; i < this.resources.length; i++) this._unloaded.push(this.resources[i].path);
+    this.#resources = resources ?? [];
+    for (let i = 0; i < this.#resources.length; i++) this.#unloaded.push(this.#resources[i].path);
   }
 
   load() {
     // ig.system.clear( '#000' ); TODO!
-    if (!this.resources.length) {
+    if (!this.#resources.length) {
       this.end();
       return;
     }
-    for (let i = 0; i < this.resources.length; i++) this.loadResource(this.resources[i]);
-    this._intervalId = setInterval(() => this.draw(), 16);
+    for (let i = 0; i < this.#resources.length; i++) this.loadResource(this.#resources[i]);
+    this.#intervalId = setInterval(() => this.draw(), 16);
   }
 
   loadResource(res) {
@@ -32,7 +35,7 @@ class GameLoader {
   end() {
     if (this.done) return;
     this.done = true;
-    clearInterval(this._intervalId);
+    clearInterval(this.#intervalId);
     // ig.system.setGame( this.gameClass ); TODO:
   }
 
@@ -55,9 +58,9 @@ class GameLoader {
   }
 
   _loadCallback(path, status) {
-    if (status) this._unloaded.erase(path);
+    if (status) this.#unloaded.erase(path);
     else throw new Error(`Failed to load resource: ${path}`);
-    this.status = 1 - this._unloaded.length / this.resources.length;
-    if (this._unloaded.length == 0) setTimeout(() => this.end(), 250); // all done?
+    this.status = 1 - this.#unloaded.length / this.#resources.length;
+    if (this.#unloaded.length == 0) setTimeout(() => this.end(), 250); // all done?
   }
 }

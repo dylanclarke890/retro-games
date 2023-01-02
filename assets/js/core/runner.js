@@ -2,19 +2,34 @@ class GameRunner {
   #resources = [];
   ready = false;
 
-  constructor(canvasId, gameClass, fps, width, height, scale, loaderClass) {
+  constructor({ canvasId, gameClass, fps, width, height, scale, loaderClass } = {}) {
     this.system = new System({ canvasId, width, height, scale, fps });
     this.userAgent = UserAgent.info;
+    this.soundManager = new SoundManager(this);
     this.inputEvents = new InputEvents();
-    this.soundManager = new SoundManager();
-    this.loader = new (loaderClass || Loader)(gameClass);
     this.ready = true;
+
+    this.loader = new (loaderClass || GameLoader)(gameClass);
+    this.loader.load();
   }
 
   addResource(resource) {
     if (resource) this.#resources.push(resource);
   }
 }
+
+class MyGame extends AltGame {
+  font = new Font("../../fonts/04b03.font.png");
+}
+
+const runner = new GameRunner({
+  canvasId: "play-area",
+  gameClass: MyGame,
+  fps: 60,
+  width: 800,
+  height: 600,
+});
+
 // ig.main = function (canvasId, gameClass, fps, width, height, scale, loaderClass) {
 //   ig.system = new ig.System(canvasId, fps, width, height, scale || 1);
 //   ig.input = new ig.Input();
