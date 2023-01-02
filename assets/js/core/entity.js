@@ -106,14 +106,14 @@ class Entity {
   }
 
   getNewVelocity(vel, accel, friction, max) {
-    if (accel) return (vel + accel * ig.system.tick).limit(-max, max);
+    if (accel) return (vel + accel * ig.system.tick).constrain(-max, max);
     else if (friction) {
       const delta = friction * ig.system.tick;
       if (vel - delta > 0) return vel - delta;
       else if (vel + delta < 0) return vel + delta;
       else return 0;
     }
-    return vel.limit(-max, max);
+    return vel.constrain(-max, max);
   }
 
   handleMovementTrace(res) {

@@ -273,7 +273,7 @@ class Music {
 
   #fadeStep() {
     const v =
-      this.#fadeTimer.delta().map(-this.#fadeTimer.target, 0, 1, 0).limit(0, 1) * this.#volume;
+      this.#fadeTimer.delta().map(-this.#fadeTimer.target, 0, 1, 0).constrain(0, 1) * this.#volume;
 
     if (v <= 0.01) {
       this.stop();
