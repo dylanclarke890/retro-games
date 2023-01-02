@@ -17,8 +17,8 @@ class Font extends GameImage {
   }
 
   onload(ev) {
-    this.#loadMetrics();
     super.onload(ev);
+    this.#loadMetrics();
     this.height -= 2; // last 2 lines contain no visual data
   }
 
@@ -37,10 +37,12 @@ class Font extends GameImage {
     return this.#widthForLine(text);
   }
 
-  #widthForLine(text) {
+  #widthForLine(text = "") {
     let width = 0;
-    for (let i = 0; i < text.length; i++)
+    for (let i = 0; i < text.length; i++) {
+      console.log(this.widthMap[text.charCodeAt(i) - this.firstChar]);
       width += this.widthMap[text.charCodeAt(i) - this.firstChar];
+    }
     if (text.length > 0) width += this.letterSpacing * (text.length - 1);
     return width;
   }
@@ -58,9 +60,9 @@ class Font extends GameImage {
       return;
     }
 
-    const width = this.#widthForLine(text);
-    if (align === Font.ALIGN.CENTER) x -= width / 2;
-    else if (align === Font.ALIGN.RIGHT) x -= width;
+    // const width = this.#widthForLine(text);
+    // if (align === Font.ALIGN.CENTER) x -= width / 2;
+    // else if (align === Font.ALIGN.RIGHT) x -= width;
 
     const ctx = this.system.ctx;
     if (this.alpha !== 1) ctx.globalAlpha = this.alpha;
@@ -102,19 +104,18 @@ class Font extends GameImage {
   #loadMetrics() {
     this.widthMap = [];
     this.indices = [];
-    const pixels = this.system.getImagePixels(this.data, 0, this.data.height, this.data.width, 1);
+
+    const pixels = this.system.getImagePixels(this.data, 0, this.height - 1, this.data.width, 1);
+
     let currentWidth = 0;
     let x;
-    for (let i = 0; i < 9; i++) {
-      for (x = 0; x < this.data.width; x++) {
-        const index = x * 4 + 3; // alpha component of this pixel
-        console.log(pixels.data[index]);
-        if (pixels.data[index] > 127) currentWidth++;
-        else if (pixels.data[index] < 128 && currentWidth) {
-          this.widthMap.push(currentWidth);
-          this.indices.push(x - currentWidth);
-          currentWidth = 0;
-        }
+    for (x = 0; x < this.data.width; x++) {
+      const index = x * 4 + 3; // alpha component of this pixel
+      if (pixels.data[index] > 127) currentWidth++;
+      else if (pixels.data[index] < 128 && currentWidth) {
+        this.widthMap.push(currentWidth);
+        this.indices.push(x - currentWidth);
+        currentWidth = 0;
       }
     }
     this.widthMap.push(currentWidth);

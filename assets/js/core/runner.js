@@ -12,12 +12,12 @@ class GameRunner {
     scale,
     loaderClass,
     showDebugStats,
-    pathToFont,
+    font,
     ...customGameOptions
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.mediaFactory = new MediaFactory({ system: this.system });
-    this.font = this.mediaFactory.createFont(pathToFont);
+    this.font = this.mediaFactory.createFont(font);
     this.soundManager = new SoundManager(this);
     this.inputEvents = new InputEvents();
 

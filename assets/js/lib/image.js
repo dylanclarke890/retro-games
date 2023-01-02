@@ -36,15 +36,17 @@ class GameImage {
     this.data.src = this.path + "?" + Date.now();
   }
 
-  onload(_) {
+  onload(_event) {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
-    if (this.system.scale != 1) this.resize();
+    if (this.system.scale !== 1) {
+      this.resize();
+    }
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
-  onerror(_) {
+  onerror(_event) {
     this.failed = true;
     if (this.loadCallback) this.loadCallback(this.path, false);
   }
@@ -57,7 +59,6 @@ class GameImage {
   resize() {
     const scale = this.system.scale;
     const origPixels = this.system.getImagePixels(this.data, 0, 0, this.width, this.height);
-
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
 
@@ -78,18 +79,17 @@ class GameImage {
       }
     }
     scaledCtx.putImageData(scaledPixels, 0, 0);
-    this.data = scaledPixels;
+    this.data = scaled;
   }
 
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
 
-    const scope = this.system;
-    const scale = scope.constants.scale;
-    sourceX = sourceX ? sourceX * scale : 0;
-    sourceY = sourceY ? sourceY * scale : 0;
-    width = (width ? width : this.width) * scale;
-    height = (height ? height : this.height) * scale;
+    const scale = this.system.scale;
+    sourceX = sourceX ?? 0 * scale;
+    sourceY = sourceY ?? 0 * scale;
+    width = (width ?? this.width) * scale;
+    height = (height ?? this.height) * scale;
 
     this.system.ctx.drawImage(
       this.data,
@@ -107,7 +107,7 @@ class GameImage {
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
-    tileHeight = tileHeight ? tileHeight : tileWidth;
+    tileHeight = tileHeight ?? tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
     const scope = this.system,
@@ -136,6 +136,6 @@ class GameImage {
     );
 
     if (flipX || flipY) ctx.restore();
-    scope.imageDrawn();
+    this.system.imageDrawn();
   }
 }

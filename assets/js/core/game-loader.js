@@ -33,8 +33,7 @@ class GameLoader {
   }
 
   loadResource(res) {
-    console.log(res);
-    res.load(this.#loadCallback);
+    res.load((path, status) => this.#loadCallback(path, status));
   }
 
   end() {
@@ -67,6 +66,7 @@ class GameLoader {
   }
 
   #loadCallback(path, status) {
+    console.log(`Path: ${path}, Status: ${status}`);
     if (status) this.#unloaded.erase(path);
     else throw new Error(`Failed to load resource: ${path}`);
     this.status = 1 - this.#unloaded.length / this.#resources.length;

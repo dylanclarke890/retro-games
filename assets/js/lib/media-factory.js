@@ -4,7 +4,7 @@ class MediaFactory {
     this.system = system;
   }
 
-  createFont(url) {
-    return new Font({ system: this.system, path: url });
+  createFont({ name, path } = {}) {
+    return new AltFont({ system: this.system, path, name });
   }
 }

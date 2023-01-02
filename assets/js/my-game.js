@@ -9,7 +9,6 @@ class MyGame extends Game {
 
   draw() {
     super.draw();
-
     const x = 50,
       y = 100;
     this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
@@ -23,7 +22,10 @@ const runner = new GameRunner({
   width: 800,
   height: 600,
   showDebugStats: true,
-  pathToFont: "./assets/fonts/04b03.font.png",
+  font: {
+    name: "FontFamily Bitter",
+    path: "https://fonts.gstatic.com/s/bitter/v7/HEpP8tJXlWaYHimsnXgfCOvvDin1pK8aKteLpeZ5c0A.woff2",
+  },
 });
 
 // ig.main = function (canvasId, gameClass, fps, width, height, scale, loaderClass) {

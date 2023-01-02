@@ -19,7 +19,7 @@ class System {
   #runner = null;
   #imageCache = {};
 
-  constructor({ runner, canvasId = null, width, height, scale, pathToFont }) {
+  constructor({ runner, canvasId = null, width, height, scale }) {
     if (!runner) throw new Error("Runner is required.");
     this.#runner = runner;
 
@@ -108,7 +108,7 @@ class System {
     canvas.width = Math.ceil(realWidth);
     canvas.height = Math.ceil(realHeight);
 
-    ctx.drawImage(image, 0, 0, width, height);
+    ctx.drawImage(image, 0, 0, realWidth, realWidth);
 
     return ctx.getImageData(x, y, width, height);
   }
