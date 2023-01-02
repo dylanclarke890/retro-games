@@ -47,6 +47,7 @@ class GameRunner {
 
   setGameNow(gameClass) {
     this.game = new gameClass({
+      system: this.system,
       mediaFactory: this.mediaFactory,
       ...this.customGameOptions,
     });

@@ -43,8 +43,8 @@ class UserAgent {
         noCache: /\?nocache/.test(document.location.href),
         pixelRatio,
         screen: {
-          width: window.screen.availWidth * pixelRatio,
-          height: window.screen.availHeight * pixelRatio,
+          x: window.screen.availWidth * pixelRatio,
+          y: window.screen.availHeight * pixelRatio,
         },
         viewport: {
           width: window.innerWidth,

@@ -20,8 +20,9 @@ class Game {
   #levelToLoad = null;
   #doSortEntities = false;
 
-  constructor({ mediaFactory } = {}) {
+  constructor({ system, mediaFactory } = {}) {
     this.mediaFactory = mediaFactory;
+    this.system = system;
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }
 
@@ -46,13 +47,13 @@ class Game {
     this.sortEntities();
 
     // Map Layer
-    this.collisionMap = ig.CollisionMap.staticNoCollision;
+    this.collisionMap = CollisionMap.staticNoCollision;
     this.backgroundMaps = [];
     for (let i = 0; i < data.layer.length; i++) {
       const ld = data.layer[i];
       if (ld.name == "collision") this.collisionMap = new CollisionMap(ld.tilesize, ld.data);
       else {
-        const newMap = new ig.BackgroundMap(ld.tilesize, ld.data, ld.tilesetName);
+        const newMap = new BackgroundMap(ld.tilesize, ld.data, ld.tilesetName);
         newMap.anims = this.backgroundAnims[ld.tilesetName] || {};
         newMap.repeat = ld.repeat;
         newMap.distance = ld.distance;
@@ -119,10 +120,9 @@ class Game {
     // Also make sure this entity doesn't collide anymore and won't get
     // updated or checked
     ent.killed = true;
-    // TODO;
-    ent.type = ig.Entity.TYPE.NONE;
-    ent.checkAgainst = ig.Entity.TYPE.NONE;
-    ent.collides = ig.Entity.COLLIDES.NEVER;
+    ent.type = Entity.TYPE.NONE;
+    ent.checkAgainst = Entity.TYPE.NONE;
+    ent.collides = Entity.COLLIDES.NEVER;
     this.#deferredKills.push(ent);
   }
 
@@ -170,14 +170,14 @@ class Game {
   }
 
   draw() {
-    if (this.clearColor) ig.system.clear(this.clearColor); // TODO
+    const system = this.system;
+    if (this.clearColor) system.clear(this.clearColor);
 
-    // This is a bit of a circle jerk. Entities reference game._rscreen TODO
-    // instead of game.screen when drawing themselves in order to be
-    // "synchronized" to the rounded(?) screen position
-    this.#rscreen.x = ig.system.getDrawPos(this.screen.x) / ig.system.scale;
-    this.#rscreen.y = ig.system.getDrawPos(this.screen.y) / ig.system.scale;
-
+    /**  TODO: This is a bit of a circle jerk. Entities reference game._rscreen
+     * instead of game.screen when drawing themselves in order to be
+     * "synchronized" to the rounded(?) screen position.*/
+    this.#rscreen.x = system.drawPosition(this.screen.x) / system.scale;
+    this.#rscreen.y = system.drawPosition(this.screen.y) / system.scale;
     let mapIndex;
     for (mapIndex = 0; mapIndex < this.backgroundMaps.length; mapIndex++) {
       const map = this.backgroundMaps[mapIndex];
@@ -213,9 +213,9 @@ class Game {
       const entity = this.entities[e];
       // Skip entities that don't check, don't get checked and don't collide
       if (
-        entity.type == ig.Entity.TYPE.NONE &&
-        entity.checkAgainst == ig.Entity.TYPE.NONE &&
-        entity.collides == ig.Entity.COLLIDES.NEVER
+        entity.type === Entity.TYPE.NONE &&
+        entity.checkAgainst === Entity.TYPE.NONE &&
+        entity.collides === Entity.COLLIDES.NEVER
       )
         continue;
 
@@ -239,7 +239,7 @@ class Game {
               // Intersects and wasn't already checkd?
               if (entity.touches(cell[c]) && !checked[cell[c].id]) {
                 checked[cell[c].id] = true;
-                // ig.Entity.checkPair(entity, cell[c]); // TODO
+                // Entity.checkPair(entity, cell[c]); // TODO
               }
             }
             cell.push(entity);

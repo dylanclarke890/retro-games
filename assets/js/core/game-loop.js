@@ -41,8 +41,8 @@ class GameLoop {
     if (elapsed < this.fpsInterval) return;
     this.#lastFrame = timestamp - (elapsed % this.fpsInterval);
 
-    this.runner.updater.update(timestamp);
-    this.runner.renderer.render();
+    this.runner.game.update();
+    this.runner.game.draw();
     if (this.showDebugStats) this.stats.update();
   }
 

@@ -5,6 +5,8 @@ class System {
   realWidth = 600;
   realHeight = 800;
   scale = 1;
+  drawPosition = this.DRAW.SMOOTH;
+  scaleMode = this.SCALE.SMOOTH;
 
   tick = 0;
   animationId = 0;
@@ -51,5 +53,43 @@ class System {
 
   reloadCache() {
     for (let path in this.#imageCache) this.#imageCache[path].reload();
+  }
+
+  clear(color) {
+    const { ctx, width, height } = this;
+    if (color) {
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, width, height);
+    } else {
+      ctx.clearRect(0, 0, width, height);
+    }
+  }
+
+  get DRAW() {
+    return {
+      AUTHENTIC: (p) => Math.round(p) * this.scale,
+      SMOOTH: (p) => Math.round(p * this.scale),
+      SUBPIXEL: (p) => p * this.scale,
+    };
+  }
+
+  get SCALE() {
+    return {
+      CRISP: (ctx) => {
+        const canvas = ctx.canvas;
+        VendorAttributes.set(ctx, "imageSmoothingEnabled", false);
+        canvas.style.imageRendering = "-moz-crisp-edges";
+        canvas.style.imageRendering = "-o-crisp-edges";
+        canvas.style.imageRendering = "-webkit-optimize-contrast";
+        canvas.style.imageRendering = "crisp-edges";
+        canvas.style.msInterpolationMode = "nearest-neighbor"; // No effect on Canvas :/
+      },
+      SMOOTH: (ctx) => {
+        const canvas = ctx.canvas;
+        VendorAttributes.set(ctx, "imageSmoothingEnabled", true);
+        canvas.style.imageRendering = "";
+        canvas.style.msInterpolationMode = "";
+      },
+    };
   }
 }

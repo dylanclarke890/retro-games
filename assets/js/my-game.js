@@ -11,10 +11,9 @@ class MyGame extends Game {
   draw() {
     super.draw();
 
-    const x = 50,
-      y = 100;
-
-    this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
+    // const x = 50,
+    //   y = 100;
+    // this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
   }
 }
 
