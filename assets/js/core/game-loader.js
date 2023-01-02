@@ -11,7 +11,7 @@ class GameLoader {
   constructor({ runner, system, gameClass, resources }) {
     if (!runner) throw new Error("Runner is required.");
     if (!system) throw new Error("System is required.");
-    if (!gameClass) throw new Error("Please pass the class type of the game to load");
+    if (!gameClass) throw new Error("Game class is required.");
     if (!(gameClass.prototype instanceof Game))
       throw new Error("Please pass a class that has derived from the 'Game' class.");
 
@@ -66,8 +66,8 @@ class GameLoader {
   }
 
   #loadCallback(path, status) {
-    if (status) this.#unloaded.erase(path);
-    else throw new Error(`Failed to load resource: ${path}`);
+    if (!status) throw new Error(`Failed to load resource: ${path}`);
+    this.#unloaded.erase(path);
     this.status = 1 - this.#unloaded.length / this.#resources.length;
     if (this.#unloaded.length == 0) setTimeout(() => this.end(), 250); // all done?
   }
