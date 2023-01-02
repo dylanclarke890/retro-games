@@ -1,5 +1,5 @@
 class GameRunner {
-  #resources = [];
+  resources = [];
   ready = false;
   game = null;
 
@@ -24,13 +24,13 @@ class GameRunner {
     this.loader = new (loaderClass ?? GameLoader)({
       system: this.system,
       gameClass,
-      resources: this.#resources,
+      resources: this.resources,
     });
     this.loader.load();
   }
 
   addResource(resource) {
-    if (resource) this.#resources.push(resource);
+    if (resource) this.resources.push(resource);
   }
 }
 

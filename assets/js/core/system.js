@@ -15,6 +15,7 @@ class System {
   canvas = null;
   context = null;
   #runner = null;
+  #imageCache = {};
 
   constructor({ runner, canvasId = null, width, height, fps, scale }) {
     if (!runner) throw new Error("Runner is required.");
@@ -27,6 +28,10 @@ class System {
     this.#runner = runner;
   }
 
+  get ready() {
+    return this.#runner.ready;
+  }
+
   setGame(gameClass) {
     if (this.running) this.newGameClass = gameClass;
     else this.setGameNow(gameClass);
@@ -37,5 +42,17 @@ class System {
       mediaFactory: this.#runner.mediaFactory,
       ...this.#runner.customOptions,
     });
+  }
+
+  addResource(resource) {
+    this.#runner.resources.push(resource);
+  }
+
+  cacheImage(path, image) {
+    this.#imageCache[path] = image;
+  }
+
+  reloadCache() {
+    for (let path in this.#imageCache) this.#imageCache[path].reload();
   }
 }
