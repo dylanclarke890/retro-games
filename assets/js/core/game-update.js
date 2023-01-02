@@ -1,15 +1,14 @@
 class GameUpdater {
-  constructor(scope) {
-    this.scope = scope;
+  constructor({ runner }) {
+    if (!runner) throw new Error("Runner is required");
+    this.runner = runner;
   }
 
   update(tframe) {
-    const scope = this.scope;
+    const game = this.runner;
 
     // Calling entity render methods
-    if (scope.state["entities"] !== undefined)
-      for (let entity in scope.state.entities) scope.state.entities[entity].update();
-
-    return scope.state;
+    if (game.entities !== undefined) for (let entity in game.entities) entity.update();
+    return game.state;
   }
 }

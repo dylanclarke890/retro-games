@@ -7,8 +7,10 @@ class GameImage {
   loadCallback = (_path, _loadingWasSuccessful) => {};
   path = "";
 
+  #system = null;
+
   constructor({ system, path } = {}) {
-    this.system = system;
+    this.#system = system;
     this.path = path;
     this.load();
   }
@@ -17,15 +19,15 @@ class GameImage {
     if (this.loaded) {
       if (loadCallback) loadCallback(this.path, true);
       return;
-    } else if (!this.loaded && !this.system.ready) {
+    } else if (!this.loaded && !this.#system.ready) {
       this.loadCallback = loadCallback || null;
       this.data = new Image();
       this.data.onload = this.onload;
       this.data.onerror = this.onerror;
       this.data.src = this.path;
-    } else this.system.addResource(this);
+    } else this.#system.addResource(this);
 
-    this.system.cacheImage(this.path, this);
+    this.#system.cacheImage(this.path, this);
   }
 
   reload() {
@@ -39,7 +41,7 @@ class GameImage {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
-    if (this.system.constants.scale != 1) this.resize();
+    if (this.#system.constants.scale != 1) this.resize();
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
@@ -54,8 +56,8 @@ class GameImage {
    * and copied into another offscreen canvas with the new size.
    * The scaled offscreen canvas becomes the image (data) of this object.*/
   resize() {
-    const scale = this.system.constants.scale;
-    const origPixels = this.system.renderer.getImagePixels(
+    const scale = this.#system.constants.scale;
+    const origPixels = this.#system.renderer.getImagePixels(
       this.data,
       0,
       0,
@@ -89,7 +91,7 @@ class GameImage {
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
 
-    const scope = this.system;
+    const scope = this.#system;
     const scale = scope.constants.scale;
     sourceX = sourceX ? sourceX * scale : 0;
     sourceY = sourceY ? sourceY * scale : 0;
@@ -115,7 +117,7 @@ class GameImage {
     tileHeight = tileHeight ? tileHeight : tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const scope = this.system,
+    const scope = this.#system,
       scale = scope.constants.scale,
       ctx = scope.ctx;
     const tileWidthScaled = Math.floor(tileWidth * scale);

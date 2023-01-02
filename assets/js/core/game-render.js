@@ -3,12 +3,14 @@ class GameRenderer {
   drawMode = this.DRAW.SMOOTH;
   scaleMode = this.SCALE.SMOOTH;
 
-  constructor(scope) {
-    this.scope = scope;
-    this.scale = scope.constants.scale || 1;
+  constructor({ runner, scale } = {}) {
+    if (!runner) throw new Error("Runner is required");
+    this.runner = runner;
+    this.scale = scale || 1;
   }
 
-  static newRenderContext(w, h, scale = null) {
+  static newRenderContext({ id, w, h, scale = null }) {
+    id ??= "canvas"; // TODO - random ID generator.
     const canvas = document.createElement("canvas"),
       ctx = canvas.getContext("2d"),
       ratio = scale || GameRenderer.getPixelRatio(ctx);
@@ -18,7 +20,7 @@ class GameRenderer {
     canvas.height = Math.round(h * ratio);
     canvas.style.width = w + "px";
     canvas.style.height = h + "px";
-
+    canvas.id = id;
     // Scale the context so we get accurate pixel density.
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
@@ -58,24 +60,25 @@ class GameRenderer {
   render() {
     this.clear();
 
-    const scope = this.scope;
+    const { system, game } = this.runner;
 
     // Example text
-    scope.ctx.font = "32px Arial";
-    scope.ctx.fillStyle = "#fff";
-    scope.ctx.fillText("It's dangerous to travel this route alone.", 5, 50);
+    system.ctx.font = "32px Arial";
+    system.ctx.fillStyle = "#fff";
+    system.ctx.fillText("It's dangerous to travel this route alone.", 5, 50);
 
     // Calling entity render methods
-    if (scope.state["entities"] !== undefined)
-      for (let entity in scope.state.entities) scope.state.entities[entity].render();
+    if (game.entities !== undefined) for (let entity in game.entities) entity.render();
   }
 
   clear(color) {
-    const { w, h } = this.scope.constants;
+    const { ctx, width, height } = this.runner.system;
     if (color) {
-      scope.ctx.fillStyle = "#fff";
-      scope.ctx.fillRect(0, 0, w, h);
-    } else this.scope.ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, width, height);
+    } else {
+      ctx.clearRect(0, 0, width, height);
+    }
   }
 
   get DRAW() {

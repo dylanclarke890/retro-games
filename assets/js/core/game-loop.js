@@ -3,16 +3,19 @@ class GameLoop {
   #lastFrame = -1;
   #stopped = false;
 
-  constructor(scope) {
-    this.scope = scope;
+  constructor({ runner, targetFps, showDebugStats }) {
+    if (!runner) throw new Error("Runner is required");
+    this.runner = runner;
+    this.showDebugStats = showDebugStats;
 
     // FPS properties
-    this.targetFps = scope.constants.targetFps;
+    this.targetFps = targetFps ?? 60;
     this.fpsInterval = 1000 / this.targetFps;
     this.lastFrame = -1;
 
-    if (this.scope.constants.showDebugStats) {
-      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.scope.viewport;
+    if (showDebugStats) {
+      // position stats in bottom right corner.
+      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.runner.system.canvas;
       const statsPositionX = offsetLeft + offsetWidth - Stats.containerWidth;
       const statsPositionY = offsetTop + offsetHeight - Stats.containerHeight;
       this.stats = new Stats({
@@ -38,9 +41,9 @@ class GameLoop {
     if (elapsed < this.fpsInterval) return;
     this.#lastFrame = timestamp - (elapsed % this.fpsInterval);
 
-    this.scope.state = this.scope.updater.update(timestamp);
-    this.scope.renderer.render();
-    if (this.scope.constants.showDebugStats) this.stats.update();
+    this.runner.updater.update(timestamp);
+    this.runner.renderer.render();
+    if (this.showDebugStats) this.stats.update();
   }
 
   stop() {

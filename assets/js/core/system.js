@@ -17,31 +17,28 @@ class System {
   #runner = null;
   #imageCache = {};
 
-  constructor({ runner, canvasId = null, width, height, fps, scale }) {
+  constructor({ runner, canvasId = null, width, height, scale }) {
     if (!runner) throw new Error("Runner is required.");
-    this.canvasId = canvasId ?? 1; // TODO: random id generator.
-    this.canvas = document.createElement("canvas");
+
+    const [ctx, actualScale] = GameRenderer.newRenderContext({
+      id: canvasId,
+      w: width,
+      h: height,
+      scale,
+    });
+    this.ctx = ctx;
+    this.canvas = ctx.canvas;
+    document.body.insertBefore(this.canvas, document.body.firstChild);
+    this.scale = actualScale;
+    // TODO - cache "real" width and height using scale.
     this.width = width;
     this.height = height;
-    this.fps = fps;
-    this.scale = scale;
+
     this.#runner = runner;
   }
 
   get ready() {
     return this.#runner.ready;
-  }
-
-  setGame(gameClass) {
-    if (this.running) this.newGameClass = gameClass;
-    else this.setGameNow(gameClass);
-  }
-
-  setGameNow(gameClass) {
-    this.#runner.game = new gameClass({
-      mediaFactory: this.#runner.mediaFactory,
-      ...this.#runner.customOptions,
-    });
   }
 
   addResource(resource) {
