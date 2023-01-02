@@ -9,9 +9,11 @@ class MyGame extends Game {
 
   draw() {
     super.draw();
-    const x = 50,
-      y = 100;
-    this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
+    const { width, height, offsetWidth } = this.system.canvas;
+    const ctx = this.system.ctx;
+    ctx.fillStyle = "lightblue";
+    ctx.fillRect(0, 0, width, height);
+    this.font.draw("It Works!", offsetWidth / 2, 100, Font.ALIGN.CENTER);
   }
 }
 

@@ -5,6 +5,6 @@ class MediaFactory {
   }
 
   createFont({ name, path } = {}) {
-    return new AltFont({ system: this.system, path, name });
+    return new Font({ system: this.system, path, name });
   }
 }
