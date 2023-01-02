@@ -12,7 +12,7 @@ class Game {
   backgroundAnims = {};
 
   autoSort = false;
-  sortBy = null;
+  #sortBy = null;
 
   cellSize = 64;
 
@@ -22,8 +22,7 @@ class Game {
 
   constructor({ mediaFactory } = {}) {
     this.mediaFactory = mediaFactory;
-    // this.sortBy = this.sortBy || ig.Game.SORT.Z_INDEX; // TODO
-    // ig.game = this; TODO
+    this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }
 
   static get SORT() {
@@ -104,7 +103,7 @@ class Game {
   }
 
   sortEntities() {
-    this.entities.sort(this.sortBy);
+    this.entities.sort(this.#sortBy);
   }
 
   sortEntitiesDeferred() {
