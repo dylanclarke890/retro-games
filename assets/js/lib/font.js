@@ -14,7 +14,7 @@ class Font extends GameImage {
 
   onload(ev) {
     this.#loadMetrics(this.data);
-    this.parent(ev);
+    super.onload(ev);
     this.height -= 2; // last 2 lines contain no visual data
   }
 

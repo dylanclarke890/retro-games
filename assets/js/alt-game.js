@@ -20,10 +20,10 @@ class AltGame {
   #levelToLoad = null;
   #doSortEntities = false;
 
-  constructor() {
+  constructor({ mediaFactory } = {}) {
+    this.mediaFactory = mediaFactory;
     // this.sortBy = this.sortBy || ig.Game.SORT.Z_INDEX; // TODO
     // ig.game = this; TODO
-    return null;
   }
 
   static get SORT() {
@@ -248,5 +248,9 @@ class AltGame {
         } // end for y size
       } // end for x size
     } // end for entities
+  }
+
+  createFont(url) {
+    return this.mediaFactory.createFont(url);
   }
 }

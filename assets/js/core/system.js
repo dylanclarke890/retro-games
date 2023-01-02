@@ -16,10 +16,14 @@ class System {
   context = null;
   #runner = null;
 
-  constructor({ runner, canvasId = null }) {
+  constructor({ runner, canvasId = null, width, height, fps, scale }) {
     if (!runner) throw new Error("Runner is required.");
     this.canvasId = canvasId ?? 1; // TODO: random id generator.
     this.canvas = document.createElement("canvas");
+    this.width = width;
+    this.height = height;
+    this.fps = fps;
+    this.scale = scale;
     this.#runner = runner;
   }
 
@@ -29,6 +33,9 @@ class System {
   }
 
   setGameNow(gameClass) {
-    this.#runner.game = new gameClass();
+    this.#runner.game = new gameClass({
+      mediaFactory: this.#runner.mediaFactory,
+      ...this.#runner.customOptions,
+    });
   }
 }

@@ -3,9 +3,20 @@ class GameRunner {
   ready = false;
   game = null;
 
-  constructor({ canvasId, gameClass, fps, width, height, scale, loaderClass } = {}) {
+  constructor({
+    canvasId,
+    gameClass,
+    fps,
+    width,
+    height,
+    scale,
+    loaderClass,
+    ...customOptions
+  } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
+    this.customOptions = customOptions;
     this.userAgent = UserAgent.info;
+    this.mediaFactory = new MediaFactory({ system: this.system });
     this.soundManager = new SoundManager(this);
     this.inputEvents = new InputEvents();
     this.ready = true;
@@ -24,7 +35,10 @@ class GameRunner {
 }
 
 class MyGame extends AltGame {
-  font = new Font("../../fonts/04b03.font.png");
+  constructor({ ...options } = {}) {
+    super(options);
+    this.font = this.mediaFactory.createFont("../../fonts/04b03.font.png");
+  }
 
   update() {
     super.update();
