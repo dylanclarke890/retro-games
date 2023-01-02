@@ -8,11 +8,14 @@ class GameLoader {
   #unloaded = [];
   #intervalId = 0;
 
-  constructor(gameClass, resources) {
+  constructor({ system, gameClass, resources }) {
     // TODO: Replace Game in error message with name of BaseGame class, check for instanceof Game not AltGame.
+    if (!system) throw new Error("System is required.");
     if (!gameClass) throw new Error("Please pass the class type of the game to load");
     if (!(gameClass.prototype instanceof AltGame))
       throw new Error("Please pass a class that has derived from the 'Game' class.");
+
+    this.system = system;
     this.gameClass = gameClass;
     this.#resources = resources ?? [];
     for (let i = 0; i < this.#resources.length; i++) this.#unloaded.push(this.#resources[i].path);
@@ -36,7 +39,7 @@ class GameLoader {
     if (this.done) return;
     this.done = true;
     clearInterval(this.#intervalId);
-    // ig.system.setGame( this.gameClass ); TODO:
+    this.system.setGame(this.gameClass);
   }
 
   // TODO!

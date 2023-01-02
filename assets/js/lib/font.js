@@ -76,7 +76,7 @@ class Font extends GameImage {
     const charY = 0;
     const charWidth = this.widthMap[char] * scale;
     const charHeight = this.height * scale;
-
+    // TODO
     ig.system.context.drawImage(
       this.data,
       charX,

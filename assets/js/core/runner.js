@@ -9,7 +9,11 @@ class GameRunner {
     this.inputEvents = new InputEvents();
     this.ready = true;
 
-    this.loader = new (loaderClass || GameLoader)(gameClass);
+    this.loader = new (loaderClass ?? GameLoader)({
+      system: this.system,
+      gameClass,
+      resources: this.#resources,
+    });
     this.loader.load();
   }
 
@@ -20,6 +24,19 @@ class GameRunner {
 
 class MyGame extends AltGame {
   font = new Font("../../fonts/04b03.font.png");
+
+  update() {
+    super.update();
+  }
+
+  draw() {
+    super.draw();
+
+    const x = 50,
+      y = 100;
+
+    this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
+  }
 }
 
 const runner = new GameRunner({
