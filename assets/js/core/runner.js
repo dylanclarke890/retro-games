@@ -1,9 +1,10 @@
 class GameRunner {
   #resources = [];
   ready = false;
+  game = null;
 
   constructor({ canvasId, gameClass, fps, width, height, scale, loaderClass } = {}) {
-    this.system = new System({ canvasId, width, height, scale, fps });
+    this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.userAgent = UserAgent.info;
     this.soundManager = new SoundManager(this);
     this.inputEvents = new InputEvents();
