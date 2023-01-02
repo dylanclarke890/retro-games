@@ -24,8 +24,6 @@ class GameRunner {
     this.userAgent = UserAgent.info;
     this.customGameOptions = customGameOptions;
 
-    this.renderer = new GameRenderer({ runner: this, scale: this.system.scale });
-    this.updater = new GameUpdater({ runner: this });
     this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.ready = true;
 

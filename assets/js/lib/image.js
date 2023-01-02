@@ -129,8 +129,8 @@ class GameImage {
       Math.floor((tile * tileWidth) / this.width) * tileHeight * scale,
       tileWidthScaled,
       tileHeightScaled,
-      scope.renderer.drawMode(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
-      scope.renderer.drawMode(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
+      this.system.drawPosition(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
+      this.system.drawPosition(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
       tileWidthScaled,
       tileHeightScaled
     );
