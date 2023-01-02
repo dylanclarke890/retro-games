@@ -12,8 +12,12 @@ class Font extends GameImage {
   letterSpacing = 1;
   lineSpacing = 0;
 
+  constructor(opts) {
+    super(opts);
+  }
+
   onload(ev) {
-    this.#loadMetrics(this.data);
+    this.#loadMetrics();
     super.onload(ev);
     this.height -= 2; // last 2 lines contain no visual data
   }
@@ -58,33 +62,32 @@ class Font extends GameImage {
     if (align === Font.ALIGN.CENTER) x -= width / 2;
     else if (align === Font.ALIGN.RIGHT) x -= width;
 
-    // TODO
-    if (this.alpha !== 1) ig.system.context.globalAlpha = this.alpha;
+    const ctx = this.system.ctx;
+    if (this.alpha !== 1) ctx.globalAlpha = this.alpha;
 
     for (let i = 0; i < text.length; i++)
       x += this.#drawChar(text.charCodeAt(i) - this.firstChar, x, y);
 
-    if (this.alpha !== 1) ig.system.context.globalAlpha = 1;
+    if (this.alpha !== 1) ctx.globalAlpha = 1;
     // ig.Image.drawCount += text.length; TODO
   }
 
   #drawChar(char, targetX, targetY) {
     if (!this.loaded || char < 0 || char >= this.indices.length) return 0;
 
-    const scale = ig.system.scale; // TODO
-    const charX = this.indices[char] * scale;
-    const charY = 0;
-    const charWidth = this.widthMap[char] * scale;
-    const charHeight = this.height * scale;
-    // TODO
-    ig.system.context.drawImage(
+    const { drawPosition, scale, ctx } = this.system;
+    const charX = this.indices[char] * scale,
+      charY = 0,
+      charWidth = this.widthMap[char] * scale,
+      charHeight = this.height * scale;
+    ctx.drawImage(
       this.data,
       charX,
       charY,
       charWidth,
       charHeight,
-      ig.system.getDrawPos(targetX),
-      ig.system.getDrawPos(targetY),
+      drawPosition(targetX),
+      drawPosition(targetY),
       charWidth,
       charHeight
     );
@@ -92,24 +95,26 @@ class Font extends GameImage {
     return this.widthMap[char] + this.letterSpacing;
   }
 
-  #loadMetrics(image) {
-    // Draw the bottommost line of this font image into an offscreen canvas
-    // and analyze it pixel by pixel.
-    // A run of non-transparent pixels represents a character and its width
-
+  /** Draw the bottommost line of this font image into an offscreen canvas
+   * and analyze it pixel by pixel.
+   *
+   * A run of non-transparent pixels represents a character and its width */
+  #loadMetrics() {
     this.widthMap = [];
     this.indices = [];
-
-    const px = ig.getImagePixels(image, 0, image.height - 1, image.width, 1); // TODO
-
+    const pixels = this.system.getImagePixels(this.data, 0, this.data.height, this.data.width, 1);
     let currentWidth = 0;
-    for (let x = 0; x < image.width; x++) {
-      const index = x * 4 + 3; // alpha component of this pixel
-      if (px.data[index] > 127) currentWidth++;
-      else if (px.data[index] < 128 && currentWidth) {
-        this.widthMap.push(currentWidth);
-        this.indices.push(x - currentWidth);
-        currentWidth = 0;
+    let x;
+    for (let i = 0; i < 9; i++) {
+      for (x = 0; x < this.data.width; x++) {
+        const index = x * 4 + 3; // alpha component of this pixel
+        console.log(pixels.data[index]);
+        if (pixels.data[index] > 127) currentWidth++;
+        else if (pixels.data[index] < 128 && currentWidth) {
+          this.widthMap.push(currentWidth);
+          this.indices.push(x - currentWidth);
+          currentWidth = 0;
+        }
       }
     }
     this.widthMap.push(currentWidth);

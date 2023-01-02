@@ -10,6 +10,7 @@ class Game {
   collisionMap = CollisionMap.staticNoCollision;
   backgroundMaps = [];
   backgroundAnims = {};
+  font = null;
 
   autoSort = false;
   #sortBy = null;
@@ -20,9 +21,9 @@ class Game {
   #levelToLoad = null;
   #doSortEntities = false;
 
-  constructor({ system, mediaFactory } = {}) {
-    this.mediaFactory = mediaFactory;
+  constructor({ system, font } = {}) {
     this.system = system;
+    this.font = font;
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }
 
@@ -247,9 +248,5 @@ class Game {
         } // end for y size
       } // end for x size
     } // end for entities
-  }
-
-  createFont(url) {
-    return this.mediaFactory.createFont(url);
   }
 }

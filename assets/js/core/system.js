@@ -19,8 +19,9 @@ class System {
   #runner = null;
   #imageCache = {};
 
-  constructor({ runner, canvasId = null, width, height, scale }) {
+  constructor({ runner, canvasId = null, width, height, scale, pathToFont }) {
     if (!runner) throw new Error("Runner is required.");
+    this.#runner = runner;
 
     const [ctx, actualScale] = GameRenderer.newRenderContext({
       id: canvasId,
@@ -35,8 +36,6 @@ class System {
     // TODO - cache "real" width and height using scale.
     this.width = width;
     this.height = height;
-
-    this.#runner = runner;
   }
 
   get ready() {
@@ -44,7 +43,7 @@ class System {
   }
 
   addResource(resource) {
-    this.#runner.resources.push(resource);
+    this.#runner.addResource(resource);
   }
 
   cacheImage(path, image) {
@@ -91,5 +90,26 @@ class System {
         canvas.style.msInterpolationMode = "";
       },
     };
+  }
+
+  /** Normalizes getImageData to extract the real, actual pixels from an image. */
+  getImagePixels(image, x, y, width, height) {
+    const canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext("2d");
+
+    this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
+    const ratio = GameRenderer.getPixelRatio(ctx);
+
+    const realWidth = image.width / ratio,
+      realHeight = image.height / ratio;
+
+    canvas.width = Math.ceil(realWidth);
+    canvas.height = Math.ceil(realHeight);
+
+    ctx.drawImage(image, 0, 0, width, height);
+
+    return ctx.getImageData(x, y, width, height);
   }
 }

@@ -23,7 +23,7 @@ class GameLoader {
   }
 
   load() {
-    this.runner.renderer.clear("#000");
+    this.system.clear("#000");
     if (!this.#resources.length) {
       this.end();
       return;
@@ -33,6 +33,7 @@ class GameLoader {
   }
 
   loadResource(res) {
+    console.log(res);
     res.load(this.#loadCallback);
   }
 

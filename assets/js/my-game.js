@@ -1,7 +1,6 @@
 class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
-    this.font = this.mediaFactory.createFont("../../fonts/04b03.font.png");
   }
 
   update() {
@@ -11,9 +10,9 @@ class MyGame extends Game {
   draw() {
     super.draw();
 
-    // const x = 50,
-    //   y = 100;
-    // this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
+    const x = 50,
+      y = 100;
+    this.font.draw("It Works!", x, y, Font.ALIGN.CENTER);
   }
 }
 
@@ -24,6 +23,7 @@ const runner = new GameRunner({
   width: 800,
   height: 600,
   showDebugStats: true,
+  pathToFont: "./assets/fonts/04b03.font.png",
 });
 
 // ig.main = function (canvasId, gameClass, fps, width, height, scale, loaderClass) {

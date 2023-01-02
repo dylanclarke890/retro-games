@@ -12,10 +12,12 @@ class GameRunner {
     scale,
     loaderClass,
     showDebugStats,
+    pathToFont,
     ...customGameOptions
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.mediaFactory = new MediaFactory({ system: this.system });
+    this.font = this.mediaFactory.createFont(pathToFont);
     this.soundManager = new SoundManager(this);
     this.inputEvents = new InputEvents();
 
@@ -48,7 +50,7 @@ class GameRunner {
   setGameNow(gameClass) {
     this.game = new gameClass({
       system: this.system,
-      mediaFactory: this.mediaFactory,
+      font: this.font,
       ...this.customGameOptions,
     });
     this.loop.start();
