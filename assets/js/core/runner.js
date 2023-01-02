@@ -54,7 +54,7 @@ class GameRunner {
   }
 }
 
-class MyGame extends AltGame {
+class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
     this.font = this.mediaFactory.createFont("../../fonts/04b03.font.png");

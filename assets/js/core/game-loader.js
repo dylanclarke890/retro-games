@@ -3,17 +3,16 @@ class GameLoader {
   status = 0;
   done = false;
 
-  drawStatus = 0;
+  #drawStatus = 0;
   #resources = [];
   #unloaded = [];
   #intervalId = 0;
 
   constructor({ runner, system, gameClass, resources }) {
-    // TODO: Replace Game in error message with name of BaseGame class, check for instanceof Game not AltGame.
     if (!runner) throw new Error("Runner is required.");
     if (!system) throw new Error("System is required.");
     if (!gameClass) throw new Error("Please pass the class type of the game to load");
-    if (!(gameClass.prototype instanceof AltGame))
+    if (!(gameClass.prototype instanceof Game))
       throw new Error("Please pass a class that has derived from the 'Game' class.");
 
     this.runner = runner;
@@ -24,17 +23,17 @@ class GameLoader {
   }
 
   load() {
-    // ig.system.clear( '#000' ); TODO!
+    this.runner.renderer.clear("#000");
     if (!this.#resources.length) {
       this.end();
       return;
     }
     for (let i = 0; i < this.#resources.length; i++) this.loadResource(this.#resources[i]);
-    this.#intervalId = setInterval(() => this.draw(), 16);
+    this.#intervalId = setInterval(() => this.drawLoadingScreen(), 16);
   }
 
   loadResource(res) {
-    res.load(this._loadCallback);
+    res.load(this.#loadCallback);
   }
 
   end() {
@@ -44,25 +43,29 @@ class GameLoader {
     this.runner.setGame(this.gameClass);
   }
 
-  // TODO!
-  draw() {
-    // this._drawStatus += (this.status - this._drawStatus) / 5;
-    // var s = ig.system.scale;
-    // var w = (ig.system.width * 0.6).floor();
-    // var h = (ig.system.height * 0.1).floor();
-    // var x = (ig.system.width * 0.5 - w / 2).floor();
-    // var y = (ig.system.height * 0.5 - h / 2).floor();
-    // ig.system.context.fillStyle = "#000";
-    // ig.system.context.fillRect(0, 0, ig.system.width, ig.system.height);
-    // ig.system.context.fillStyle = "#fff";
-    // ig.system.context.fillRect(x * s, y * s, w * s, h * s);
-    // ig.system.context.fillStyle = "#000";
-    // ig.system.context.fillRect(x * s + s, y * s + s, w * s - s - s, h * s - s - s);
-    // ig.system.context.fillStyle = "#fff";
-    // ig.system.context.fillRect(x * s, y * s, w * s * this._drawStatus, h * s);
+  // TODO: Check this.
+  drawLoadingScreen() {
+    this.#drawStatus += (this.status - this.#drawStatus) / 5;
+    const system = this.system;
+    const scale = system.scale;
+    let width = (system.width * 0.6).floor();
+    let height = (system.height * 0.1).floor();
+    const x = (system.width * 0.5 - width / 2).floor() * scale;
+    const y = (system.height * 0.5 - height / 2).floor() * scale;
+    width = width * scale;
+    height = height * scale;
+
+    system.ctx.fillStyle = "#000";
+    system.ctx.fillRect(0, 0, system.width, system.height);
+    system.ctx.fillStyle = "#fff";
+    system.ctx.fillRect(x, y, width, height);
+    system.ctx.fillStyle = "#000";
+    system.ctx.fillRect(x + scale, y + scale, width - scale - scale, height - scale - scale);
+    system.ctx.fillStyle = "#fff";
+    system.ctx.fillRect(x, y, width * this.#drawStatus, height);
   }
 
-  _loadCallback(path, status) {
+  #loadCallback(path, status) {
     if (status) this.#unloaded.erase(path);
     else throw new Error(`Failed to load resource: ${path}`);
     this.status = 1 - this.#unloaded.length / this.#resources.length;
