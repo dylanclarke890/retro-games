@@ -12,7 +12,7 @@ class GameRunner {
     scale,
     loaderClass,
     showDebugStats,
-    ...customOptions
+    ...customGameOptions
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.mediaFactory = new MediaFactory({ system: this.system });
@@ -20,12 +20,12 @@ class GameRunner {
     this.inputEvents = new InputEvents();
 
     this.userAgent = UserAgent.info;
-    this.customOptions = customOptions;
-    this.ready = true;
+    this.customGameOptions = customGameOptions;
 
     this.renderer = new GameRenderer({ runner: this, scale: this.system.scale });
     this.updater = new GameUpdater({ runner: this });
     this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
+    this.ready = true;
 
     this.loader = new (loaderClass ?? GameLoader)({
       runner: this,
@@ -48,7 +48,7 @@ class GameRunner {
   setGameNow(gameClass) {
     this.game = new gameClass({
       mediaFactory: this.mediaFactory,
-      ...this.customOptions,
+      ...this.customGameOptions,
     });
     this.loop.start();
   }
