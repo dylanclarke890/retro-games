@@ -14,11 +14,10 @@ class Color {
 }
 
 class Stats {
-  // TODO: Check
-  static panelWidth = 106;
-  static panelHeight = 40;
-  static containerWidth = 110;
-  static containerHeight = 60;
+  #containerWidth = 96;
+  #containerHeight = 48;
+  #panelWidth = 92;
+  #panelHeight = 32;
   static colorSchemes = {
     fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
     ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
@@ -32,8 +31,12 @@ class Stats {
   #maxPanels = 2;
   #firstUpdate = true;
 
-  constructor({ containerElementStyles, target } = {}) {
+  constructor({ width, height, containerElementStyles, target } = {}) {
     this.#containerElementStyles = containerElementStyles;
+    this.#containerWidth = width ?? 96;
+    this.#containerHeight = height ?? 48;
+    this.#panelHeight = (this.#containerHeight / 3) * 2;
+    this.#panelWidth = this.#containerWidth - 4;
     this.#target = target;
     this.#setup();
   }
@@ -45,8 +48,8 @@ class Stats {
       textAlign: "left",
       fontSize: "9px",
       opacity: "0.9",
-      width: `${Stats.containerWidth}px`,
-      height: `${Stats.containerHeight}px`,
+      width: `${this.#containerWidth}px`,
+      height: `${this.#containerHeight}px`,
       cursor: "pointer",
     });
     parent.addEventListener("click", () => this.#nextPanel());
@@ -58,7 +61,7 @@ class Stats {
     this.#createPanel("ms", false);
 
     try {
-      if (performance && performance.memory.totalJSHeapSize) {
+      if (window.performance && performance.memory.totalJSHeapSize) {
         this.#createPanel("mem", false);
         this.#maxPanels = 3;
       }
@@ -81,8 +84,8 @@ class Stats {
   }
 
   #drawPanelData(data, minVal, colorScheme) {
-    const width = Stats.panelWidth;
-    const height = Stats.panelHeight;
+    const width = this.#panelWidth;
+    const height = this.#panelHeight;
 
     // moving existing data across one "column"
     for (let i = 0; i < height; i++)
@@ -108,15 +111,14 @@ class Stats {
     }
   }
 
-  #panelContainer(panelColor, display, target) {
+  #panelContainer(panelType, display, target) {
     const div = document.createElement("div");
+    const { r, g, b } = Stats.colorSchemes[panelType].bg;
     this.#assignStyles(div, {
-      backgroundColor: `rgb(${Math.floor(Stats.colorSchemes[panelColor].bg.r / 2)},${Math.floor(
-        Stats.colorSchemes[panelColor].bg.g / 2
-      )},${Math.floor(Stats.colorSchemes[panelColor].bg.b / 2)})`,
+      backgroundColor: `rgb(${Math.floor(r / 2)},${Math.floor(g / 2)},${Math.floor(b / 2)})`,
       padding: "2px 0px 3px 0px",
       display,
-      height: `${Stats.containerHeight}px`,
+      height: `${this.#containerHeight}px`,
       boxSizing: "border-box",
     });
     target.appendChild(div);
@@ -125,24 +127,25 @@ class Stats {
 
   #panelText(panelType, target) {
     const div = document.createElement("div");
+    const { r, g, b } = Stats.colorSchemes[panelType].fg;
     div.innerHTML = `<strong>${panelType.toUpperCase()}</strong>`;
     this.#assignStyles(div, {
-      color: `rgb(${Stats.colorSchemes[panelType].fg.r},${Stats.colorSchemes[panelType].fg.g},${Stats.colorSchemes[panelType].fg.b})`,
+      color: `rgb(${r},${g},${b})`,
       margin: "0px 0px 1px 3px",
     });
     target.appendChild(div);
     return div;
   }
 
-  #panelCanvas(bgColor, target) {
+  #panelCanvas({ r, g, b }, target) {
     const canv = document.createElement("canvas");
-    canv.width = Stats.panelWidth;
-    canv.height = Stats.panelHeight;
+    canv.width = this.#panelWidth;
+    canv.height = this.#panelHeight;
     this.#assignStyles(canv, { display: "block", marginLeft: "3px" });
     target.appendChild(canv);
 
     const ctx = canv.getContext("2d");
-    ctx.fillStyle = `rgb(${bgColor.r},${bgColor.g},${bgColor.b})`;
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
     ctx.fillRect(0, 0, canv.width, canv.height);
     const data = ctx.getImageData(0, 0, canv.width, canv.height);
 

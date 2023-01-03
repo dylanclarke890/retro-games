@@ -16,16 +16,20 @@ class GameLoop {
 
     if (showDebugStats) {
       // position stats in bottom right corner.
+      const width = 96;
+      const height = 48;
       const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.runner.system.canvas;
-      const statsPositionX = offsetLeft + offsetWidth - Stats.containerWidth;
-      const statsPositionY = offsetTop + offsetHeight - Stats.containerHeight;
+      const statsPositionX = offsetLeft + offsetWidth - width;
+      const statsPositionY = offsetTop + offsetHeight - height;
       this.stats = new Stats({
-        target: document.body,
         containerElementStyles: {
           position: "absolute",
           left: statsPositionX + "px",
           top: statsPositionY + "px",
         },
+        height,
+        target: document.body,
+        width,
       });
     }
   }

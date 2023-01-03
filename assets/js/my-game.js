@@ -1,4 +1,5 @@
 class MyGame extends Game {
+  clearColor = "black";
   constructor({ ...options } = {}) {
     super(options);
     this.loadLevel(levelOne);
