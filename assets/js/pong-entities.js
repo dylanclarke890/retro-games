@@ -1,8 +1,14 @@
 class EntityBall extends Entity {
   draw() {
-    const { ctx } = this.system;
+    super.draw();
+
+    const { ctx } = this.game.system;
     ctx.fillStyle = "orange";
-    ctx.fillRect(40, 40, 40, 40);
+    ctx.fillRect(300, 240, 40, 40);
+  }
+
+  update() {
+    super.update();
   }
 }
 class EntityPaddleCpu extends Entity {}
