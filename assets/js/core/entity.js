@@ -89,13 +89,13 @@ class Entity {
   update() {
     this.last.x = this.pos.x;
     this.last.y = this.pos.y;
-    this.vel.y += this.game.gravity * this.game.system.tick * this.gravityFactor; // TODO
+    this.vel.y += this.game.gravity * this.game.system.tick * this.gravityFactor;
 
     this.vel.x = this.getNewVelocity(this.vel.x, this.accel.x, this.friction.x, this.maxVel.x);
     this.vel.y = this.getNewVelocity(this.vel.y, this.accel.y, this.friction.y, this.maxVel.y);
 
     // movement & collision
-    const mx = this.vel.x * this.game.system.tick; // TODO
+    const mx = this.vel.x * this.game.system.tick;
     const my = this.vel.y * this.game.system.tick;
     const res = this.game.collisionMap.trace(
       this.pos.x,
@@ -104,7 +104,7 @@ class Entity {
       my,
       this.size.x,
       this.size.y
-    ); // TODO
+    );
     this.handleMovementTrace(res);
     if (this.currentAnim) this.currentAnim.update();
   }
@@ -238,7 +238,6 @@ class Entity {
       weak.vel.x = -weak.vel.x * weak.bounciness + strong.vel.x;
 
       const resWeak = this.game.collisionMap.trace(
-        // TODO
         weak.pos.x,
         weak.pos.y,
         weak === left ? -nudge : nudge,
@@ -340,7 +339,6 @@ class Entity {
       top.pos.y = resTop.pos.y;
 
       const resBottom = this.game.collisionMap.trace(
-        //TODO
         bottom.pos.x,
         bottom.pos.y,
         0,

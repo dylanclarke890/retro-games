@@ -27,11 +27,10 @@ const runner = new GameRunner({
   canvasId: "play-area",
   gameClass: MyGame,
   fps: 60,
-  width: 800,
+  width: 768,
   height: 600,
   showDebugStats: true,
   font: {
-    name: "arcadeclassic",
     path: "./assets/fonts/arcade-classic.TTF",
   },
 });

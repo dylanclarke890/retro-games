@@ -167,7 +167,6 @@ PONG.Paddle.Pong = class extends PONG.Paddle.Base {
     super("Pong", fieldPosition, maxSpeed);
   }
 
-  // TODO: update ai to stop jittering effect.
   update() {
     const ball = board.ball;
     let movement;

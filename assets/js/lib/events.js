@@ -221,7 +221,6 @@ class InputEvents {
     event.preventDefault();
   }
 
-  // TODO
   mousemove(event) {
     const system = this.system;
     const internalWidth = system.canvas.offsetWidth || system.realWidth;

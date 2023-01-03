@@ -60,9 +60,19 @@ class Game {
     data.layer = data.layer || [];
     for (let i = 0; i < data.layer.length; i++) {
       const ld = data.layer[i];
-      if (ld.name == "collision") this.collisionMap = new CollisionMap(ld.tilesize, ld.data);
+      if (ld.name == "collision")
+        this.collisionMap = new CollisionMap({
+          system: this.system,
+          tilesize: ld.tilesize,
+          data: ld.data,
+        });
       else {
-        const newMap = new BackgroundMap(ld.tilesize, ld.data, ld.tilesetName);
+        const newMap = new BackgroundMap({
+          system: this.system,
+          tilesize: ld.tilesize,
+          data: ld.data,
+          tilesetName: ld.tilesetName,
+        });
         newMap.anims = this.backgroundAnims[ld.tilesetName] || {};
         newMap.repeat = ld.repeat;
         newMap.distance = ld.distance;

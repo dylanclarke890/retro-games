@@ -1,5 +1,6 @@
 class EntityBall extends Entity {
   size = { x: 48, y: 48 };
+  vel = { x: 200, y: 100 };
   collides = Entity.COLLIDES.ACTIVE;
 
   constructor(opts) {
