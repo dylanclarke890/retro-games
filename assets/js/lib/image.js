@@ -84,7 +84,6 @@ class GameImage {
 
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
-
     const scale = this.system.scale;
     sourceX = sourceX ?? 0 * scale;
     sourceY = sourceY ?? 0 * scale;

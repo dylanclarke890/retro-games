@@ -190,8 +190,8 @@ class Game {
      * instead of game.screen.actual when drawing themselves in order to be
      * "synchronized" to the rounded(?) screen position.*/
     this.screen.rounded = {
-      x: system.drawPosition(this.screen.x) / system.scale,
-      y: system.drawPosition(this.screen.y) / system.scale,
+      x: system.drawPosition(this.screen.actual.x) / system.scale,
+      y: system.drawPosition(this.screen.actual.y) / system.scale,
     };
     let mapIndex;
     for (mapIndex = 0; mapIndex < this.backgroundMaps.length; mapIndex++) {

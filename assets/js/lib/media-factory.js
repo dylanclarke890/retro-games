@@ -9,8 +9,6 @@ class MediaFactory {
   }
 
   createAnimationSheet({ path, size }) {
-    const res = new GameAnimationSheet({ system: this.system, size, path });
-    console.log(res);
-    return res;
+    return new GameAnimationSheet({ system: this.system, size, path });
   }
 }
