@@ -1,12 +1,13 @@
 class GameAnimationSheet {
-  width = 8;
-  height = 8;
+  width = 0;
+  height = 0;
   image = null;
 
-  constructor(path, width, height) {
-    this.width = width;
-    this.height = height;
-    this.image = new GameImage(path);
+  constructor({ path, size = {}, system }) {
+    if (!system) throw new Error("System is required");
+    this.width = size.x ?? 8;
+    this.height = size.y ?? 8;
+    this.image = new GameImage({ system, path });
   }
 }
 

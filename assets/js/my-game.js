@@ -13,7 +13,6 @@ class MyGame extends Game {
     super.draw();
 
     /** Extra draw logic goes here. */
-    // this.system.clear("lightblue")
     const { offsetWidth } = this.system.canvas;
     this.font.write("It Works!", offsetWidth / 2, 100, {
       align: Font.ALIGN.CENTER,

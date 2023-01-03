@@ -47,6 +47,7 @@ class GameRunner {
     this.game = new gameClass({
       system: this.system,
       font: this.font,
+      mediaFactory: this.mediaFactory,
       ...this.customGameOptions,
     });
     this.loop.start();

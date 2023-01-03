@@ -7,4 +7,10 @@ class MediaFactory {
   createFont({ name, path } = {}) {
     return new Font({ system: this.system, path, name });
   }
+
+  createAnimationSheet({ path, size }) {
+    const res = new GameAnimationSheet({ system: this.system, size, path });
+    console.log(res);
+    return res;
+  }
 }

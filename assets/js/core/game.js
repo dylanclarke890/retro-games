@@ -21,8 +21,9 @@ class Game {
   #levelToLoad = null;
   #doSortEntities = false;
 
-  constructor({ system, font } = {}) {
+  constructor({ system, font, mediaFactory } = {}) {
     this.system = system;
+    this.mediaFactory = mediaFactory;
     this.font = font;
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }

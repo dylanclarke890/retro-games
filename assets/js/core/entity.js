@@ -74,6 +74,10 @@ class Entity {
     NativeExtensions.extend(this, settings);
   }
 
+  createAnimationSheet(path, size = this.size) {
+    this.animSheet = this.game.mediaFactory.createAnimationSheet({ path, size });
+  }
+
   addAnim(name, frameTime, sequence, stop) {
     if (!this.animSheet) throw new Error(`No animSheet to add the animation ${name} to.`);
     const animation = new GameAnimation(this.animSheet, frameTime, sequence, stop);
