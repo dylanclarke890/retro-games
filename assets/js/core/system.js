@@ -25,44 +25,30 @@ class System {
     if (!runner) throw new Error("Runner is required.");
     this.#runner = runner;
 
-    const [ctx, actualScale] = this.createRenderContext({
-      id: canvasId,
-      w: width,
-      h: height,
-      scale,
-    });
-    this.ctx = ctx;
-    this.canvas = ctx.canvas;
+    this.canvas = document.getElementById(canvasId) ?? document.createElement("canvas");
+    this.canvas.id = canvasId ?? "canva"; // TODO
+    this.resize(width, height, scale);
+    this.ctx = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.firstChild);
-    this.scale = actualScale;
-    // TODO - cache "real" width and height using scale.
     this.width = width;
     this.height = height;
-  }
-
-  createRenderContext({ id, w, h, scale = null }) {
-    id ??= "canvas"; // TODO - random ID generator.
-    const canvas = document.createElement("canvas"),
-      ctx = canvas.getContext("2d"),
-      ratio = scale || this.getPixelRatio(ctx);
-
-    // Set the canvas' width then downscale via CSS.
-    canvas.width = Math.round(w * ratio);
-    canvas.height = Math.round(h * ratio);
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-    canvas.id = id;
-    // Scale the context so we get accurate pixel density.
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-    // return the context (has back-reference to canvas) and the scale used.
-    return [ctx, ratio];
   }
 
   getPixelRatio(ctx) {
     const deviceRatio = devicePixelRatio;
     const backingRatio = VendorAttributes.get(ctx, "backingStorePixelRatio") || 1;
     return deviceRatio / backingRatio;
+  }
+
+  resize(width, height, scale) {
+    this.width = width;
+    this.height = height;
+    this.scale = scale || this.scale;
+
+    this.realWidth = this.width * this.scale;
+    this.realHeight = this.height * this.scale;
+    this.canvas.width = this.realWidth;
+    this.canvas.height = this.realHeight;
   }
 
   get ready() {
@@ -125,10 +111,9 @@ class System {
     const ctx = canvas.getContext("2d");
 
     this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
-    const ratio = this.getPixelRatio(ctx);
 
-    const realWidth = image.width / ratio,
-      realHeight = image.height / ratio;
+    const realWidth = image.width / this.scale,
+      realHeight = image.height / this.scale;
 
     canvas.width = Math.ceil(realWidth);
     canvas.height = Math.ceil(realHeight);

@@ -5,7 +5,7 @@ class EntityBall extends Entity {
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/ball.png");
-    this.addAnim("Default", 10, [0, 1], false);
+    this.addAnim("Default", 0.4, [0, 1], false);
   }
 
   draw() {

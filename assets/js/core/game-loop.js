@@ -7,6 +7,7 @@ class GameLoop {
     if (!runner) throw new Error("Runner is required");
     this.runner = runner;
     this.showDebugStats = showDebugStats;
+    this.clock = new Timer();
 
     // FPS properties
     this.targetFps = targetFps ?? 60;
@@ -36,6 +37,8 @@ class GameLoop {
   main(timestamp) {
     if (this.#stopped) return caf(this.#rafId);
     this.#rafId = raf((t) => this.main(t));
+    Timer.step();
+    this.runner.system.tick = this.clock.tick();
 
     const elapsed = timestamp - this.#lastFrame;
     if (elapsed < this.fpsInterval) return;

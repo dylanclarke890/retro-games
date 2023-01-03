@@ -109,7 +109,7 @@ class GameImage {
     tileHeight = tileHeight ?? tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const { scale, ctx } = this.system;
+    const { scale, ctx } = this.system; // FIXME
     const tileWidthScaled = Math.floor(tileWidth * scale);
     const tileHeightScaled = Math.floor(tileHeight * scale);
 
