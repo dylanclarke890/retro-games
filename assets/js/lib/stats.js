@@ -14,19 +14,19 @@ class Color {
 }
 
 class Stats {
-  #containerWidth = 96;
-  #containerHeight = 48;
-  #panelWidth = 92;
-  #panelHeight = 32;
   static colorSchemes = {
     fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
     ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
     mem: new PanelColorScheme(new Color(48, 16, 26), new Color(255, 0, 128)),
   };
 
-  #target = null;
-  #DOMElements = {};
   #containerElementStyles = [];
+  #target = null;
+  #containerWidth = 96;
+  #containerHeight = 48;
+  #panelWidth = 92;
+  #panelHeight = 32;
+  #DOMElements = {};
   #currentPanelIndex = 0;
   #maxPanels = 2;
   #firstUpdate = true;
