@@ -84,11 +84,9 @@ class System {
   clear(color) {
     const { ctx, width, height } = this;
     if (color) {
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = color;
       ctx.fillRect(0, 0, width, height);
-    } else {
-      ctx.clearRect(0, 0, width, height);
-    }
+    } else ctx.clearRect(0, 0, width, height);
   }
 
   get DRAW() {

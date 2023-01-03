@@ -1,6 +1,7 @@
 class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
+    this.loadLevel(levelOne);
   }
 
   update() {
@@ -12,13 +13,11 @@ class MyGame extends Game {
     super.draw();
 
     /** Extra draw logic goes here. */
-    const { width, height, offsetWidth } = this.system.canvas;
-    const ctx = this.system.ctx;
-    ctx.fillStyle = "lightblue";
-    ctx.fillRect(0, 0, width, height);
+    this.system.clear("lightblue")
+    const { offsetWidth } = this.system.canvas;
     this.font.write("It Works!", offsetWidth / 2, 100, {
       align: Font.ALIGN.CENTER,
-      alpha: 0.5,
+      alpha: 1,
       color: "green",
       size: 80,
     });

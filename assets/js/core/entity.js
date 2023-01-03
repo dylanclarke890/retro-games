@@ -47,6 +47,7 @@ class Entity {
   killed = false;
 
   constructor(x, y, settings) {
+    console.log("Init");
     this.id = ++Entity.#lastId;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;
@@ -54,7 +55,6 @@ class Entity {
   }
 
   reset(x, y, settings) {
-    // TODO: Add default settings property
     const proto = this.constructor.prototype;
     this.pos.x = x;
     this.pos.y = y;
@@ -357,3 +357,4 @@ class Entity {
   ready() {}
   erase() {}
 }
+Register.entity(Entity);
