@@ -5,6 +5,11 @@ class Font {
     CENTER: 2,
   };
 
+  align = null;
+  alpha = 1;
+  color = null;
+  size = null;
+
   constructor({ system, name, path } = {}) {
     this.system = system;
     this.name = name;
@@ -45,22 +50,24 @@ class Font {
     return this.system.ctx.measureText(text);
   }
 
-  draw(text, x, y, opts = {}) {
-    const { align = Font.ALIGN.LEFT, alpha = 1, color = "black" } = opts;
+  write(text, x, y, opts = {}) {
     if (typeof text !== "string") text = text.toString();
+
+    let { align, alpha, color, size } = opts;
+    align = align ?? this.align ?? Font.ALIGN.LEFT;
+    alpha = alpha ?? this.alpha ?? 1;
+    color = color ?? this.color ?? "black";
+    size = size ?? this.size ?? 36;
 
     if (align !== Font.ALIGN.LEFT) {
       const textWidth = this.sizeOfText(text).width;
-      if (align === Font.ALIGN.CENTER) {
-        x -= textWidth / 2;
-      } else if (align === Font.ALIGN.RIGHT) {
-        x -= textWidth;
-      }
+      if (align === Font.ALIGN.CENTER) x -= textWidth / 2;
+      else if (align === Font.ALIGN.RIGHT) x -= textWidth;
     }
 
     const ctx = this.system.ctx;
     if (alpha !== 1) ctx.globalAlpha = alpha;
-    ctx.font = `72px ${this.name}`;
+    ctx.font = `${size}px ${this.name}`;
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
     ctx.globalAlpha = 1;

@@ -10,15 +10,17 @@ class MyGame extends Game {
 
   draw() {
     super.draw();
+
     /** Extra draw logic goes here. */
     const { width, height, offsetWidth } = this.system.canvas;
     const ctx = this.system.ctx;
     ctx.fillStyle = "lightblue";
     ctx.fillRect(0, 0, width, height);
-    this.font.draw("It Works!", offsetWidth / 2, 100, {
+    this.font.write("It Works!", offsetWidth / 2, 100, {
       align: Font.ALIGN.CENTER,
       alpha: 0.5,
       color: "green",
+      size: 80,
     });
   }
 }
