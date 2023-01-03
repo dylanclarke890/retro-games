@@ -19,6 +19,8 @@ class System {
   #runner = null;
   #imageCache = {};
 
+  imagesDrawn = 0;
+
   constructor({ runner, canvasId = null, width, height, scale }) {
     if (!runner) throw new Error("Runner is required.");
     this.#runner = runner;
@@ -136,5 +138,9 @@ class System {
     ctx.drawImage(image, 0, 0, realWidth, realWidth);
 
     return ctx.getImageData(x, y, width, height);
+  }
+
+  imageDrawn() {
+    this.imagesDrawn++;
   }
 }

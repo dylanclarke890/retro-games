@@ -71,7 +71,5 @@ class Font {
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
     ctx.globalAlpha = 1;
-
-    // ig.Image.drawCount += text.length; TODO
   }
 }
