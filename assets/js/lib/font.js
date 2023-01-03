@@ -46,14 +46,8 @@ class Font {
   }
 
   draw(text, x, y, opts = {}) {
-    const { align } = opts;
+    const { align, alpha = 1 } = opts;
     if (typeof text !== "string") text = text.toString();
-    // if (this.#isMultiline(text)) {
-    //   const lines = text.split("\n");
-    //   const lineHeight = this.heightForString(text);
-    //   for (let i = 0; i < lines.length; i++) this.draw(lines[i], x, y + i * lineHeight, align);
-    //   return;
-    // }
 
     if (align !== Font.ALIGN.LEFT) {
       const textWidth = this.sizeOfText(text).width;
@@ -65,14 +59,12 @@ class Font {
     }
 
     const ctx = this.system.ctx;
-    // if (this.alpha !== 1) ctx.globalAlpha = this.alpha;
+    if (alpha !== 1) ctx.globalAlpha = alpha;
     ctx.font = `72px ${this.name}`;
     ctx.fillStyle = `black`;
     ctx.fillText(text, x, y);
-    // for (let i = 0; i < text.length; i++)
-    //   x += this.#drawChar(text.charCodeAt(i) - this.firstChar, x, y);
-
-    // if (this.alpha !== 1) ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;
+    
     // ig.Image.drawCount += text.length; TODO
   }
 }

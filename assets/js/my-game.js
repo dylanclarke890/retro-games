@@ -15,7 +15,7 @@ class MyGame extends Game {
     const ctx = this.system.ctx;
     ctx.fillStyle = "lightblue";
     ctx.fillRect(0, 0, width, height);
-    this.font.draw("It Works!", offsetWidth / 2, 100, { align: Font.ALIGN.CENTER });
+    this.font.draw("It Works!", offsetWidth / 2, 100, { align: Font.ALIGN.CENTER, alpha: 0.5 });
   }
 }
 
