@@ -110,9 +110,7 @@ class GameImage {
     tileHeight = tileHeight ?? tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const scope = this.system,
-      scale = scope.constants.scale,
-      ctx = scope.ctx;
+    const { scale, ctx } = this.system;
     const tileWidthScaled = Math.floor(tileWidth * scale);
     const tileHeightScaled = Math.floor(tileHeight * scale);
 
