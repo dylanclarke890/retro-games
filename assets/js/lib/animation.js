@@ -9,6 +9,10 @@ class GameAnimationSheet {
     this.height = size.y ?? 8;
     this.image = new GameImage({ system, path });
   }
+
+  get system() {
+    return this.image.system;
+  }
 }
 
 class GameAnimation {
@@ -67,18 +71,11 @@ class GameAnimation {
 
   draw(targetX, targetY) {
     const bbsize = Math.max(this.sheet.width, this.sheet.height);
+    const { width, height, ctx, drawPosition } = this.sheet.system;
+    // Exit early if not on screen.
+    if (targetX > width || targetY > height || targetX + bbsize < 0 || targetY + bbsize < 0) return;
 
-    // On screen?
-    if (
-      targetX > ig.system.width ||
-      targetY > ig.system.height ||
-      targetX + bbsize < 0 ||
-      targetY + bbsize < 0
-    )
-      return;
-
-    if (this.alpha !== 1) ig.system.context.globalAlpha = this.alpha;
-
+    if (this.alpha !== 1) ctx.globalAlpha = this.alpha;
     if (this.angle === 0) {
       this.sheet.image.drawTile(
         targetX,
@@ -90,13 +87,9 @@ class GameAnimation {
         this.flip.y
       );
     } else {
-      // TODO
-      ig.system.context.save();
-      ig.system.context.translate(
-        ig.system.getDrawPos(targetX + this.pivot.x),
-        ig.system.getDrawPos(targetY + this.pivot.y)
-      );
-      ig.system.context.rotate(this.angle);
+      ctx.save();
+      ctx.translate(drawPosition(targetX + this.pivot.x), drawPosition(targetY + this.pivot.y));
+      ctx.rotate(this.angle);
       this.sheet.image.drawTile(
         -this.pivot.x,
         -this.pivot.y,
@@ -106,9 +99,8 @@ class GameAnimation {
         this.flip.x,
         this.flip.y
       );
-      ig.system.context.restore();
+      ctx.restore();
     }
-
     if (this.alpha !== 1) ig.system.context.globalAlpha = 1;
   }
 }
