@@ -1,8 +1,10 @@
 class Game {
   clearColor = "#000000";
   gravity = 0;
-  screen = { x: 0, y: 0 };
-  #rscreen = { x: 0, y: 0 };
+  screen = {
+    actual: { x: 0, y: 0 },
+    rounded: { x: 0, y: 0 },
+  };
 
   entities = [];
 
@@ -37,7 +39,10 @@ class Game {
   }
 
   loadLevel(data) {
-    this.screen = { x: 0, y: 0 };
+    this.screen = {
+      actual: { x: 0, y: 0 },
+      rounded: { x: 0, y: 0 },
+    };
 
     // Entities
     this.entities = [];
@@ -181,17 +186,19 @@ class Game {
     const system = this.system;
     if (this.clearColor) system.clear(this.clearColor);
 
-    /**  TODO: This is a bit of a circle jerk. Entities reference game._rscreen
-     * instead of game.screen when drawing themselves in order to be
+    /**  TODO: This is a bit of a circle jerk. Entities reference game.screen.rounded
+     * instead of game.screen.actual when drawing themselves in order to be
      * "synchronized" to the rounded(?) screen position.*/
-    this.#rscreen.x = system.drawPosition(this.screen.x) / system.scale;
-    this.#rscreen.y = system.drawPosition(this.screen.y) / system.scale;
+    this.screen.rounded = {
+      x: system.drawPosition(this.screen.x) / system.scale,
+      y: system.drawPosition(this.screen.y) / system.scale,
+    };
     let mapIndex;
     for (mapIndex = 0; mapIndex < this.backgroundMaps.length; mapIndex++) {
       const map = this.backgroundMaps[mapIndex];
       // All foreground layers are drawn after the entities
       if (map.foreground) break;
-      map.setScreenPos(this.screen.x, this.screen.y);
+      map.setScreenPos(this.screen.actual.x, this.screen.actual.y);
       map.draw();
     }
 
@@ -199,7 +206,7 @@ class Game {
 
     for (mapIndex; mapIndex < this.backgroundMaps.length; mapIndex++) {
       const map = this.backgroundMaps[mapIndex];
-      map.setScreenPos(this.screen.x, this.screen.y);
+      map.setScreenPos(this.screen.actual.x, this.screen.actual.y);
       map.draw();
     }
   }

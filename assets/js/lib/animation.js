@@ -30,7 +30,7 @@ class GameAnimation {
   constructor(sheet, frameTime, sequence, stop) {
     this.sheet = sheet;
     this.pivot = { x: sheet.width / 2, y: sheet.height / 2 };
-    this.timer = new ig.Timer();
+    this.timer = new Timer();
 
     this.frameTime = frameTime;
     this.sequence = sequence;

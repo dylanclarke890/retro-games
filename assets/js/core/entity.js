@@ -157,18 +157,15 @@ class Entity {
 
   draw() {
     if (!this.currentAnim) return;
-
-    this.currentAnim.draw(
-      this.pos.x - this.offset.x - this.game._rscreen.x, // TODO
-      this.pos.y - this.offset.y - this.game._rscreen.y
-    );
+    const { x, y } = this.game.screen.rounded;
+    this.currentAnim.draw(this.pos.x - this.offset.x - x, this.pos.y - this.offset.y - y);
   }
 
   kill() {
     this.game.removeEntity(this);
   }
 
-  receiveDamage(amount, from) {
+  receiveDamage(amount, _from) {
     this.health -= amount;
     if (this.health <= 0) this.kill();
   }
