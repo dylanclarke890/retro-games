@@ -47,7 +47,6 @@ class Entity {
   killed = false;
 
   constructor(x, y, settings) {
-    console.log("Init");
     this.id = ++Entity.#lastId;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;

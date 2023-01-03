@@ -81,8 +81,6 @@ class Game {
   }
 
   #getEntityClass(type) {
-    console.log(type);
-    console.log(globalThis[type]);
     return typeof type === "string" ? globalThis[type] : type;
   }
 
