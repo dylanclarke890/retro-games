@@ -5,15 +5,17 @@ class MyGame extends Game {
 
   update() {
     super.update();
+    /** Extra draw logic goes here. */
   }
 
   draw() {
     super.draw();
+    /** Extra draw logic goes here. */
     const { width, height, offsetWidth } = this.system.canvas;
     const ctx = this.system.ctx;
     ctx.fillStyle = "lightblue";
     ctx.fillRect(0, 0, width, height);
-    this.font.draw("It Works!", offsetWidth / 2, 100, Font.ALIGN.CENTER);
+    this.font.draw("It Works!", offsetWidth / 2, 100, { align: Font.ALIGN.CENTER });
   }
 }
 
@@ -25,7 +27,7 @@ const runner = new GameRunner({
   height: 600,
   showDebugStats: true,
   font: {
-    name: "FontFamily Bitter",
+    name: "arcadeclassic",
     path: "./assets/fonts/arcade-classic.TTF",
   },
 });

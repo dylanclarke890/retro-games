@@ -45,7 +45,8 @@ class Font {
     return this.system.ctx.measureText(text);
   }
 
-  draw(text, x, y, align) {
+  draw(text, x, y, opts = {}) {
+    const { align } = opts;
     if (typeof text !== "string") text = text.toString();
     // if (this.#isMultiline(text)) {
     //   const lines = text.split("\n");
