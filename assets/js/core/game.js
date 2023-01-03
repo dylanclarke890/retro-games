@@ -71,7 +71,7 @@ class Game {
           system: this.system,
           tilesize: ld.tilesize,
           data: ld.data,
-          tilesetName: ld.tilesetName,
+          tileset: ld.tilesetName,
         });
         newMap.anims = this.backgroundAnims[ld.tilesetName] || {};
         newMap.repeat = ld.repeat;

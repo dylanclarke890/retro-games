@@ -28,7 +28,7 @@ const runner = new GameRunner({
   gameClass: MyGame,
   fps: 60,
   width: 768,
-  height: 600,
+  height: 624,
   showDebugStats: true,
   font: {
     path: "./assets/fonts/arcade-classic.TTF",
