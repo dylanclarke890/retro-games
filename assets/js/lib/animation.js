@@ -101,6 +101,6 @@ class GameAnimation {
       );
       ctx.restore();
     }
-    if (this.alpha !== 1) ig.system.context.globalAlpha = 1;
+    if (this.alpha !== 1) ctx.globalAlpha = 1;
   }
 }
