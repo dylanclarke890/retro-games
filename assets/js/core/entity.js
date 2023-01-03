@@ -46,8 +46,9 @@ class Entity {
   slopeStanding = { min: (44).toRad(), max: (136).toRad() };
   killed = false;
 
-  constructor(x, y, settings) {
+  constructor({ x, y, game, settings }) {
     this.id = ++Entity.#lastId;
+    this.game = game;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;
     NativeExtensions.extend(this, settings);
@@ -84,15 +85,15 @@ class Entity {
   update() {
     this.last.x = this.pos.x;
     this.last.y = this.pos.y;
-    this.vel.y += ig.game.gravity * ig.system.tick * this.gravityFactor; // TODO
+    this.vel.y += this.game.gravity * this.game.system.tick * this.gravityFactor; // TODO
 
     this.vel.x = this.getNewVelocity(this.vel.x, this.accel.x, this.friction.x, this.maxVel.x);
     this.vel.y = this.getNewVelocity(this.vel.y, this.accel.y, this.friction.y, this.maxVel.y);
 
     // movement & collision
-    const mx = this.vel.x * ig.system.tick; // TODO
-    const my = this.vel.y * ig.system.tick;
-    const res = ig.game.collisionMap.trace(
+    const mx = this.vel.x * this.game.system.tick; // TODO
+    const my = this.vel.y * this.game.system.tick;
+    const res = this.game.collisionMap.trace(
       this.pos.x,
       this.pos.y,
       mx,
@@ -105,9 +106,9 @@ class Entity {
   }
 
   getNewVelocity(vel, accel, friction, max) {
-    if (accel) return (vel + accel * ig.system.tick).constrain(-max, max);
+    if (accel) return (vel + accel * this.game.system.tick).constrain(-max, max);
     else if (friction) {
-      const delta = friction * ig.system.tick; // TOO
+      const delta = friction * this.game.system.tick; // TOO
       if (vel - delta > 0) return vel - delta;
       else if (vel + delta < 0) return vel + delta;
       else return 0;
@@ -154,17 +155,16 @@ class Entity {
     if (!this.currentAnim) return;
 
     this.currentAnim.draw(
-      this.pos.x - this.offset.x - ig.game._rscreen.x, // TODO
-      this.pos.y - this.offset.y - ig.game._rscreen.y
+      this.pos.x - this.offset.x - this.game._rscreen.x, // TODO
+      this.pos.y - this.offset.y - this.game._rscreen.y
     );
   }
 
   kill() {
-    ig.game.removeEntity(this); // TODO
+    this.game.removeEntity(this);
   }
 
   receiveDamage(amount, from) {
-    // TODO
     this.health -= amount;
     if (this.health <= 0) this.kill();
   }
@@ -236,7 +236,7 @@ class Entity {
       const strong = left === weak ? right : left;
       weak.vel.x = -weak.vel.x * weak.bounciness + strong.vel.x;
 
-      const resWeak = ig.game.collisionMap.trace(
+      const resWeak = this.game.collisionMap.trace(
         // TODO
         weak.pos.x,
         weak.pos.y,
@@ -254,7 +254,7 @@ class Entity {
       left.vel.x = -v2;
       right.vel.x = v2;
 
-      const resLeft = ig.game.collisionMap.trace(
+      const resLeft = this.game.collisionMap.trace(
         left.pos.x,
         left.pos.y,
         -nudge / 2,
@@ -264,7 +264,7 @@ class Entity {
       );
       left.pos.x = Math.floor(resLeft.pos.x);
 
-      const resRight = ig.game.collisionMap.trace(
+      const resRight = this.game.collisionMap.trace(
         right.pos.x,
         right.pos.y,
         nudge / 2,
@@ -288,10 +288,10 @@ class Entity {
       let nudgeX = 0;
       if (weak == top && Math.abs(weak.vel.y - strong.vel.y) < weak.minBounceVelocity) {
         weak.standing = true;
-        nudgeX = strong.vel.x * ig.system.tick;
+        nudgeX = strong.vel.x * this.game.system.tick;
       }
 
-      const resWeak = ig.game.collisionMap.trace(
+      const resWeak = this.game.collisionMap.trace(
         weak.pos.x,
         weak.pos.y,
         nudgeX,
@@ -304,8 +304,8 @@ class Entity {
     }
 
     // Bottom entity is standing - just bounce the top one
-    else if (ig.game.gravity && (bottom.standing || top.vel.y > 0)) {
-      const resTop = ig.game.collisionMap.trace(
+    else if (this.game.gravity && (bottom.standing || top.vel.y > 0)) {
+      const resTop = this.game.collisionMap.trace(
         top.pos.x,
         top.pos.y,
         0,
@@ -327,8 +327,8 @@ class Entity {
       top.vel.y = -v2;
       bottom.vel.y = v2;
 
-      const nudgeX = bottom.vel.x * ig.system.tick;
-      const resTop = ig.game.collisionMap.trace(
+      const nudgeX = bottom.vel.x * this.game.system.tick;
+      const resTop = this.game.collisionMap.trace(
         top.pos.x,
         top.pos.y,
         nudgeX,
@@ -338,7 +338,7 @@ class Entity {
       );
       top.pos.y = resTop.pos.y;
 
-      const resBottom = ig.game.collisionMap.trace(
+      const resBottom = this.game.collisionMap.trace(
         //TODO
         bottom.pos.x,
         bottom.pos.y,

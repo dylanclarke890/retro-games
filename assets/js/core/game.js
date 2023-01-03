@@ -50,6 +50,8 @@ class Game {
     // Map Layer
     this.collisionMap = CollisionMap.staticNoCollision;
     this.backgroundMaps = [];
+
+    data.layer = data.layer || [];
     for (let i = 0; i < data.layer.length; i++) {
       const ld = data.layer[i];
       if (ld.name == "collision") this.collisionMap = new CollisionMap(ld.tilesize, ld.data);
@@ -99,9 +101,10 @@ class Game {
   }
 
   spawnEntity(type, x, y, settings) {
+    settings = settings || {};
     const entityClass = this.#getEntityClass(type);
     if (!entityClass) throw new Error("Can't spawn entity of type " + type);
-    const ent = new entityClass(x, y, settings || {});
+    const ent = new entityClass({ x, y, game: this, settings });
     this.entities.push(ent);
     if (ent.name) this.namedEntities[ent.name] = ent;
     return ent;
