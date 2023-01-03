@@ -46,7 +46,7 @@ class Font {
   }
 
   draw(text, x, y, opts = {}) {
-    const { align, alpha = 1 } = opts;
+    const { align = Font.ALIGN.LEFT, alpha = 1, color = "black" } = opts;
     if (typeof text !== "string") text = text.toString();
 
     if (align !== Font.ALIGN.LEFT) {
@@ -61,10 +61,10 @@ class Font {
     const ctx = this.system.ctx;
     if (alpha !== 1) ctx.globalAlpha = alpha;
     ctx.font = `72px ${this.name}`;
-    ctx.fillStyle = `black`;
+    ctx.fillStyle = color;
     ctx.fillText(text, x, y);
     ctx.globalAlpha = 1;
-    
+
     // ig.Image.drawCount += text.length; TODO
   }
 }
