@@ -31,7 +31,7 @@ class GameLoop {
   }
 
   start() {
-    this.main(now());
+    this.main(performance.now());
   }
 
   main(timestamp) {

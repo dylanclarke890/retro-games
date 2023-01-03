@@ -1,10 +1,11 @@
 //#region performance.now()
-// TODO
-const moduleLoadTime = Date.now();
-const now = () => {
-  if (performance && performance.now) return performance.now();
-  return Date.now() - moduleLoadTime;
-};
+(function polyfillPerformanceNow() {
+  const moduleLoadTime = Date.now();
+  if (window.performance && performance.now) return;
+  window.performance = {
+    now: () => Date.now() - moduleLoadTime,
+  };
+})();
 
 //#endregion performance.now()
 
@@ -17,7 +18,7 @@ let last = 0;
 
 function requestFixedTick(cb, fps = 60) {
   if (QUEUE.length === 0) {
-    const frame = now();
+    const frame = performance.now();
     const next = Math.max(0, 1000 / fps - (frame - last));
     last = frame + next;
 
