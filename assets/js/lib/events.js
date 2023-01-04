@@ -170,6 +170,11 @@ class InputEvents {
     this.#userAgent = UserAgent.info;
   }
 
+  targetIsInputOrText(event) {
+    const { tagName } = event.target;
+    return tagName === "INPUT" || tagName === "TEXTAREA";
+  }
+
   initMouse() {
     if (this.isUsingMouse) return;
     this.isUsingMouse = true;
@@ -240,8 +245,7 @@ class InputEvents {
   }
 
   keydown(event) {
-    const tag = event.target.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (this.targetIsInputOrText(event)) return;
     const code =
       event.type === "keydown"
         ? event.keyCode
@@ -265,9 +269,7 @@ class InputEvents {
   }
 
   keyup(event) {
-    // TODO: private function checking for input into text box.
-    const tag = event.target.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (this.targetIsInputOrText(event)) return;
     const code =
       event.type === "keyup"
         ? event.keyCode
