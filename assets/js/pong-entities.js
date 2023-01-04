@@ -17,7 +17,33 @@ class EntityBall extends Entity {
     super.update();
   }
 }
-class EntityPaddleCpu extends Entity {}
-class EntityPaddlePlayer extends Entity {}
+
+class EntityPaddle extends Entity {
+  size = { x: 64, y: 128 };
+  collides = Entity.COLLIDES.FIXED;
+
+  constructor(opts) {
+    super(opts);
+    this.createAnimationSheet("assets/images/paddle.png");
+    this.addAnim("Default", 0.4, [0], true);
+  }
+}
+
+class EntityPaddleCpu extends EntityPaddle {
+  update() {
+    const ball = this.game.getEntitiesByType(EntityBall)[0];
+    this.vel.y = ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2 ? -100 : 100;
+    super.update();
+  }
+}
+class EntityPaddlePlayer extends EntityPaddle {
+  update() {
+    const inputState = (v) => this.game.inputEvents.state(v);
+    if (inputState("up")) this.vel.y = -100;
+    else if (inputState("down")) this.vel.y = 100;
+    else this.vel.y = 0;
+    super.update();
+  }
+}
 
 Register.entities(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);

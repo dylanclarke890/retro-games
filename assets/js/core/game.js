@@ -28,6 +28,7 @@ class Game {
     this.mediaFactory = mediaFactory;
     this.font = font;
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
+    this.inputEvents = new InputEvents({ system: this.system });
   }
 
   static get SORT() {
@@ -155,6 +156,7 @@ class Game {
   }
 
   update() {
+    this.inputEvents.clearPressed();
     // load new level?
     if (this.#levelToLoad) {
       this.loadLevel(this.#levelToLoad);
@@ -264,7 +266,7 @@ class Game {
               // Intersects and wasn't already checkd?
               if (entity.touches(cell[c]) && !checked[cell[c].id]) {
                 checked[cell[c].id] = true;
-                // Entity.checkPair(entity, cell[c]); // TODO
+                Entity.checkPair(entity, cell[c]); // TODO
               }
             }
             cell.push(entity);

@@ -17,7 +17,6 @@ class GameRunner {
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.mediaFactory = new MediaFactory({ system: this.system });
-    this.inputEvents = new InputEvents({ system: this.system });
     this.soundManager = new SoundManager(this);
     this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.userAgent = UserAgent.info;

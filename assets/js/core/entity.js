@@ -198,8 +198,9 @@ class Entity {
     if (b.checkAgainst & a.type) b.check(a);
     // If this pair allows collision, solve it! At least one entity must
     // collide ACTIVE or FIXED, while the other one must not collide NEVER.
-    if (a.collides && b.collides && a.collides + b.collides > Entity.COLLIDES.ACTIVE)
+    if (a.collides && b.collides && a.collides + b.collides > Entity.COLLIDES.ACTIVE) {
       this.solveCollision(a, b);
+    }
   }
 
   solveCollision(a, b) {
