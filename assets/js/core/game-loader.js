@@ -28,7 +28,7 @@ class GameLoader {
       return;
     }
     for (let i = 0; i < this.#assetsToPreload.length; i++)
-      resource.load((path, success) => this.#loadCallback(path, success));
+      this.#assetsToPreload[i].load((path, success) => this.#loadCallback(path, success));
     this.#intervalId = setInterval(() => this.#drawLoadingScreen(), 16);
   }
 
