@@ -6,9 +6,9 @@ class GameLoader {
   #progressPercent = 0;
   #intervalId = 0;
   #unloaded = [];
-  #resources = [];
+  #assetsToPreload = [];
 
-  constructor({ runner, gameClass, resources }) {
+  constructor({ runner, gameClass }) {
     if (!runner) throw new Error("Runner is required.");
     if (!gameClass) throw new Error("Game class is required.");
     if (!(gameClass.prototype instanceof Game))
@@ -16,17 +16,20 @@ class GameLoader {
 
     this.#runner = runner;
     this.#gameClass = gameClass;
-    this.#resources = resources ?? [];
-    for (let i = 0; i < this.#resources.length; i++) this.#unloaded.push(this.#resources[i].path);
+    this.#assetsToPreload = Register.getAssetsToPreload();
+    console.log(this.#assetsToPreload);
+    for (let i = 0; i < this.#assetsToPreload.length; i++)
+      this.#unloaded.push(this.#assetsToPreload[i].path);
   }
 
   load() {
     this.#runner.system.clear("#000");
-    if (!this.#resources.length) {
+    if (!this.#assetsToPreload.length) {
       this.#end();
       return;
     }
-    for (let i = 0; i < this.#resources.length; i++) this.#loadResource(this.#resources[i]);
+    for (let i = 0; i < this.#assetsToPreload.length; i++)
+      this.#loadResource(this.#assetsToPreload[i]);
     this.#intervalId = setInterval(() => this.#drawLoadingScreen(), 16);
   }
 
@@ -39,9 +42,9 @@ class GameLoader {
     this.done = true;
     clearInterval(this.#intervalId);
     this.#runner.setGame(this.#gameClass);
+    Register.clearPreloadCache();
   }
 
-  // FIXME: Progress bar is off center.
   #drawLoadingScreen() {
     this.#progressPercent += (this.#status - this.#progressPercent) / 5;
     const system = this.#runner.system;
@@ -66,7 +69,7 @@ class GameLoader {
   #loadCallback(path, wasSuccessful) {
     if (!wasSuccessful) throw new Error(`Failed to load resource: ${path}`);
     this.#unloaded.erase(path);
-    this.#status = 1 - this.#unloaded.length / this.#resources.length;
+    this.#status = 1 - this.#unloaded.length / this.#assetsToPreload.length;
     if (this.#unloaded.length === 0) setTimeout(() => this.#end(), 250);
   }
 }

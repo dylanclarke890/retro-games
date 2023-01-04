@@ -33,6 +33,6 @@ const runner = new GameRunner({
   height: 624,
   showDebugStats: true,
   font: {
-    path: "./assets/fonts/arcade-classic.TTF",
+    path: "assets/fonts/arcade-classic.TTF",
   },
 });

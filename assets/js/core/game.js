@@ -99,16 +99,12 @@ class Game {
     return null;
   }
 
-  #getEntityClass(type) {
-    return typeof type === "string" ? globalThis[type] : type;
-  }
-
   getEntityByName(name) {
     return this.namedEntities[name];
   }
 
   getEntitiesByType(type) {
-    const entityClass = this.#getEntityClass(type);
+    const entityClass = Register.getEntityByType(type);
     const a = [];
     for (let i = 0; i < this.entities.length; i++) {
       const ent = this.entities[i];
@@ -119,7 +115,7 @@ class Game {
 
   spawnEntity(type, x, y, settings) {
     settings = settings || {};
-    const entityClass = this.#getEntityClass(type);
+    const entityClass = Register.getEntityByType(type);
     if (!entityClass) throw new Error("Can't spawn entity of type " + type);
     const ent = new entityClass({ x, y, game: this, settings });
     this.entities.push(ent);
