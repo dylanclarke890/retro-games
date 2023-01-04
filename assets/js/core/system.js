@@ -26,7 +26,7 @@ class System {
     this.#runner = runner;
 
     this.canvas = document.getElementById(canvasId) ?? document.createElement("canvas");
-    this.canvas.id = canvasId ?? "canva"; // TODO
+    this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.firstChild);

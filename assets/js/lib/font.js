@@ -12,7 +12,7 @@ class Font {
 
   constructor({ system, name, path } = {}) {
     this.system = system;
-    this.name = name; // TODO - ?? generate random name
+    this.name = name ?? NativeExtensions.uniqueId();
     this.path = path;
     this.loaded = false;
     this.failed = false;
