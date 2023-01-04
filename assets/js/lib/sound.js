@@ -339,7 +339,7 @@ class Sound {
     if (this.ready)
       // TODO
       ig.soundManager.load(this.path, this.multiChannel, loadCallback); // TODO
-    else ig.addResource(this); // TODO
+    else Register.preloadAsset(this);
   }
 
   play() {

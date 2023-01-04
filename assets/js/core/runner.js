@@ -33,10 +33,6 @@ class GameRunner {
     this.loader.load();
   }
 
-  addResource(resource) {
-    if (resource) this.resources.push(resource);
-  }
-
   setGame(gameClass) {
     if (this.running) this.newGameClass = gameClass;
     else this.setGameNow(gameClass);

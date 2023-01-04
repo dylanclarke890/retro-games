@@ -24,16 +24,20 @@ class Font {
     if (this.loaded) {
       if (loadCallback) loadCallback(this.path, true);
       return;
-    } else if (!this.loaded && this.system.ready) {
-      if (loadCallback) this.loadCallback = loadCallback;
-      const fontFace = new FontFace(this.name, `url(${this.path})`);
-      document.fonts.add(fontFace);
-      this.data = fontFace;
-      this.data.load().then(
-        () => this.onload(),
-        (err) => this.onerror(err)
-      );
-    } else this.system.addResource(this);
+    }
+    if (!this.system.ready) {
+      Register.preloadAsset(this);
+      return;
+    }
+
+    if (loadCallback) this.loadCallback = loadCallback;
+    const fontFace = new FontFace(this.name, `url(${this.path})`);
+    document.fonts.add(fontFace);
+    this.data = fontFace;
+    this.data.load().then(
+      () => this.onload(),
+      (err) => this.onerror(err)
+    );
   }
 
   onload() {

@@ -355,4 +355,4 @@ class Entity {
   ready() {}
   erase() {}
 }
-Register.entity(Entity);
+Register.entityType(Entity);

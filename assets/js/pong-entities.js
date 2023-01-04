@@ -49,4 +49,5 @@ class EntityPaddlePlayer extends EntityPaddle {
   }
 }
 
-Register.entities(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);
+Register.preloadAsset("assets/images/paddle.png");
+Register.entityTypes(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);

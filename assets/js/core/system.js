@@ -55,10 +55,6 @@ class System {
     return this.#runner.ready;
   }
 
-  addResource(resource) {
-    this.#runner.addResource(resource);
-  }
-
   cacheImage(path, image) {
     this.#imageCache[path] = image;
   }
