@@ -173,18 +173,22 @@ class Music {
   #fadeTimer = null;
 
   get loop() {
-    // TODO - do we need the other methods?
     return {
-      get: () => this.getLooping(),
-      set: (value) => this.setLooping(value),
+      get: () => this.#loop,
+      set: (value) => {
+        this.#loop = value;
+        for (let i in this.tracks) this.tracks[i].loop = this.#loop;
+      },
     };
   }
 
   get volume() {
-    // TODO - do we need the other methods?
     return {
-      get: () => this.getVolume(),
-      set: (value) => this.setVolume(value),
+      get: () => this.#volume,
+      set: (value) => {
+        this.#volume = value.constrain(0, 1);
+        for (let i in this.tracks) this.tracks[i].volume = this.#volume;
+      },
     };
   }
 
@@ -193,15 +197,12 @@ class Music {
     const path = music instanceof Sound ? music.path : music;
     const track = ig.soundManager.load(path, false); // TODO
 
-    // Did we get a WebAudio Source? This is suboptimal; Music should be loaded
-    // as HTML5 Audio so it can be streamed
-    if (track instanceof WebAudioSource) {
-      // Since this error will likely occur at game start, we stop the game
-      // to not produce any more errors.
+    // Loading music as WebAudioSource is suboptimal, should be loaded as HTML5Audio.
+    // Probably happened on game start. Throw now to avoid further errors.
+    if (track instanceof WebAudioSource)
       throw new Error(
         `Sound '${path}' loaded as MultiChannel but used for music. Set the multiChannel param to false when loading.`
       );
-    }
 
     track.loop = this.#loop;
     track.volume = this.#volume;
@@ -244,24 +245,6 @@ class Music {
       }
     } else if (!this.currentTrack) return;
     this.currentTrack.play();
-  }
-
-  getLooping() {
-    return this.#loop;
-  }
-
-  setLooping(l) {
-    this.#loop = l;
-    for (let i in this.tracks) this.tracks[i].loop = l;
-  }
-
-  getVolume() {
-    return this.#volume;
-  }
-
-  setVolume(v) {
-    this.#volume = v.constrain(0, 1);
-    for (let i in this.tracks) this.tracks[i].volume = this.#volume;
   }
 
   fadeOut(time) {
@@ -314,20 +297,13 @@ class Sound {
   }
 
   get loop() {
-    // TODO - do we need the other methods?
     return {
-      get: () => this.getLooping(),
-      set: (value) => this.setLooping(value),
+      get: () => this.#loop,
+      set: (value) => {
+        this.#loop = value;
+        if (this.currentClip) this.currentClip.loop = this.#loop;
+      },
     };
-  }
-
-  getLooping() {
-    return this.#loop;
-  }
-
-  setLooping(loop) {
-    this.#loop = loop;
-    if (this.currentClip) this.currentClip.loop = loop;
   }
 
   load(loadCallback) {
@@ -360,29 +336,30 @@ class Sound {
 }
 
 class WebAudioSource {
-  sources = [];
-  gain = null;
+  #sources = [];
+  #gain = null;
   buffer = null;
   #loop = false;
 
   constructor() {
-    this.gain = ig.soundManager.audioContext.createGain(); // TODO
-    this.gain.connect(ig.soundManager.audioContext.destination);
+    this.#gain = ig.soundManager.audioContext.createGain(); // TODO
+    this.#gain.connect(ig.soundManager.audioContext.destination);
   }
 
   get loop() {
-    // TODO - do we need the other methods?
     return {
-      get: () => this.getLooping(),
-      set: (value) => this.setLooping(value),
+      get: () => this.#loop,
+      set: (value) => {
+        this.#loop = value;
+        for (let i = 0; i < this.#sources.length; i++) this.#sources[i].loop = this.#loop;
+      },
     };
   }
 
   get volume() {
-    // TODO - do we need the other methods?
     return {
-      get: () => this.getVolume(),
-      set: (value) => this.setVolume(value),
+      get: () => this.#gain.gain.value,
+      set: (value) => (this.#gain.gain.value = value.constrain(0, 1)),
     };
   }
 
@@ -390,35 +367,18 @@ class WebAudioSource {
     if (!this.buffer) return;
     const source = ig.soundManager.audioContext.createBufferSource(); // TODO
     source.buffer = this.buffer;
-    source.connect(this.gain);
+    source.connect(this.#gain);
     source.loop = this.#loop;
-    this.sources.push(source); // Add this new source to our sources array
-    source.onended = () => this.sources.erase(source); // remove it when it has finished playing.
+    this.#sources.push(source); // Add this new source to our sources array
+    source.onended = () => this.#sources.erase(source); // remove it when it has finished playing.
     source.start(0);
   }
 
   pause() {
-    for (let i = 0; i < this.sources.length; i++) {
+    for (let i = 0; i < this.#sources.length; i++) {
       try {
-        this.sources[i].stop();
+        this.#sources[i].stop();
       } catch (err) {}
     }
-  }
-
-  getLooping() {
-    return this.#loop;
-  }
-
-  setLooping(loop) {
-    this.#loop = loop;
-    for (let i = 0; i < this.sources.length; i++) this.sources[i].loop = loop;
-  }
-
-  getVolume() {
-    return this.gain.gain.value;
-  }
-
-  setVolume(volume) {
-    this.gain.gain.value = volume;
   }
 }

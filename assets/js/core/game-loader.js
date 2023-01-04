@@ -17,7 +17,6 @@ class GameLoader {
     this.#runner = runner;
     this.#gameClass = gameClass;
     this.#assetsToPreload = Register.getAssetsToPreload();
-    console.log(this.#assetsToPreload);
     for (let i = 0; i < this.#assetsToPreload.length; i++)
       this.#unloaded.push(this.#assetsToPreload[i].path);
   }
@@ -29,12 +28,8 @@ class GameLoader {
       return;
     }
     for (let i = 0; i < this.#assetsToPreload.length; i++)
-      this.#loadResource(this.#assetsToPreload[i]);
+      resource.load((path, success) => this.#loadCallback(path, success));
     this.#intervalId = setInterval(() => this.#drawLoadingScreen(), 16);
-  }
-
-  #loadResource(resource) {
-    resource.load((path, success) => this.#loadCallback(path, success));
   }
 
   #end() {
