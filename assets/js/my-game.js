@@ -2,8 +2,8 @@ class MyGame extends Game {
   clearColor = "black";
   constructor({ ...options } = {}) {
     super(options);
-    this.inputEvents.bind(InputEvents.KEY.UP_ARROW, "up");
-    this.inputEvents.bind(InputEvents.KEY.DOWN_ARROW, "down");
+    this.input.bind(Input.KEY.UP_ARROW, "up");
+    this.input.bind(Input.KEY.DOWN_ARROW, "down");
     this.loadLevel(levelOne);
   }
 

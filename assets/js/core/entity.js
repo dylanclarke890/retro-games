@@ -75,7 +75,7 @@ class Entity {
   }
 
   createAnimationSheet(path, size = this.size) {
-    this.animSheet = this.game.mediaFactory.createAnimationSheet({ path, size });
+    this.animSheet = this.game.media.createAnimationSheet({ path, size });
   }
 
   addAnim(name, frameTime, sequence, stop) {

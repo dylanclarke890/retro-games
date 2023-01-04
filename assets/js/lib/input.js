@@ -1,61 +1,4 @@
-class KeyPressEvents {
-  constructor() {
-    this.left = false;
-    this.right = false;
-    this.up = false;
-    this.down = false;
-
-    document.onkeydown = (e) => {
-      switch (e.code) {
-        case "ArrowRight":
-          this.right = true;
-          break;
-        case "ArrowLeft":
-          this.left = true;
-          break;
-        case "ArrowUp":
-          this.up = true;
-          break;
-        case "ArrowDown":
-          this.down = true;
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.onkeyup = (e) => {
-      switch (e.code) {
-        case "ArrowRight":
-          this.right = false;
-          break;
-        case "ArrowLeft":
-          this.left = false;
-          break;
-        case "ArrowUp":
-          this.up = false;
-          break;
-        case "ArrowDown":
-          this.down = false;
-          break;
-        default:
-          break;
-      }
-    };
-  }
-
-  get isPressed() {
-    return {
-      left: this.left,
-      right: this.right,
-      up: this.up,
-      down: this.down,
-    };
-  }
-}
-
-// FIXME
-class InputEvents {
+class Input {
   static KEY = {
     MOUSE1: -1,
     MOUSE2: -3,
@@ -215,7 +158,7 @@ class InputEvents {
   }
 
   mousewheel(event) {
-    const code = event.deltaY < 0 ? InputEvents.KEY.MWHEEL_UP : InputEvents.KEY.MWHEEL_DOWN;
+    const code = event.deltaY < 0 ? Input.KEY.MWHEEL_UP : Input.KEY.MWHEEL_DOWN;
     const action = this.bindings[code];
     if (!action) return;
 
@@ -239,7 +182,7 @@ class InputEvents {
   }
 
   contextmenu(event) {
-    if (!this.bindings[InputEvents.KEY.MOUSE2]) return;
+    if (!this.bindings[Input.KEY.MOUSE2]) return;
     event.stopPropagation();
     event.preventDefault();
   }
@@ -250,8 +193,8 @@ class InputEvents {
       event.type === "keydown"
         ? event.keyCode
         : event.button === 2
-        ? InputEvents.KEY.MOUSE2
-        : InputEvents.KEY.MOUSE1;
+        ? Input.KEY.MOUSE2
+        : Input.KEY.MOUSE1;
 
     // Focus window element for mouse clicks. Prevents issues when
     // running the game in an iframe.
@@ -274,8 +217,8 @@ class InputEvents {
       event.type === "keyup"
         ? event.keyCode
         : event.button === 2
-        ? InputEvents.KEY.MOUSE2
-        : InputEvents.KEY.MOUSE1;
+        ? Input.KEY.MOUSE2
+        : Input.KEY.MOUSE1;
 
     const action = this.bindings[code];
     if (!action) return;

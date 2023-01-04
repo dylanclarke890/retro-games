@@ -41,7 +41,7 @@ class EntityPaddleCpu extends EntityPaddle {
 }
 class EntityPaddlePlayer extends EntityPaddle {
   update() {
-    const inputState = (v) => this.game.inputEvents.state(v);
+    const inputState = (v) => this.game.input.state(v);
     if (inputState("up")) this.vel.y = -this.paddleSpeed;
     else if (inputState("down")) this.vel.y = this.paddleSpeed;
     else this.vel.y = 0;

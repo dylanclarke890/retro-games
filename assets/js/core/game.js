@@ -24,11 +24,13 @@ class Game {
   #doSortEntities = false;
 
   constructor({ system, font, mediaFactory } = {}) {
+    if (!system) throw new Error("System is required.");
+    if (!mediaFactory) throw new Error("Media factory is required.");
     this.system = system;
-    this.mediaFactory = mediaFactory;
+    this.media = mediaFactory;
     this.font = font;
+    this.input = new Input({ system: this.system });
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
-    this.inputEvents = new InputEvents({ system: this.system });
   }
 
   static get SORT() {
@@ -152,7 +154,7 @@ class Game {
   }
 
   update() {
-    this.inputEvents.clearPressed();
+    this.input.clearPressed();
     // load new level?
     if (this.#levelToLoad) {
       this.loadLevel(this.#levelToLoad);
