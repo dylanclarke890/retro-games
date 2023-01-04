@@ -25,25 +25,26 @@ class SoundManager {
       break;
     }
 
-    // No compatible format found? -> Disable sound
+    // Disable sound if no compatible format found
     if (!this.format) Sound.enabled = false;
 
-    // Create WebAudio Context
     if (Sound.enabled && Sound.useWebAudio) {
-      this.audioContext = new AudioContext();
       const canvas = this.#runner.system.canvas;
       canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
       canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
     }
   }
 
+  /** Initialises the WebAudio Context */
   unlockWebAudio() {
     const canvas = this.#runner.system.canvas;
     canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false);
     canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
-    const buffer = this.audioContext.createBuffer(1, 1, 22050); // create empty buffer
+
+    this.audioContext = new AudioContext();
+    const emptyBuffer = this.audioContext.createBuffer(1, 1, 22050);
     const source = this.audioContext.createBufferSource();
-    source.buffer = buffer;
+    source.buffer = emptyBuffer;
     source.connect(this.audioContext.destination);
     source.start(0);
   }
@@ -51,19 +52,18 @@ class SoundManager {
   load(path, multiChannel, loadCallback) {
     return multiChannel && Sound.useWebAudio
       ? this.loadWebAudio(path, multiChannel, loadCallback) // Requested as MultiChannel and we're using WebAudio.
-      : this.loadHTML5Audio(path, multiChannel, loadCallback); // old-school HTML5 Audio - always used for Music.
+      : this.loadHTML5Audio(path, multiChannel, loadCallback); // HTML5 Audio - always used for Music.
   }
 
   loadWebAudio(path, _multiChannel, loadCallback) {
     if (this.clips[path]) return this.clips[path];
 
-    // Path to the soundfile with the right extension (.ogg or .mp3)
-    const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
+    // const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
     const audioSource = new WebAudioSource();
     this.clips[path] = audioSource;
 
     const request = new XMLHttpRequest();
-    request.open("GET", realPath, true);
+    request.open("GET", path, true);
     request.responseType = "arraybuffer";
 
     request.onload = (event) => {
@@ -95,9 +95,9 @@ class SoundManager {
       // Only loaded as single channel and now requested as multichannel?
       if (multiChannel && this.clips[path].length < Sound.channels) {
         // Path to the soundfile with the right extension (.ogg or .mp3)
-        const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
+        // const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
         for (let i = this.clips[path].length; i < Sound.channels; i++) {
-          const a = new Audio(realPath);
+          const a = new Audio(path);
           a.load();
           this.clips[path].push(a);
         }
@@ -145,7 +145,7 @@ class SoundManager {
     const channels = this.clips[path];
     // Is this a WebAudio source? We only ever have one for each Sound
     if (channels && channels instanceof WebAudioSource) return channels;
-    // Oldschool HTML5 Audio - find a channel that's not currently
+    // HTML5 Audio - find a channel that's not currently
     // playing or, if all are playing, rewind one
     for (let i = 0, clip; (clip = channels[i++]); ) {
       if (!clip.paused && !clip.ended) continue;
@@ -161,7 +161,16 @@ class SoundManager {
   }
 }
 
-class Music {
+class GameAudio {
+  soundManager = null;
+
+  constructor({ soundManager }) {
+    if (!soundManager) throw new Error("Sound Manager is required.");
+    this.soundManager = soundManager;
+  }
+}
+
+class Music extends GameAudio {
   tracks = [];
   namedTracks = {};
   currentTrack = null;
@@ -195,7 +204,7 @@ class Music {
   add(music, name) {
     if (!Sound.enabled) return;
     const path = music instanceof Sound ? music.path : music;
-    const track = ig.soundManager.load(path, false); // TODO
+    const track = this.soundManager.load(path, false);
 
     // Loading music as WebAudioSource is suboptimal, should be loaded as HTML5Audio.
     // Probably happened on game start. Throw now to avoid further errors.
@@ -206,7 +215,7 @@ class Music {
 
     track.loop = this.#loop;
     track.volume = this.#volume;
-    track.addEventListener("ended", () => this.#endedCallback, false); // TODO
+    track.addEventListener("ended", () => this.#endedCallback, false);
     this.tracks.push(track);
 
     if (name) this.namedTracks[name] = track;
@@ -251,7 +260,7 @@ class Music {
     if (!this.currentTrack) return;
     clearInterval(this.#fadeInterval);
     this.#fadeTimer = new Timer(time);
-    this.#fadeInterval = setInterval(() => this.#fadeStep(), 50); // TODO - Check this
+    this.#fadeInterval = setInterval(() => this.#fadeStep(), 50);
   }
 
   #fadeStep() {
@@ -271,7 +280,7 @@ class Music {
   }
 }
 
-class Sound {
+class Sound extends GameAudio {
   static FORMAT = {
     MP3: { ext: "mp3", mime: "audio/mpeg" },
     M4A: { ext: "m4a", mime: "audio/mp4; codecs=mp4a.40.2" },
@@ -280,7 +289,7 @@ class Sound {
     CAF: { ext: "caf", mime: "audio/x-caf" },
   };
   static enabled = true;
-  static use = [Sound.FORMAT.OGG, Sound.FORMAT.MP3];
+  static use = [Sound.FORMAT.OGG, Sound.FORMAT.MP3, Sound.FORMAT.M4A];
   static useWebAudio = !!window.AudioContext;
   static channels = 4;
 
@@ -290,9 +299,10 @@ class Sound {
   multiChannel = true;
   #loop = false;
 
-  constructor(path, multiChannel) {
+  constructor({ path, multiChannel, ...opts }) {
+    super(opts);
     this.path = path;
-    this.multiChannel = multiChannel !== false;
+    this.multiChannel = !!multiChannel === true;
     this.load();
   }
 
@@ -312,18 +322,16 @@ class Sound {
       return;
     }
 
-    if (this.ready)
-      // TODO
-      ig.soundManager.load(this.path, this.multiChannel, loadCallback); // TODO
+    if (this.ready) this.soundManager.load(this.path, this.multiChannel, loadCallback);
     else Register.preloadAsset(this);
   }
 
   play() {
     if (!Sound.enabled) return;
 
-    this.currentClip = ig.soundManager.get(this.path); // TODO
+    this.currentClip = this.soundManager.get(this.path);
     this.currentClip.loop = this.#loop;
-    this.currentClip.volume = ig.soundManager.volume * this.volume;
+    this.currentClip.volume = this.soundManager.volume * this.volume;
     this.currentClip.play();
   }
 
@@ -335,15 +343,16 @@ class Sound {
   }
 }
 
-class WebAudioSource {
+class WebAudioSource extends GameAudio {
   #sources = [];
   #gain = null;
   buffer = null;
   #loop = false;
 
-  constructor() {
-    this.#gain = ig.soundManager.audioContext.createGain(); // TODO
-    this.#gain.connect(ig.soundManager.audioContext.destination);
+  constructor(opts) {
+    super(opts);
+    this.#gain = this.soundManager.audioContext.createGain();
+    this.#gain.connect(this.soundManager.audioContext.destination);
   }
 
   get loop() {
@@ -365,7 +374,7 @@ class WebAudioSource {
 
   play() {
     if (!this.buffer) return;
-    const source = ig.soundManager.audioContext.createBufferSource(); // TODO
+    const source = this.soundManager.audioContext.createBufferSource();
     source.buffer = this.buffer;
     source.connect(this.#gain);
     source.loop = this.#loop;
