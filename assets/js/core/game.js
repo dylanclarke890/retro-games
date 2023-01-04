@@ -263,10 +263,10 @@ class Game {
           else {
             const cell = hash[x][y];
             for (let c = 0; c < cell.length; c++) {
-              // Intersects and wasn't already checkd?
+              // Intersects and wasn't already checked?
               if (entity.touches(cell[c]) && !checked[cell[c].id]) {
                 checked[cell[c].id] = true;
-                Entity.checkPair(entity, cell[c]); // TODO
+                Entity.checkPair(entity, cell[c]);
               }
             }
             cell.push(entity);
