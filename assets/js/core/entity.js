@@ -192,17 +192,17 @@ class Entity {
     );
   }
 
-  static checkPair(a, b) {
+  checkWith(other) {
     // Do these entities want checks?
-    if (a.checkAgainst & b.type) a.check(b);
-    if (b.checkAgainst & a.type) b.check(a);
+    if (this.checkAgainst & other.type) this.check(other);
+    if (other.checkAgainst & this.type) other.check(this);
     // If this pair allows collision, solve it! At least one entity must
     // collide ACTIVE or FIXED, while the other one must not collide NEVER.
-    if (a.collides && b.collides && a.collides + b.collides > Entity.COLLIDES.ACTIVE)
-      Entity.solveCollision(a, b);
+    if (this.collides && other.collides && this.collides + other.collides > Entity.COLLIDES.ACTIVE)
+      this.solveCollision(this, other);
   }
 
-  static solveCollision(a, b) {
+  solveCollision(a, b) {
     // If one entity is FIXED, or the other entity is LITE, the weak
     // (FIXED/NON-LITE) entity won't move in collision response
     let weak = null;
@@ -213,16 +213,16 @@ class Entity {
     // this must be a vertical collision!
     if (a.last.x + a.size.x > b.last.x && a.last.x < b.last.x + b.size.x) {
       // Which one is on top?
-      if (a.last.y < b.last.y) Entity.separateOnYAxis(a, b, weak);
-      else Entity.separateOnYAxis(b, a, weak);
+      if (a.last.y < b.last.y) this.separateOnYAxis(a, b, weak);
+      else this.separateOnYAxis(b, a, weak);
       a.collideWith(b, "y");
       b.collideWith(a, "y");
     }
     // Horizontal collision
     else if (a.last.y + a.size.y > b.last.y && a.last.y < b.last.y + b.size.y) {
       // Which one is on the left?
-      if (a.last.x < b.last.x) Entity.separateOnXAxis(a, b, weak);
-      else Entity.separateOnXAxis(b, a, weak);
+      if (a.last.x < b.last.x) this.separateOnXAxis(a, b, weak);
+      else this.separateOnXAxis(b, a, weak);
       a.collideWith(b, "x");
       b.collideWith(a, "x");
     }
@@ -230,7 +230,7 @@ class Entity {
 
   /** FIXME/TODO - This is a mess. Instead of doing all the movements here, the entities
    * should get notified of the collision (with all details) and resolve it themselves. */
-  static separateOnXAxis(left, right, weak) {
+  separateOnXAxis(left, right, weak) {
     const nudge = left.pos.x + left.size.x - right.pos.x;
     // We have a weak entity, so just move this one
     if (weak) {
@@ -276,7 +276,7 @@ class Entity {
     }
   }
 
-  static separateOnYAxis(top, bottom, weak) {
+  separateOnYAxis(top, bottom, weak) {
     const nudge = top.pos.y + top.size.y - bottom.pos.y;
 
     // We have a weak entity, so just move this one

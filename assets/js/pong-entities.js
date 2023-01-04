@@ -21,7 +21,7 @@ class EntityBall extends Entity {
 class EntityPaddle extends Entity {
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;
-
+  paddleSpeed = 100;
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/paddle.png");
@@ -32,15 +32,18 @@ class EntityPaddle extends Entity {
 class EntityPaddleCpu extends EntityPaddle {
   update() {
     const ball = this.game.getEntitiesByType(EntityBall)[0];
-    this.vel.y = ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2 ? -100 : 100;
+    this.vel.y =
+      ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2
+        ? this.paddleSpeed
+        : -this.paddleSpeed;
     super.update();
   }
 }
 class EntityPaddlePlayer extends EntityPaddle {
   update() {
     const inputState = (v) => this.game.inputEvents.state(v);
-    if (inputState("up")) this.vel.y = -100;
-    else if (inputState("down")) this.vel.y = 100;
+    if (inputState("up")) this.vel.y = -this.paddleSpeed;
+    else if (inputState("down")) this.vel.y = this.paddleSpeed;
     else this.vel.y = 0;
     super.update();
   }

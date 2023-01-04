@@ -266,7 +266,7 @@ class Game {
               // Intersects and wasn't already checked?
               if (entity.touches(cell[c]) && !checked[cell[c].id]) {
                 checked[cell[c].id] = true;
-                Entity.checkPair(entity, cell[c]);
+                entity.checkWith(cell[c]);
               }
             }
             cell.push(entity);
