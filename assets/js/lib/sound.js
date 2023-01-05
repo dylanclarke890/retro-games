@@ -299,8 +299,8 @@ class Sound extends GameAudio {
   multiChannel = true;
   #loop = false;
 
-  constructor({ path, multiChannel, ...opts }) {
-    super(opts);
+  constructor({ path, multiChannel, soundManager }) {
+    super({ soundManager });
     this.path = path;
     this.multiChannel = !!multiChannel === true;
     this.load();
@@ -323,10 +323,11 @@ class Sound extends GameAudio {
     }
 
     if (this.ready) this.soundManager.load(this.path, this.multiChannel, loadCallback);
-    else Register.preloadAsset(this);
+    else Register.preloadImages(this);
   }
 
   play() {
+    console.log("playing");
     if (!Sound.enabled) return;
 
     this.currentClip = this.soundManager.get(this.path);

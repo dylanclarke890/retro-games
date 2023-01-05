@@ -24,7 +24,7 @@ class GameImage {
       this.data.onerror = (ev) => this.onerror(ev);
       this.data.src = this.path;
     } else {
-      Register.preloadAsset(this);
+      Register.preloadImage(this);
     }
     this.system.cacheImage(this.path, this);
   }

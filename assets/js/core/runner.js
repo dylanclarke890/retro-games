@@ -16,8 +16,8 @@ class GameRunner {
     ...customGameOptions
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
-    this.mediaFactory = new MediaFactory({ system: this.system });
     this.soundManager = new SoundManager(this);
+    this.mediaFactory = new MediaFactory({ system: this.system, soundManager: this.soundManager });
     this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.userAgent = UserAgent.info;
     this.font = this.mediaFactory.createFont(font);

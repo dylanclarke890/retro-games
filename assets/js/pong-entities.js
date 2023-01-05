@@ -1,8 +1,9 @@
 class EntityBall extends Entity {
   size = { x: 48, y: 48 };
-  vel = { x: 200, y: 100 };
+  vel = { x: 250, y: 100 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
+  hitSound = this.game.media.createSound("assets/sounds/hit.m4a");
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/ball.png");
@@ -15,13 +16,15 @@ class EntityBall extends Entity {
 
   update() {
     super.update();
+    const paddles = this.game.getEntitiesByType(EntityPaddle);
+    console.log(paddles);
   }
 }
 
 class EntityPaddle extends Entity {
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;
-  paddleSpeed = 100;
+  paddleSpeed = 150;
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/paddle.png");
@@ -50,4 +53,5 @@ class EntityPaddlePlayer extends EntityPaddle {
 }
 
 Register.entityTypes(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);
-Register.preloadAsset("assets/images/paddle.png");
+Register.preloadImages("assets/images/paddle.png");
+Register.preloadSounds("assets/sounds/hit.m4a");

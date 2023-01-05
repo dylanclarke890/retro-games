@@ -1,12 +1,24 @@
 class AssetToPreload {
   path = "";
+  type = "";
+  data = null;
 
-  constructor({ path }) {
+  constructor({ path, type }) {
     this.path = path;
+    this.type = type;
   }
 
   load(loadCallback) {
-    this.data = new Image();
+    switch (this.type) {
+      case "image":
+        this.data = new Image();
+        break;
+      case "sound":
+        this.data = new Audio();
+        break;
+      default:
+        throw new Error(`Couldn't determine type of: ${type}.`);
+    }
     this.data.onload = () => loadCallback(this.path, true);
     this.data.onerror = () => loadCallback(this.path, false);
     this.data.src = this.path;
@@ -14,16 +26,19 @@ class AssetToPreload {
 }
 
 class Register {
-  static #scopes = {
-    classDefinitions: "globalClasses",
-    assetsToPreload: "assets",
+  // TODO: Use sets instead of arrays.
+  static #cache = {
+    classDefinitions: {},
+    preload: {
+      image: [],
+      sound: [],
+    },
   };
-  static #cache = {};
 
   static entityType(classDefinition) {
-    const key = this.#scopes.classDefinitions;
-    this.#cache[key] = this.#cache[key] || {};
-    this.#cache[key][classDefinition.name] = classDefinition;
+    if (!classDefinition) throw new Error("Class definition is required.");
+    const store = this.#cache.classDefinitions;
+    store[classDefinition.name] = classDefinition;
   }
 
   static entityTypes(...classDefinitions) {
@@ -32,28 +47,43 @@ class Register {
 
   static getEntityByType(className) {
     if (typeof className !== "string") return className;
-    const key = this.#scopes.classDefinitions;
-    return (this.#cache[key] || {})[className];
+    return this.#cache.classDefinitions[className];
   }
 
-  static preloadAsset(asset) {
-    if (typeof asset === "string") asset = new AssetToPreload({ path: asset });
-    const key = this.#scopes.assetsToPreload;
-    this.#cache[key] = this.#cache[key] || [];
-    this.#cache[key].push(asset);
+  static preloadImage(imgOrPath) {
+    Register.preloadAsset(imgOrPath, "image");
   }
 
-  static preloadAssets(...assets) {
-    assets.forEach((a) => Register.preloadAsset(a));
+  static preloadImages(...imgOrPaths) {
+    imgOrPaths.forEach((i) => Register.preloadImage(i));
+  }
+
+  static preloadSound(soundOrPath) {
+    Register.preloadAsset(soundOrPath, "sound");
+  }
+
+  static preloadSounds(...soundsOrPaths) {
+    soundsOrPaths.forEach((i) => Register.preloadSound(i));
+  }
+
+  static preloadAsset(asset, type = "image") {
+    if (typeof asset === "string") asset = new AssetToPreload({ path: asset, type });
+    const store = this.#cache.preload[type];
+    store.push(asset);
   }
 
   static getAssetsToPreload() {
-    const key = this.#scopes.assetsToPreload;
-    return this.#cache[key] || [];
+    const allAssets = [];
+    const preload = this.#cache.preload;
+    allAssets.concat(preload.image);
+    allAssets.concat(preload.sound);
+    return allAssets;
   }
 
   static clearPreloadCache() {
-    const key = this.#scopes.assetsToPreload;
-    delete this.#cache[key];
+    this.#cache.preload = {
+      image: [],
+      sound: [],
+    };
   }
 }
