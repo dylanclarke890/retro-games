@@ -22,7 +22,7 @@ class System {
   imagesDrawn = 0;
 
   constructor({ runner, canvasId = null, width, height, scale }) {
-    if (!runner) throw new Error("Runner is required.");
+    Guard.againstNull({ runner });
     this.#runner = runner;
 
     this.canvas = document.getElementById(canvasId) ?? document.createElement("canvas");

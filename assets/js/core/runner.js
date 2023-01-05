@@ -24,8 +24,8 @@ class GameRunner {
     this.customGameOptions = customGameOptions;
 
     this.ready = true;
-
-    this.loader = new (loaderClass ?? GameLoader)({
+    loaderClass ??= GameLoader;
+    this.loader = new loaderClass({
       runner: this,
       gameClass,
       resources: this.resources,

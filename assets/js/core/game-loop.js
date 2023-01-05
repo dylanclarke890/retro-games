@@ -4,7 +4,7 @@ class GameLoop {
   #stopped = false;
 
   constructor({ runner, targetFps, showDebugStats }) {
-    if (!runner) throw new Error("Runner is required");
+    Guard.againstNull({ runner });
     this.runner = runner;
     this.showDebugStats = showDebugStats;
     this.clock = new Timer();

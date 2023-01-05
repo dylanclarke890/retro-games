@@ -162,7 +162,7 @@ class GameAudio {
   soundManager = null;
 
   constructor({ soundManager }) {
-    if (!soundManager) throw new Error("Sound Manager is required.");
+    Guard.againstNull({ soundManager });
     this.soundManager = soundManager;
   }
 }

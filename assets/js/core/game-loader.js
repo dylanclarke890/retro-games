@@ -9,10 +9,8 @@ class GameLoader {
   #assetsToPreload = [];
 
   constructor({ runner, gameClass }) {
-    if (!runner) throw new Error("Runner is required.");
-    if (!gameClass) throw new Error("Game class is required.");
-    if (!(gameClass.prototype instanceof Game))
-      throw new Error("Please pass a class that has extended the 'Game' class.");
+    Guard.againstNull({ runner });
+    Guard.againstNull({ gameClass }).isInstanceOf(Game);
 
     this.#runner = runner;
     this.#gameClass = gameClass;

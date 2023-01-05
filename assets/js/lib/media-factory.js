@@ -1,7 +1,7 @@
 class MediaFactory {
   constructor({ system, soundManager } = {}) {
-    if (!system) throw new Error("System is required");
-    if (!soundManager) throw new Error("Sound Manager is required");
+    Guard.againstNull({ system });
+    Guard.againstNull({ soundManager });
     this.system = system;
     this.soundManager = soundManager;
   }

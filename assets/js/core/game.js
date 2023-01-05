@@ -24,8 +24,8 @@ class Game {
   #doSortEntities = false;
 
   constructor({ system, font, mediaFactory } = {}) {
-    if (!system) throw new Error("System is required.");
-    if (!mediaFactory) throw new Error("Media factory is required.");
+    Guard.againstNull({ system });
+    Guard.againstNull({ mediaFactory });
     this.system = system;
     this.media = mediaFactory;
     this.font = font;

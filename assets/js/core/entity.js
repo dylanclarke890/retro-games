@@ -48,6 +48,7 @@ class Entity {
 
   constructor({ x, y, game, settings }) {
     this.id = ++Entity.#lastId;
+    Guard.againstNull({ game });
     this.game = game;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;

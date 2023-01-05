@@ -4,7 +4,7 @@ class GameAnimationSheet {
   image = null;
 
   constructor({ path, size = {}, system }) {
-    if (!system) throw new Error("System is required");
+    Guard.againstNull({ system });
     this.width = size.x ?? 8;
     this.height = size.y ?? 8;
     this.image = new GameImage({ system, path });

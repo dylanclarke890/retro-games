@@ -36,7 +36,7 @@ class Register {
   };
 
   static entityType(classDefinition) {
-    if (!classDefinition) throw new Error("Class definition is required.");
+    Guard.againstNull({ classDefinition });
     const store = this.#cache.classDefinitions;
     store[classDefinition.name] = classDefinition;
   }

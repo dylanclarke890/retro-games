@@ -109,7 +109,7 @@ class Input {
   accel = { x: 0, y: 0, z: 0 };
 
   constructor({ system } = {}) {
-    if (!system) throw new Error("System is required");
+    Guard.againstNull({ system });
     this.#userAgent = UserAgent.info;
   }
 
