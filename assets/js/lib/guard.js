@@ -12,7 +12,7 @@ class Guard {
     const { key, value } = this.#getKeyValue(keyValue);
     if (!value) throw new Error(`${key} is required.`);
     return {
-      isInstanceOf: (other) => {
+      isInstanceOf: function (other) {
         if (!(value.prototype instanceof other))
           throw new Error(`${key} must be derived from ${other.name}`);
       },
