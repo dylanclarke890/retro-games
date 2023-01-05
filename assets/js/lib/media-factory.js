@@ -14,7 +14,7 @@ class MediaFactory {
     return new GameAnimationSheet({ system: this.system, size, path });
   }
 
-  createSound({ path, multiChannel }) {
+  createSound({ path, multiChannel = false }) {
     return new Sound({ path, multiChannel, soundManager: this.soundManager });
   }
 }

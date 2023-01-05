@@ -3,7 +3,7 @@ class EntityBall extends Entity {
   vel = { x: 250, y: 100 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
-  hitSound = this.game.media.createSound("assets/sounds/hit.m4a");
+  hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/ball.png");
@@ -16,8 +16,6 @@ class EntityBall extends Entity {
 
   update() {
     super.update();
-    const paddles = this.game.getEntitiesByType(EntityPaddle);
-    console.log(paddles);
   }
 }
 

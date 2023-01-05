@@ -1,12 +1,12 @@
 class SoundManager {
   clips = {};
-  static volume = 1;
+  volume = 1;
   format = null;
   #userAgent = null;
-  #runner = null;
+  runner = null;
 
   constructor(runner) {
-    this.#runner = runner;
+    this.runner = runner;
     VendorAttributes.normalize(window, "AudioContext");
     this.#userAgent = UserAgent.info;
 
@@ -29,7 +29,7 @@ class SoundManager {
     if (!this.format) Sound.enabled = false;
 
     if (Sound.enabled && Sound.useWebAudio) {
-      const canvas = this.#runner.system.canvas;
+      const canvas = this.runner.system.canvas;
       canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
       canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
     }
@@ -37,7 +37,7 @@ class SoundManager {
 
   /** Initialises the WebAudio Context */
   unlockWebAudio() {
-    const canvas = this.#runner.system.canvas;
+    const canvas = this.runner.system.canvas;
     canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false);
     canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
 
@@ -58,7 +58,6 @@ class SoundManager {
   loadWebAudio(path, _multiChannel, loadCallback) {
     if (this.clips[path]) return this.clips[path];
 
-    // const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache;
     const audioSource = new WebAudioSource();
     this.clips[path] = audioSource;
 
@@ -94,8 +93,6 @@ class SoundManager {
 
       // Only loaded as single channel and now requested as multichannel?
       if (multiChannel && this.clips[path].length < Sound.channels) {
-        // Path to the soundfile with the right extension (.ogg or .mp3)
-        // const realPath = ig.prefix + path.replace(/[^\.]+$/, this.format.ext) + ig.nocache; // TODO
         for (let i = this.clips[path].length; i < Sound.channels; i++) {
           const a = new Audio(path);
           a.load();
@@ -105,7 +102,7 @@ class SoundManager {
       return this.clips[path][0];
     }
 
-    const clip = new Audio(realPath);
+    const clip = new Audio(path);
     if (loadCallback) {
       // The canplaythrough event is dispatched when the browser determines
       // that the sound can be played without interuption, provided the
@@ -289,7 +286,7 @@ class Sound extends GameAudio {
     CAF: { ext: "caf", mime: "audio/x-caf" },
   };
   static enabled = true;
-  static use = [Sound.FORMAT.OGG, Sound.FORMAT.MP3, Sound.FORMAT.M4A];
+  static use = [Sound.FORMAT.M4A, Sound.FORMAT.OGG, Sound.FORMAT.MP3];
   static useWebAudio = !!window.AudioContext;
   static channels = 4;
 
@@ -322,12 +319,12 @@ class Sound extends GameAudio {
       return;
     }
 
-    if (this.ready) this.soundManager.load(this.path, this.multiChannel, loadCallback);
-    else Register.preloadImages(this);
+    if (this.soundManager.runner.ready)
+      this.soundManager.load(this.path, this.multiChannel, loadCallback);
+    else Register.preloadSound(this);
   }
 
   play() {
-    console.log("playing");
     if (!Sound.enabled) return;
 
     this.currentClip = this.soundManager.get(this.path);
