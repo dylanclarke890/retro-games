@@ -318,10 +318,12 @@ class Sound extends GameAudio {
       if (loadCallback) loadCallback(this.path, true);
       return;
     }
+    if (!this.soundManager.runner.ready) {
+      Register.preloadSound(this);
+      return;
+    }
 
-    if (this.soundManager.runner.ready)
-      this.soundManager.load(this.path, this.multiChannel, loadCallback);
-    else Register.preloadSound(this);
+    this.soundManager.load(this.path, this.multiChannel, loadCallback);
   }
 
   play() {

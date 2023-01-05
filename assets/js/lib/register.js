@@ -10,18 +10,36 @@ class AssetToPreload {
 
   load(loadCallback) {
     switch (this.type) {
+      case "font":
+        const fontFace = new FontFace(NativeExtensions.uniqueId(), `url(${this.path})`);
+        document.fonts.add(fontFace);
+        this.data = fontFace;
+        this.data.load().then(
+          () => loadCallback(path, true),
+          () => loadCallback(path, false)
+        );
+        break;
       case "image":
         this.data = new Image();
+        this.data.onload = () => {
+          loadCallback(this.path, true);
+        };
+        this.data.onerror = () => {
+          loadCallback(this.path, false);
+        };
+        this.data.src = this.path;
         break;
       case "sound":
-        this.data = new Audio();
+        this.data = new Audio(this.path);
+        this.data.oncanplaythrough = () => {
+          this.data.oncanplaythrough = null;
+          loadCallback(this.path, true);
+        };
+        this.data.onerror = () => loadCallback(this.path, false);
         break;
       default:
-        throw new Error(`Couldn't determine type of: ${type}.`);
+        throw new Error(`Unable to determine type of asset to preload: ${this.type}`);
     }
-    this.data.onload = () => loadCallback(this.path, true);
-    this.data.onerror = () => loadCallback(this.path, false);
-    this.data.src = this.path;
   }
 }
 
@@ -32,6 +50,7 @@ class Register {
     preload: {
       image: [],
       sound: [],
+      font: [],
     },
   };
 
@@ -66,6 +85,14 @@ class Register {
     soundsOrPaths.forEach((i) => Register.preloadSound(i));
   }
 
+  static preloadFont(fontFaceOrPath) {
+    Register.preloadAsset(fontFaceOrPath, "font");
+  }
+
+  static preloadFonts(...fontFacesOrPaths) {
+    fontFacesOrPaths.forEach((i) => Register.preloadFont(i));
+  }
+
   static preloadAsset(asset, type = "image") {
     if (typeof asset === "string") asset = new AssetToPreload({ path: asset, type });
     const store = this.#cache.preload[type];
@@ -73,10 +100,11 @@ class Register {
   }
 
   static getAssetsToPreload() {
-    const allAssets = [];
     const preload = this.#cache.preload;
-    allAssets.concat(preload.image);
-    allAssets.concat(preload.sound);
+    const allAssets = Object.keys(preload).reduce((a, b) => {
+      if (typeof a === "string") return preload[a].concat(preload[b]);
+      else return a.concat(preload[b]);
+    });
     return allAssets;
   }
 
@@ -84,6 +112,7 @@ class Register {
     this.#cache.preload = {
       image: [],
       sound: [],
+      font: [],
     };
   }
 }

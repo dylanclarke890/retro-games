@@ -26,10 +26,9 @@ class Font {
       return;
     }
     if (!this.system.ready) {
-      Register.preloadAsset(this);
+      Register.preloadFont(this);
       return;
     }
-
     if (loadCallback) this.loadCallback = loadCallback;
     const fontFace = new FontFace(this.name, `url(${this.path})`);
     document.fonts.add(fontFace);
