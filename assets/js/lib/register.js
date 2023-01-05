@@ -44,19 +44,20 @@ class AssetToPreload {
 }
 
 class Register {
-  // TODO: Use sets instead of arrays.
-  static #cache = {
+  static #assetCache = {};
+
+  static #preloadCache = {
     classDefinitions: {},
-    preload: {
-      image: [],
-      sound: [],
-      font: [],
+    assets: {
+      image: new Set(),
+      sound: new Set(),
+      font: new Set(),
     },
   };
 
   static entityType(classDefinition) {
     Guard.againstNull({ classDefinition });
-    const store = this.#cache.classDefinitions;
+    const store = this.#preloadCache.classDefinitions;
     store[classDefinition.name] = classDefinition;
   }
 
@@ -66,7 +67,7 @@ class Register {
 
   static getEntityByType(className) {
     if (typeof className !== "string") return className;
-    return this.#cache.classDefinitions[className];
+    return this.#preloadCache.classDefinitions[className];
   }
 
   static preloadImage(imgOrPath) {
@@ -95,24 +96,31 @@ class Register {
 
   static preloadAsset(asset, type = "image") {
     if (typeof asset === "string") asset = new AssetToPreload({ path: asset, type });
-    const store = this.#cache.preload[type];
-    store.push(asset);
+    const store = this.#preloadCache.assets[type];
+    store.add(asset);
   }
 
   static getAssetsToPreload() {
-    const preload = this.#cache.preload;
-    const allAssets = Object.keys(preload).reduce((a, b) => {
-      if (typeof a === "string") return preload[a].concat(preload[b]);
-      else return a.concat(preload[b]);
-    });
+    const preload = this.#preloadCache.assets;
+    const allAssets = [...preload.font, ...preload.image, ...preload.sound];
     return allAssets;
   }
 
   static clearPreloadCache() {
-    this.#cache.preload = {
-      image: [],
-      sound: [],
-      font: [],
+    this.#preloadCache.assets = {
+      image: new Set(),
+      sound: new Set(),
+      font: new Set(),
     };
+  }
+
+  // TODO: ensure that all assets have a name property so they can be fetched easily.
+  static cacheAsset(asset) {
+    this.#assetCache[asset.name] = asset;
+  }
+
+  // TODO: Check.
+  static getCachedAsset(name) {
+    return this.#assetCache[name];
   }
 }
