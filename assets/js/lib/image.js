@@ -14,28 +14,22 @@ class GameImage {
   }
 
   load(loadCallback) {
-    if (this.loaded) {
-      if (loadCallback) loadCallback(this.path, true);
-      return;
-    } else if (!this.loaded && this.system.ready) {
+    if (!this.loaded && this.system.ready) {
       this.loadCallback = loadCallback || null;
       this.data = new Image();
       this.data.onload = (ev) => this.onload(ev);
       this.data.onerror = (ev) => this.onerror(ev);
       this.data.src = this.path;
-    } else {
-      Register.preloadImage(this);
-    }
-    this.system.cacheImage(this.path, this);
+    } else if (this.loaded) {
+      if (loadCallback) loadCallback(this.path, true);
+    } else Register.preloadImage(this);
   }
 
   onload(_event) {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
-    if (this.system.scale !== 1) {
-      this.resize();
-    }
+    if (this.system.scale !== 1) this.resize();
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
@@ -77,50 +71,45 @@ class GameImage {
 
   draw(targetX, targetY, sourceX, sourceY, width, height) {
     if (!this.loaded) return;
-    const scale = this.system.scale;
+    const { scale, ctx, drawPosition } = this.system;
+    targetX = drawPosition(targetX);
+    targetY = drawPosition(targetY);
     sourceX = sourceX ?? 0 * scale;
     sourceY = sourceY ?? 0 * scale;
     width = (width ?? this.width) * scale;
     height = (height ?? this.height) * scale;
-
-    this.system.ctx.drawImage(
-      this.data,
-      sourceX,
-      sourceY,
-      width,
-      height,
-      this.system.drawPosition(targetX),
-      this.system.drawPosition(targetY),
-      width,
-      height
-    );
+    ctx.drawImage(this.data, sourceX, sourceY, width, height, targetX, targetY, width, height);
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
     tileHeight = tileHeight ?? tileWidth;
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
 
-    const { scale, ctx } = this.system; // FIXME
-    const tileWidthScaled = Math.floor(tileWidth * scale);
-    const tileHeightScaled = Math.floor(tileHeight * scale);
-
     const scaleX = flipX ? -1 : 1;
     const scaleY = flipY ? -1 : 1;
+    const { scale, ctx, drawPosition } = this.system;
+    const sourceX = (Math.floor(tile * tileWidth) % this.width) * scale;
+    const sourceY = Math.floor((tile * tileWidth) / this.width) * tileHeight * scale;
+    tileWidth = Math.floor(tileWidth * scale);
+    tileHeight = Math.floor(tileHeight * scale);
+    targetX = drawPosition(targetX) * scaleX - (flipX ? tileWidth : 0);
+    targetY = drawPosition(targetY) * scaleY - (flipY ? tileHeight : 0);
 
     if (flipX || flipY) {
       ctx.save();
       ctx.scale(scaleX, scaleY);
     }
+
     ctx.drawImage(
       this.data,
-      (Math.floor(tile * tileWidth) % this.width) * scale,
-      Math.floor((tile * tileWidth) / this.width) * tileHeight * scale,
-      tileWidthScaled,
-      tileHeightScaled,
-      this.system.drawPosition(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
-      this.system.drawPosition(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
-      tileWidthScaled,
-      tileHeightScaled
+      sourceX,
+      sourceY,
+      tileWidth,
+      tileHeight,
+      targetX,
+      targetY,
+      tileWidth,
+      tileHeight
     );
 
     if (flipX || flipY) ctx.restore();
