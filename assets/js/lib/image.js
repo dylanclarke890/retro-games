@@ -29,13 +29,6 @@ class GameImage {
     this.system.cacheImage(this.path, this);
   }
 
-  reload() {
-    this.loaded = false;
-    this.data = new Image();
-    this.data.onload = this.onload;
-    this.data.src = this.path + "?" + Date.now();
-  }
-
   onload(_event) {
     this.width = this.data.width;
     this.height = this.data.height;
@@ -101,8 +94,6 @@ class GameImage {
       width,
       height
     );
-
-    this.system.imageDrawn();
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
@@ -133,6 +124,5 @@ class GameImage {
     );
 
     if (flipX || flipY) ctx.restore();
-    this.system.imageDrawn();
   }
 }

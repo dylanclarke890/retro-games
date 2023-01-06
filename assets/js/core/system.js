@@ -1,5 +1,9 @@
 class System {
   fps = 60;
+  tick = 0;
+  animationId = 0;
+  newGameClass = null;
+  running = false;
   width = 600;
   height = 800;
   realWidth = 600;
@@ -7,19 +11,10 @@ class System {
   scale = 1;
   drawPosition = this.DRAW.SMOOTH;
   scaleMode = this.SCALE.SMOOTH;
-
-  tick = 0;
-  animationId = 0;
-  newGameClass = null;
-  running = false;
-
   clock = null;
   canvas = null;
   context = null;
   #runner = null;
-  #imageCache = {};
-
-  imagesDrawn = 0;
 
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
@@ -53,14 +48,6 @@ class System {
 
   get ready() {
     return this.#runner.ready;
-  }
-
-  cacheImage(path, image) {
-    this.#imageCache[path] = image;
-  }
-
-  reloadCache() {
-    for (let path in this.#imageCache) this.#imageCache[path].reload();
   }
 
   clear(color) {
@@ -117,9 +104,5 @@ class System {
     ctx.drawImage(image, 0, 0, realWidth, realWidth);
 
     return ctx.getImageData(x, y, width, height);
-  }
-
-  imageDrawn() {
-    this.imagesDrawn++;
   }
 }

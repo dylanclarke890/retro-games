@@ -173,7 +173,6 @@ class BackgroundMap extends GameMap {
         const x = -dx + cx * this.chunkSize - nudgeX;
         const y = -dy + cy * this.chunkSize - nudgeY;
         this.system.ctx.drawImage(chunk, x, y);
-        this.system.imageDrawn();
 
         if (this.debugChunks) {
           this.system.ctx.strokeStyle = "#f0f";

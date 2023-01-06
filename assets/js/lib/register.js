@@ -1,3 +1,7 @@
+/**
+ * To be used when the asset passed to MediaFactory.create-* is just a path to the resource, instead of one of the various
+ * media classes that are used for them (GameImage etc). Will call the relevant load logic for each media type.
+ */
 class AssetToPreload {
   path = "";
   type = "";
@@ -71,6 +75,7 @@ class Register {
   }
 
   static preloadImage(imgOrPath) {
+    Guard.againstNull({ imgOrPath });
     Register.preloadAsset(imgOrPath, "image");
   }
 
@@ -79,6 +84,7 @@ class Register {
   }
 
   static preloadSound(soundOrPath) {
+    Guard.againstNull({ soundOrPath });
     Register.preloadAsset(soundOrPath, "sound");
   }
 
@@ -87,6 +93,7 @@ class Register {
   }
 
   static preloadFont(fontFaceOrPath) {
+    Guard.againstNull({ fontFaceOrPath });
     Register.preloadAsset(fontFaceOrPath, "font");
   }
 
