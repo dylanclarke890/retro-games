@@ -6,15 +6,49 @@ class MediaFactory {
     this.soundManager = soundManager;
   }
 
-  createFont({ name, path } = {}) {
-    return new Font({ system: this.system, path, name });
+  #createAsset(path, data, type) {
+    // Animations end up calling the factory again to create the image anyway,
+    // may as well just cache that instead as the image class can be more generically used.
+    if (type !== "animation") {
+      const cached = Register.getCachedAsset(path);
+      if (cached) return cached;
+    }
+    let asset;
+    switch (type) {
+      case "font":
+        asset = new Font({ path, system: this.system, ...data });
+        break;
+      case "sound":
+        asset = new Sound({ path, soundManager: this.soundManager, ...data });
+        break;
+      case "animation":
+        asset = new GameAnimationSheet({ path, system: this.system, ...data });
+        break;
+      case "image":
+        console.log(path);
+        asset = new GameImage({ path, system: this.system, ...data });
+        break;
+      default:
+        throw new Error(`Couldn't determine asset type of ${type}`);
+    }
+    // We don't want to overwrite a cached image with the same path.
+    if (type !== "animation") Register.cacheAsset(path, asset);
+    return asset;
+  }
+
+  createFont({ path, name } = {}) {
+    return this.#createAsset(path, { name }, "font");
   }
 
   createAnimationSheet({ path, size }) {
-    return new GameAnimationSheet({ system: this.system, size, path });
+    return this.#createAsset(path, { size, mediaFactory: this }, "animation");
   }
 
   createSound({ path, multiChannel = false }) {
-    return new Sound({ path, multiChannel, soundManager: this.soundManager });
+    return this.#createAsset(path, { multiChannel }, "sound");
+  }
+
+  createImage({ path, ...data }) {
+    return this.#createAsset(path, data, "image");
   }
 }

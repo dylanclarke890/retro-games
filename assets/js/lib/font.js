@@ -11,7 +11,7 @@ class Font {
   size = null;
 
   constructor({ system, name, path } = {}) {
-    Guard.againstNull("beautiful");
+    Guard.againstNull({ system });
     this.system = system;
     this.name = name ?? NativeExtensions.uniqueId();
     this.path = path;

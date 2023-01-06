@@ -102,8 +102,8 @@ class Register {
 
   static getAssetsToPreload() {
     const preload = this.#preloadCache.assets;
-    const allAssets = [...preload.font, ...preload.image, ...preload.sound];
-    return allAssets;
+    const allAssets = new Set([...preload.font, ...preload.image, ...preload.sound]);
+    return [...allAssets.values()];
   }
 
   static clearPreloadCache() {
@@ -114,13 +114,12 @@ class Register {
     };
   }
 
-  // TODO: ensure that all assets have a name property so they can be fetched easily.
-  static cacheAsset(asset) {
-    this.#assetCache[asset.name] = asset;
+  static cacheAsset(path, asset) {
+    this.#assetCache[path] = asset;
   }
 
-  // TODO: Check.
-  static getCachedAsset(name) {
-    return this.#assetCache[name];
+  static getCachedAsset(path) {
+    console.log(this.#assetCache);
+    return this.#assetCache[path];
   }
 }

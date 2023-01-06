@@ -3,15 +3,14 @@ class GameAnimationSheet {
   height = 0;
   image = null;
 
-  constructor({ path, size = {}, system }) {
+  constructor({ path, size = {}, system, mediaFactory }) {
     Guard.againstNull({ system });
+    Guard.againstNull({ mediaFactory });
+    this.system = system;
+    this.mediaFactory = mediaFactory;
     this.width = size.x ?? 8;
     this.height = size.y ?? 8;
-    this.image = new GameImage({ system, path });
-  }
-
-  get system() {
-    return this.image.system;
+    this.image = mediaFactory.createImage({ system, path });
   }
 }
 
