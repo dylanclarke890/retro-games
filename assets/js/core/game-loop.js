@@ -1,19 +1,22 @@
 class GameLoop {
-  #rafId = -1;
+  #clock = null;
   #lastFrame = -1;
-  #stopped = false;
+  #rafId = -1;
   #runner = null;
+  #stats = null;
+  #stopped = false;
+  #targetFps = 60;
+  #fpsInterval = 1000 / 60;
 
   constructor({ runner, targetFps, showDebugStats }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
-    this.showDebugStats = showDebugStats;
-    this.clock = new Timer();
+    this.#clock = new Timer();
 
     // FPS properties
-    this.targetFps = targetFps ?? 60;
-    this.fpsInterval = 1000 / this.targetFps;
-    this.lastFrame = -1;
+    this.#targetFps = targetFps ?? 60;
+    this.#fpsInterval = 1000 / this.#targetFps;
+    this.#lastFrame = -1;
 
     if (showDebugStats) {
       // position stats in bottom right corner.
@@ -22,7 +25,7 @@ class GameLoop {
       const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.#runner.system.canvas;
       const statsPositionX = offsetLeft + offsetWidth - width;
       const statsPositionY = offsetTop + offsetHeight - height;
-      this.stats = new Stats({
+      this.#stats = new Stats({
         containerElementStyles: {
           position: "absolute",
           left: statsPositionX + "px",
@@ -42,16 +45,17 @@ class GameLoop {
   main(timestamp) {
     if (this.#stopped) return caf(this.#rafId);
     this.#rafId = raf((t) => this.main(t));
+
     Timer.step();
-    this.#runner.system.tick = this.clock.tick();
+    this.#runner.system.tick = this.#clock.tick();
 
     const elapsed = timestamp - this.#lastFrame;
-    if (elapsed < this.fpsInterval) return;
-    this.#lastFrame = timestamp - (elapsed % this.fpsInterval);
+    if (elapsed < this.#fpsInterval) return;
+    this.#lastFrame = timestamp - (elapsed % this.#fpsInterval);
 
     this.#runner.game.update();
     this.#runner.game.draw();
-    if (this.showDebugStats) this.stats.update();
+    if (this.#stats) this.#stats.update();
   }
 
   stop() {
