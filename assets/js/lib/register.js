@@ -119,7 +119,6 @@ class Register {
   }
 
   static getCachedAsset(path) {
-    console.log(this.#assetCache);
     return this.#assetCache[path];
   }
 }

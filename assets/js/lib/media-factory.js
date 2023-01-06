@@ -25,7 +25,6 @@ class MediaFactory {
         asset = new GameAnimationSheet({ path, system: this.system, ...data });
         break;
       case "image":
-        console.log(path);
         asset = new GameImage({ path, system: this.system, ...data });
         break;
       default:
