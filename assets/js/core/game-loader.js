@@ -1,12 +1,12 @@
 class GameLoader {
-  done = false;
+  #assetsToPreload = [];
+  #done = false;
   #gameClass = null;
+  #intervalId = 0;
+  #progressPercent = 0;
   #runner = null;
   #status = 0;
-  #progressPercent = 0;
-  #intervalId = 0;
   #unloaded = [];
-  #assetsToPreload = [];
 
   constructor({ runner, gameClass }) {
     Guard.againstNull({ runner });
@@ -31,8 +31,8 @@ class GameLoader {
   }
 
   #end() {
-    if (this.done) return;
-    this.done = true;
+    if (this.#done) return;
+    this.#done = true;
     clearInterval(this.#intervalId);
     this.#runner.setGame(this.#gameClass);
     Register.clearPreloadCache();
@@ -40,23 +40,22 @@ class GameLoader {
 
   #drawLoadingScreen() {
     this.#progressPercent += (this.#status - this.#progressPercent) / 5;
-    const system = this.#runner.system;
-    const scale = system.scale;
-    let width = (system.width * 0.6).floor();
-    let height = (system.height * 0.1).floor();
-    const x = (system.width * 0.5 - width / 2).floor() * scale;
-    const y = (system.height * 0.5 - height / 2).floor() * scale;
-    width = width * scale;
-    height = height * scale;
+    const { scale, width, height, ctx } = this.#runner.system;
+    let barWidth = (width * 0.6).floor();
+    let barHeight = (height * 0.1).floor();
+    const x = (width * 0.5 - barWidth / 2).floor() * scale;
+    const y = (height * 0.5 - barHeight / 2).floor() * scale;
+    barWidth = barWidth * scale;
+    barHeight = barHeight * scale;
 
-    system.ctx.fillStyle = "#000";
-    system.ctx.fillRect(0, 0, system.width, system.height);
-    system.ctx.fillStyle = "#fff";
-    system.ctx.fillRect(x, y, width, height);
-    system.ctx.fillStyle = "#000";
-    system.ctx.fillRect(x + scale, y + scale, width - scale - scale, height - scale - scale);
-    system.ctx.fillStyle = "#fff";
-    system.ctx.fillRect(x, y, width * this.#progressPercent, height);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x + scale, y + scale, barWidth - scale - scale, barHeight - scale - scale);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(x, y, barWidth * this.#progressPercent, barHeight);
   }
 
   #loadCallback(path, wasSuccessful) {

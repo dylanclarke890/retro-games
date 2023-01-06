@@ -2,10 +2,11 @@ class GameLoop {
   #rafId = -1;
   #lastFrame = -1;
   #stopped = false;
+  #runner = null;
 
   constructor({ runner, targetFps, showDebugStats }) {
     Guard.againstNull({ runner });
-    this.runner = runner;
+    this.#runner = runner;
     this.showDebugStats = showDebugStats;
     this.clock = new Timer();
 
@@ -18,7 +19,7 @@ class GameLoop {
       // position stats in bottom right corner.
       const width = 96;
       const height = 48;
-      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.runner.system.canvas;
+      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.#runner.system.canvas;
       const statsPositionX = offsetLeft + offsetWidth - width;
       const statsPositionY = offsetTop + offsetHeight - height;
       this.stats = new Stats({
@@ -42,14 +43,14 @@ class GameLoop {
     if (this.#stopped) return caf(this.#rafId);
     this.#rafId = raf((t) => this.main(t));
     Timer.step();
-    this.runner.system.tick = this.clock.tick();
+    this.#runner.system.tick = this.clock.tick();
 
     const elapsed = timestamp - this.#lastFrame;
     if (elapsed < this.fpsInterval) return;
     this.#lastFrame = timestamp - (elapsed % this.fpsInterval);
 
-    this.runner.game.update();
-    this.runner.game.draw();
+    this.#runner.game.update();
+    this.#runner.game.draw();
     if (this.showDebugStats) this.stats.update();
   }
 
