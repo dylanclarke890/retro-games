@@ -13,7 +13,6 @@ class System {
   scaleMode = this.SCALE.SMOOTH;
   clock = null;
   canvas = null;
-  context = null;
   #runner = null;
 
   constructor({ runner, canvasId = null, width, height, scale }) {

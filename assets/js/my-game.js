@@ -1,5 +1,4 @@
 class MyGame extends Game {
-  clearColor = "black";
   constructor({ ...options } = {}) {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
