@@ -1,4 +1,3 @@
-/// /// <reference path="assets/js/my-game.js" />
 // #region DEBUG
 /// <reference path="assets/js/debug/performance.js"/>
 // #endregion DEBUG
