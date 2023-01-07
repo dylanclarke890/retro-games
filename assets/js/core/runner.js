@@ -1,7 +1,14 @@
 class GameRunner {
-  resources = [];
-  ready = false;
+  customGameOptions = null;
+  font = null;
   game = null;
+  loader = null;
+  loop = null;
+  mediaFactory = null;
+  ready = false;
+  soundManager = null;
+  system = null;
+  userAgent = UserAgent.info;
 
   constructor({
     canvasId,
@@ -19,7 +26,6 @@ class GameRunner {
     this.soundManager = new SoundManager(this);
     this.mediaFactory = new MediaFactory({ system: this.system, soundManager: this.soundManager });
     this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
-    this.userAgent = UserAgent.info;
     this.font = this.mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;
 
@@ -28,7 +34,6 @@ class GameRunner {
     this.loader = new loaderClass({
       runner: this,
       gameClass,
-      resources: this.resources,
     });
     this.loader.load();
   }
