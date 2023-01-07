@@ -16,20 +16,20 @@ ig.module("impact.debug.menu")
       },
     });
 
-    ig.Debug = ig.Class.extend({
-      options: {},
-      panels: {},
-      numbers: {},
-      container: null,
-      panelMenu: null,
-      numberContainer: null,
-      activePanel: null,
+    class Debug {
+      options = {};
+      panels = {};
+      numbers = {};
+      container = null;
+      panelMenu = null;
+      numberContainer = null;
+      activePanel = null;
 
-      debugTime: 0,
-      debugTickAvg: 0.016,
-      debugRealTime: Date.now(),
+      debugTime = 0;
+      debugTickAvg = 0.016;
+      debugRealTime = Date.now();
 
-      init: function () {
+      constructor() {
         // Inject the Stylesheet
         var style = ig.$new("link");
         style.rel = "stylesheet";
@@ -61,24 +61,24 @@ ig.module("impact.debug.menu")
           ig.assert = console.assert.bind ? console.assert.bind(console) : console.assert;
         }
         ig.show = this.showNumber.bind(this);
-      },
+      }
 
-      addNumber: function (name) {
+      addNumber(name) {
         var number = ig.$new("span");
         this.numberContainer.appendChild(number);
         this.numberContainer.appendChild(document.createTextNode(name));
 
         this.numbers[name] = number;
-      },
+      }
 
-      showNumber: function (name, number) {
+      showNumber(name, number) {
         if (!this.numbers[name]) {
           this.addNumber(name);
         }
         this.numbers[name].textContent = number;
-      },
+      }
 
-      addPanel: function (panelDef) {
+      addPanel(panelDef) {
         // Create the panel and options
         var panel = new panelDef.type(panelDef.name, panelDef.label);
         if (panelDef.options) {
@@ -119,13 +119,13 @@ ig.module("impact.debug.menu")
           // Not inserted? Append at the end!
           this.panelMenu.appendChild(menuItem);
         }
-      },
+      }
 
-      showPanel: function (name) {
+      showPanel(name) {
         this.togglePanel(this.panels[name]);
-      },
+      }
 
-      togglePanel: function (panel) {
+      togglePanel(panel) {
         if (panel != this.activePanel && this.activePanel) {
           this.activePanel.toggle(false);
           this.activePanel.menuItem.className = "ig_debug_menu_item";
@@ -140,15 +140,15 @@ ig.module("impact.debug.menu")
         if (active) {
           this.activePanel = panel;
         }
-      },
+      }
 
-      ready: function () {
+      ready() {
         for (var p in this.panels) {
           this.panels[p].ready();
         }
-      },
+      }
 
-      beforeRun: function () {
+      beforeRun() {
         var timeBeforeRun = Date.now();
         this.debugTickAvg = this.debugTickAvg * 0.8 + (timeBeforeRun - this.debugRealTime) * 0.2;
         this.debugRealTime = timeBeforeRun;
@@ -156,9 +156,9 @@ ig.module("impact.debug.menu")
         if (this.activePanel) {
           this.activePanel.beforeRun();
         }
-      },
+      }
 
-      afterRun: function () {
+      afterRun() {
         var frameTime = Date.now() - this.debugRealTime;
         var nextFrameDue = 1000 / ig.system.fps - frameTime;
 
@@ -175,8 +175,8 @@ ig.module("impact.debug.menu")
           this.showNumber("entities", ig.game.entities.length);
         }
         ig.Image.drawCount = 0;
-      },
-    });
+      }
+    }
 
     ig.DebugPanel = ig.Class.extend({
       active: false,
