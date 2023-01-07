@@ -1,13 +1,21 @@
 class Timer {
-  target = 0;
+  static #last = 0;
+
+  static maxStep = 0.05;
+  static time = Number.MIN_VALUE;
+  static timeScale = 1;
+
   base = 0;
   last = 0;
   pausedAt = 0;
+  target = 0;
 
-  static timeScale = 1;
-  static maxStep = 0.05;
-  static time = Number.MIN_VALUE;
-  static #last = 0;
+  static step() {
+    const current = performance.now();
+    const delta = (current - Timer.#last) / 1000;
+    Timer.time += Math.min(delta, Timer.maxStep) * Timer.timeScale;
+    Timer.#last = current;
+  }
 
   constructor(seconds) {
     this.base = Timer.time;
@@ -46,12 +54,5 @@ class Timer {
     if (!this.pausedAt) return;
     this.base += Timer.time - this.pausedAt;
     this.pausedAt = 0;
-  }
-
-  static step() {
-    const current = performance.now();
-    const delta = (current - Timer.#last) / 1000;
-    Timer.time += Math.min(delta, Timer.maxStep) * Timer.timeScale;
-    Timer.#last = current;
   }
 }
