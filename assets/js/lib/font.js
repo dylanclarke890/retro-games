@@ -23,7 +23,7 @@ class Font {
 
   load(loadCallback) {
     if (!this.loaded && this.system.ready) {
-      this.loadCallback = loadCallback || ((_, _) => {});
+      this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
       const fontFace = new FontFace(this.name, `url(${this.path})`);
       document.fonts.add(fontFace);
       this.data = fontFace;

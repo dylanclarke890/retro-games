@@ -121,27 +121,17 @@ class Game {
     data.layer = data.layer || [];
     for (let i = 0; i < data.layer.length; i++) {
       const layer = data.layer[i];
-      if (layer.name == "collision")
-        this.collisionMap = new CollisionMap({
-          system: this.system,
-          tilesize: layer.tilesize,
-          data: layer.data,
-        });
-      else {
-        const newMap = new BackgroundMap({
-          system: this.system,
-          tilesize: layer.tilesize,
-          data: layer.data,
-          tileset: layer.tilesetName,
-        });
-        newMap.anims = this.#backgroundAnims[layer.tilesetName] || {};
-        newMap.repeat = layer.repeat;
-        newMap.distance = layer.distance;
-        newMap.foreground = !!layer.foreground;
-        newMap.preRender = !!layer.preRender;
-        newMap.name = layer.name;
-        this.#backgroundMaps.push(newMap);
-      }
+      const shared = { system: this.system, tilesize: layer.tilesize, data: layer.data };
+      if (layer.name == "collision") this.collisionMap = new CollisionMap({ ...shared });
+      else
+        this.#backgroundMaps.push(
+          new BackgroundMap({
+            anims: this.#backgroundAnims[layer.tilesetName],
+            tileset: layer.tilesetName,
+            ...shared,
+            ...layer,
+          })
+        );
     }
 
     // Call post-init ready function on all entities

@@ -26,12 +26,6 @@ class System {
     this.height = height;
   }
 
-  getPixelRatio(ctx) {
-    const deviceRatio = devicePixelRatio;
-    const backingRatio = VendorAttributes.get(ctx, "backingStorePixelRatio") || 1;
-    return deviceRatio / backingRatio;
-  }
-
   resize(width, height, scale) {
     this.width = width;
     this.height = height;

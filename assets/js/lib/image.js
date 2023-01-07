@@ -17,7 +17,7 @@ class GameImage {
 
   load(loadCallback) {
     if (!this.loaded && this.system.ready) {
-      this.loadCallback = loadCallback || ((_, _) => {});
+      this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
       this.#data = new Image();
       this.#data.onload = (ev) => this.onload(ev);
       this.#data.onerror = (ev) => this.onerror(ev);

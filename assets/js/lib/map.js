@@ -9,7 +9,7 @@ class GameMap {
 
   constructor({ system, tilesize, data }) {
     this.tilesize = tilesize;
-    this.data = data;
+    this.data = data || [[]];
     this.system = system;
     this.height = data.length;
     this.width = data[0].length;
@@ -50,8 +50,25 @@ class BackgroundMap extends GameMap {
 
   anims = {};
 
-  constructor({ system, tilesize, data, tileset }) {
+  constructor({
+    anims,
+    data,
+    distance,
+    foreground,
+    name,
+    preRender,
+    repeat,
+    system,
+    tileset,
+    tilesize,
+  }) {
     super({ system, tilesize, data });
+    this.anims = anims || {};
+    this.distance = distance;
+    this.foreground = !!foreground;
+    this.name = name;
+    this.preRender = !!preRender;
+    this.repeat = repeat;
     this.setTileset(tileset);
   }
 
@@ -97,7 +114,6 @@ class BackgroundMap extends GameMap {
     const chunk = document.createElement("canvas");
     chunk.width = w;
     chunk.height = h;
-    chunk.retinaResolutionEnabled = false; // Opt out for Ejecta
 
     const chunkContext = chunk.getContext("2d");
     this.system.scaleMode(chunk, chunkContext);
@@ -121,13 +137,11 @@ class BackgroundMap extends GameMap {
     }
     this.system.ctx = screenContext;
 
-    // Workaround for Chrome 49 bug - handling many offscreen canvases
-    // seems to slow down the browser significantly. So we convert the
-    // canvas to an image.
-    const image = new Image();
+    /**  Workaround for Chrome 49 bug - handling many offscreen canvases
+     * slows down the browser significantly so we convert the
+     * canvas to an image instead. */
+    const image = new Image(chunk.width, chunk.height);
     image.src = chunk.toDataURL();
-    image.width = chunk.width;
-    image.height = chunk.height;
 
     return image;
   }
