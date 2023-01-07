@@ -8,7 +8,7 @@ class Game {
   #entities = [];
   #levelToLoad = null;
   #namedEntities = {};
-  #sortBy = null;
+  #sortBy = Game.SORT.Z_INDEX;
 
   clearColor = "#000000";
   collisionMap = CollisionMap.staticNoCollision;
@@ -215,43 +215,35 @@ class Game {
    * is maintained for each entity.*/
   checkEntities() {
     const hash = {};
-    for (let e = 0; e < this.#entities.length; e++) {
-      const entity = this.#entities[e];
-      // Skip entities that don't check, don't get checked and don't collide
-      if (
-        entity.type === Entity.TYPE.NONE &&
-        entity.checkAgainst === Entity.TYPE.NONE &&
-        entity.collides === Entity.COLLIDES.NEVER
-      )
-        continue;
+    for (let i = 0; i < this.#entities.length; i++) {
+      const entity = this.#entities[i];
+      if (entity.skipCollisionChecks) continue;
 
       const checked = {},
         xmin = Math.floor(entity.pos.x / this.#cellSize),
         ymin = Math.floor(entity.pos.y / this.#cellSize),
         xmax = Math.floor((entity.pos.x + entity.size.x) / this.#cellSize) + 1,
         ymax = Math.floor((entity.pos.y + entity.size.y) / this.#cellSize) + 1;
+      for (let x = xmin; x < xmax; x++)
+        for (let y = ymin; y < ymax; y++) this.#checkCell(hash, entity, checked, x, y);
+    }
+  }
 
-      for (let x = xmin; x < xmax; x++) {
-        for (let y = ymin; y < ymax; y++) {
-          // Current cell is empty - create it and insert!
-          if (!hash[x]) {
-            hash[x] = {};
-            hash[x][y] = [entity];
-          } else if (!hash[x][y]) hash[x][y] = [entity];
-          // Check against each entity in this cell, then insert
-          else {
-            const cell = hash[x][y];
-            for (let c = 0; c < cell.length; c++) {
-              // Intersects and wasn't already checked?
-              if (entity.touches(cell[c]) && !checked[cell[c].id]) {
-                checked[cell[c].id] = true;
-                entity.checkWith(cell[c]);
-              }
-            }
-            cell.push(entity);
-          }
-        } // end for y size
-      } // end for x size
-    } // end for entities
+  #checkCell(hash, entity, checked, x, y) {
+    // Current cell is empty - create it and insert!
+    if (!hash[x]) hash[x] = {};
+    if (!hash[x][y]) {
+      hash[x][y] = [entity];
+      return;
+    }
+    // Check against each entity in this cell, then insert
+    const cell = hash[x][y];
+    for (let c = 0; c < cell.length; c++) {
+      // Intersects and wasn't already checked?
+      if (!entity.touches(cell[c]) || checked[cell[c].id]) continue;
+      checked[cell[c].id] = true;
+      entity.checkWith(cell[c]);
+    }
+    cell.push(entity);
   }
 }

@@ -46,6 +46,14 @@ class Entity {
   slopeStanding = { min: (44).toRad(), max: (136).toRad() };
   killed = false;
 
+  get skipCollisionChecks() {
+    return (
+      this.type === Entity.TYPE.NONE &&
+      this.checkAgainst === Entity.TYPE.NONE &&
+      this.collides === Entity.COLLIDES.NEVER
+    );
+  }
+
   constructor({ x, y, game, settings }) {
     this.id = ++Entity.#lastId;
     Guard.againstNull({ game });
