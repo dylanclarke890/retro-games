@@ -1,146 +1,135 @@
-ig.module("impact.debug.maps-panel")
-  .requires("impact.debug.menu", "impact.game", "impact.background-map")
-  .defines(function () {
-    "use strict";
+ig.Game.inject({
+  loadLevel: function (data) {
+    this.parent(data);
+    ig.debug.panels.maps.load(this);
+  },
+});
 
-    ig.Game.inject({
-      loadLevel: function (data) {
-        this.parent(data);
-        ig.debug.panels.maps.load(this);
-      },
-    });
+class MapsDebugPanel extends DebugPanel {
+  maps = [];
+  mapScreens = [];
 
-    ig.DebugMapsPanel = ig.DebugPanel.extend({
-      maps: [],
-      mapScreens: [],
+  constructor(name, label) {
+    this.parent(name, label);
+    this.load();
+  }
 
-      init: function (name, label) {
-        this.parent(name, label);
-        this.load();
-      },
+  load(game) {
+    this.options = [];
+    this.panels = [];
 
-      load: function (game) {
-        this.options = [];
-        this.panels = [];
+    if (!game || !game.backgroundMaps.length) {
+      this.container.innerHTML = "<em>No Maps Loaded</em>";
+      return;
+    }
 
-        if (!game || !game.backgroundMaps.length) {
-          this.container.innerHTML = "<em>No Maps Loaded</em>";
-          return;
+    this.maps = game.backgroundMaps;
+    this.mapScreens = [];
+    this.container.innerHTML = "";
+
+    for (let i = 0; i < this.maps.length; i++) {
+      const map = this.maps[i];
+      const subPanel = new DebugPanel(i, `Layer ${i}`);
+      const head = document.createElement("strong");
+
+      head.textContent = `${i}: ${map.tiles.path}`;
+      subPanel.container.appendChild(head);
+      subPanel.addOption(new DebugOption("Enabled", map, "enabled"));
+      subPanel.addOption(new DebugOption("Pre Rendered", map, "preRender"));
+      subPanel.addOption(new DebugOption("Show Chunks", map, "debugChunks"));
+
+      this.generateMiniMap(subPanel, map, i);
+      this.addPanel(subPanel);
+    }
+  }
+
+  generateMiniMap(panel, map, id) {
+    const scale = ig.system.scale; // we'll need this a lot
+
+    // resize the tileset, so that one tile is 'scale' pixels wide and high
+    const tsC = document.createElement("canvas");
+    const tsCtx = tsC.getContext("2d");
+
+    const w = map.tiles.width * scale;
+    const h = map.tiles.height * scale;
+    const ws = w / map.tilesize;
+    const hs = h / map.tilesize;
+    tsC.width = ws;
+    tsC.height = hs;
+    tsCtx.drawImage(map.tiles.data, 0, 0, w, h, 0, 0, ws, hs);
+
+    // create the minimap canvas
+    const mapCanvas = document.createElement("canvas");
+    mapCanvas.width = map.width * scale;
+    mapCanvas.height = map.height * scale;
+    const ctx = mapCanvas.getContext("2d");
+
+    if (ig.game.clearColor) {
+      ctx.fillStyle = ig.game.clearColor;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // draw the map
+    let tile = 0;
+    for (let x = 0; x < map.width; x++) {
+      for (let y = 0; y < map.height; y++) {
+        if ((tile = map.data[y][x])) {
+          ctx.drawImage(
+            tsC,
+            Math.floor(((tile - 1) * scale) % ws),
+            Math.floor(((tile - 1) * scale) / ws) * scale,
+            scale,
+            scale,
+            x * scale,
+            y * scale,
+            scale,
+            scale
+          );
         }
+      }
+    }
 
-        this.maps = game.backgroundMaps;
-        this.mapScreens = [];
-        this.container.innerHTML = "";
+    const mapContainer = document.createElement("div");
+    mapContainer.className = "debug-map-container";
+    mapContainer.style.width = map.width * scale + "px";
+    mapContainer.style.height = map.height * scale + "px";
 
-        for (var m = 0; m < this.maps.length; m++) {
-          var map = this.maps[m];
+    const mapScreen = document.createElement("div");
+    mapScreen.className = "debug-map-screen";
+    mapScreen.style.width = (ig.system.width / map.tilesize) * scale - 2 + "px";
+    mapScreen.style.height = (ig.system.height / map.tilesize) * scale - 2 + "px";
+    this.mapScreens[id] = mapScreen;
 
-          var subPanel = new ig.DebugPanel(m, "Layer " + m);
+    mapContainer.appendChild(mapCanvas);
+    mapContainer.appendChild(mapScreen);
+    panel.container.appendChild(mapContainer);
+  }
 
-          var head = ig.$new("strong");
-          head.textContent = m + ": " + map.tiles.path;
-          subPanel.container.appendChild(head);
+  afterRun() {
+    // Update the screen position DIV for each mini-map
+    const scale = ig.system.scale;
+    for (let i = 0; i < this.maps.length; i++) {
+      const map = this.maps[i];
+      const screen = this.mapScreens[i];
 
-          subPanel.addOption(new ig.DebugOption("Enabled", map, "enabled"));
-          subPanel.addOption(new ig.DebugOption("Pre Rendered", map, "preRender"));
-          subPanel.addOption(new ig.DebugOption("Show Chunks", map, "debugChunks"));
+      // Quick sanity check
+      if (!map || !screen) continue;
 
-          this.generateMiniMap(subPanel, map, m);
-          this.addPanel(subPanel);
-        }
-      },
+      let x = map.scroll.x / map.tilesize;
+      let y = map.scroll.y / map.tilesize;
+      if (map.repeat) {
+        x %= map.width;
+        y %= map.height;
+      }
 
-      generateMiniMap: function (panel, map, id) {
-        var s = ig.system.scale; // we'll need this a lot
+      screen.style.left = x * scale + "px";
+      screen.style.top = y * scale + "px";
+    }
+  }
+}
 
-        // resize the tileset, so that one tile is 's' pixels wide and high
-        var ts = ig.$new("canvas");
-        var tsctx = ts.getContext("2d");
-
-        var w = map.tiles.width * s;
-        var h = map.tiles.height * s;
-        var ws = w / map.tilesize;
-        var hs = h / map.tilesize;
-        ts.width = ws;
-        ts.height = hs;
-        tsctx.drawImage(map.tiles.data, 0, 0, w, h, 0, 0, ws, hs);
-
-        // create the minimap canvas
-        var mapCanvas = ig.$new("canvas");
-        mapCanvas.width = map.width * s;
-        mapCanvas.height = map.height * s;
-        var ctx = mapCanvas.getContext("2d");
-
-        if (ig.game.clearColor) {
-          ctx.fillStyle = ig.game.clearColor;
-          ctx.fillRect(0, 0, w, h);
-        }
-
-        // draw the map
-        var tile = 0;
-        for (var x = 0; x < map.width; x++) {
-          for (var y = 0; y < map.height; y++) {
-            if ((tile = map.data[y][x])) {
-              ctx.drawImage(
-                ts,
-                Math.floor(((tile - 1) * s) % ws),
-                Math.floor(((tile - 1) * s) / ws) * s,
-                s,
-                s,
-                x * s,
-                y * s,
-                s,
-                s
-              );
-            }
-          }
-        }
-
-        var mapContainer = ig.$new("div");
-        mapContainer.className = "ig_debug_map_container";
-        mapContainer.style.width = map.width * s + "px";
-        mapContainer.style.height = map.height * s + "px";
-
-        var mapScreen = ig.$new("div");
-        mapScreen.className = "ig_debug_map_screen";
-        mapScreen.style.width = (ig.system.width / map.tilesize) * s - 2 + "px";
-        mapScreen.style.height = (ig.system.height / map.tilesize) * s - 2 + "px";
-        this.mapScreens[id] = mapScreen;
-
-        mapContainer.appendChild(mapCanvas);
-        mapContainer.appendChild(mapScreen);
-        panel.container.appendChild(mapContainer);
-      },
-
-      afterRun: function () {
-        // Update the screen position DIV for each mini-map
-        var s = ig.system.scale;
-        for (var m = 0; m < this.maps.length; m++) {
-          var map = this.maps[m];
-          var screen = this.mapScreens[m];
-
-          if (!map || !screen) {
-            // Quick sanity check
-            continue;
-          }
-
-          var x = map.scroll.x / map.tilesize;
-          var y = map.scroll.y / map.tilesize;
-
-          if (map.repeat) {
-            x %= map.width;
-            y %= map.height;
-          }
-
-          screen.style.left = x * s + "px";
-          screen.style.top = y * s + "px";
-        }
-      },
-    });
-
-    ig.debug.addPanel({
-      type: ig.DebugMapsPanel,
-      name: "maps",
-      label: "Background Maps",
-    });
-  });
+ig.debug.addPanel({
+  type: ig.DebugMapsPanel,
+  name: "maps",
+  label: "Background Maps",
+});
