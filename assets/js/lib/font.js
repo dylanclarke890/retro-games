@@ -50,7 +50,7 @@ class Font {
     this.loadCallback(this.path, false);
   }
 
-  sizeOfText(text) {
+  sizeOf(text) {
     return this.system.ctx.measureText(text);
   }
 
@@ -64,7 +64,7 @@ class Font {
     size = size ?? this.size ?? 36;
 
     if (align !== Font.ALIGN.LEFT) {
-      const textWidth = this.sizeOfText(text).width;
+      const textWidth = this.sizeOf(text).width;
       if (align === Font.ALIGN.CENTER) x -= textWidth / 2;
       else if (align === Font.ALIGN.RIGHT) x -= textWidth;
     }
