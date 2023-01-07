@@ -22,22 +22,17 @@ class Font {
   }
 
   load(loadCallback) {
-    if (this.loaded) {
-      if (loadCallback) loadCallback(this.path, true);
-      return;
-    }
-    if (!this.system.ready) {
-      Register.preloadFont(this);
-      return;
-    }
-    if (loadCallback) this.loadCallback = loadCallback;
-    const fontFace = new FontFace(this.name, `url(${this.path})`);
-    document.fonts.add(fontFace);
-    this.data = fontFace;
-    this.data.load().then(
-      () => this.onload(),
-      (err) => this.onerror(err)
-    );
+    if (!this.loaded && this.system.ready) {
+      this.loadCallback = loadCallback || ((_, _) => {});
+      const fontFace = new FontFace(this.name, `url(${this.path})`);
+      document.fonts.add(fontFace);
+      this.data = fontFace;
+      this.data.load().then(
+        () => this.onload(),
+        (err) => this.onerror(err)
+      );
+    } else if (this.loaded) this.loadCallback(this.path, true);
+    else Register.preloadFont(this);
   }
 
   onload() {
