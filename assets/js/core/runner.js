@@ -7,6 +7,7 @@ class GameRunner {
   #soundManager = null;
 
   game = null;
+  newGameClass = null; // TODO: link up to run() in loop
   ready = false;
   system = null;
 
@@ -24,7 +25,10 @@ class GameRunner {
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.#soundManager = new SoundManager(this);
-    this.#mediaFactory = new MediaFactory({ system: this.system, soundManager: this.#soundManager });
+    this.#mediaFactory = new MediaFactory({
+      system: this.system,
+      soundManager: this.#soundManager,
+    });
     this.#loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
     this.#font = this.#mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;

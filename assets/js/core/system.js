@@ -1,19 +1,17 @@
 class System {
-  fps = 60;
+  #runner = null;
+
+  canvas = null;
+  ctx = null;
+  clock = null;
   tick = 0;
-  animationId = 0;
-  newGameClass = null;
-  running = false;
-  width = 600;
-  height = 800;
-  realWidth = 600;
-  realHeight = 800;
   scale = 1;
   drawPosition = this.DRAW.SMOOTH;
+  realHeight = 800;
+  realWidth = 600;
   scaleMode = this.SCALE.SMOOTH;
-  clock = null;
-  canvas = null;
-  #runner = null;
+  height = 800;
+  width = 600;
 
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
