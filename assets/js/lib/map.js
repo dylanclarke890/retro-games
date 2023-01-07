@@ -35,20 +35,19 @@ class GameMap {
 }
 
 class BackgroundMap extends GameMap {
-  tiles = null;
-  scroll = { x: 0, y: 0 };
-  distance = 1;
-  repeat = false;
-  tilesetName = "";
-  foreground = false;
-  enabled = true;
-
-  preRender = false;
-  preRenderedChunks = null;
-  chunkSize = 512;
-  debugChunks = false;
+  #scroll = { x: 0, y: 0 };
 
   anims = {};
+  chunkSize = 512;
+  debugChunks = false;
+  distance = 1;
+  enabled = true;
+  foreground = false;
+  preRender = false;
+  preRenderedChunks = null;
+  repeat = false;
+  tiles = null;
+  tilesetName = "";
 
   constructor({
     anims,
@@ -79,8 +78,8 @@ class BackgroundMap extends GameMap {
   }
 
   setScreenPos(x, y) {
-    this.scroll.x = x / this.distance;
-    this.scroll.y = y / this.distance;
+    this.#scroll.x = x / this.distance;
+    this.#scroll.y = y / this.distance;
   }
 
   preRenderMapToChunks() {
@@ -155,8 +154,8 @@ class BackgroundMap extends GameMap {
   drawPreRendered() {
     if (!this.preRenderedChunks) this.preRenderMapToChunks();
 
-    let dx = this.system.drawPosition(this.scroll.x),
-      dy = this.system.drawPosition(this.scroll.y);
+    let dx = this.system.drawPosition(this.#scroll.x),
+      dy = this.system.drawPosition(this.#scroll.y);
 
     if (this.repeat) {
       const scaledTileSize = this.tilesize * this.system.scale;
@@ -223,10 +222,10 @@ class BackgroundMap extends GameMap {
   drawTiled() {
     let tile = 0,
       anim = null,
-      tileOffsetX = (this.scroll.x / this.tilesize).toInt(),
-      tileOffsetY = (this.scroll.y / this.tilesize).toInt(),
-      pxOffsetX = this.scroll.x % this.tilesize,
-      pxOffsetY = this.scroll.y % this.tilesize,
+      tileOffsetX = (this.#scroll.x / this.tilesize).toInt(),
+      tileOffsetY = (this.#scroll.y / this.tilesize).toInt(),
+      pxOffsetX = this.#scroll.x % this.tilesize,
+      pxOffsetY = this.#scroll.y % this.tilesize,
       pxMinX = -pxOffsetX - this.tilesize,
       pxMinY = -pxOffsetY - this.tilesize,
       pxMaxX = this.system.width + this.tilesize - pxOffsetX,
