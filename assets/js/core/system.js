@@ -16,7 +16,6 @@ class System {
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
-
     this.canvas = document.getElementById(canvasId) ?? document.createElement("canvas");
     this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
     this.resize(width, height, scale);
@@ -30,7 +29,6 @@ class System {
     this.width = width;
     this.height = height;
     this.scale = scale || this.scale;
-
     this.realWidth = this.width * this.scale;
     this.realHeight = this.height * this.scale;
     this.canvas.width = this.realWidth;
@@ -83,17 +81,13 @@ class System {
     canvas.width = image.width;
     canvas.height = image.height;
     const ctx = canvas.getContext("2d");
-
     this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
 
     const realWidth = image.width / this.scale,
       realHeight = image.height / this.scale;
-
     canvas.width = Math.ceil(realWidth);
     canvas.height = Math.ceil(realHeight);
-
     ctx.drawImage(image, 0, 0, realWidth, realWidth);
-
     return ctx.getImageData(x, y, width, height);
   }
 }
