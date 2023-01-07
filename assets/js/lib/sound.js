@@ -1,9 +1,10 @@
 class SoundManager {
-  clips = {};
-  volume = 1;
-  format = null;
+  #clips = {};
+  #format = null;
   #userAgent = null;
+
   runner = null;
+  volume = 1;
 
   constructor(runner) {
     this.runner = runner;
@@ -21,26 +22,25 @@ class SoundManager {
     for (let i = 0; i < Sound.use.length; i++) {
       const format = Sound.use[i];
       if (!probe.canPlayType(format.mime)) continue;
-      this.format = format;
+      this.#format = format;
       break;
     }
 
     // Disable sound if no compatible format found
-    if (!this.format) Sound.enabled = false;
+    if (!this.#format) Sound.enabled = false;
 
     if (Sound.enabled && Sound.useWebAudio) {
       const canvas = this.runner.system.canvas;
-      canvas.addEventListener("touchstart", () => this.unlockWebAudio(), false);
-      canvas.addEventListener("mousedown", () => this.unlockWebAudio(), false);
+      canvas.addEventListener("touchstart", () => this.unlockWebAudio(), {
+        once: true,
+        passive: true,
+      });
+      canvas.addEventListener("mousedown", () => this.unlockWebAudio(), { once: true });
     }
   }
 
   /** Initialises the WebAudio Context */
   unlockWebAudio() {
-    const canvas = this.runner.system.canvas;
-    canvas.removeEventListener("touchstart", () => this.unlockWebAudio(), false);
-    canvas.removeEventListener("mousedown", () => this.unlockWebAudio(), false);
-
     this.audioContext = new AudioContext();
     const emptyBuffer = this.audioContext.createBuffer(1, 1, 22050);
     const source = this.audioContext.createBufferSource();
@@ -56,30 +56,25 @@ class SoundManager {
   }
 
   loadWebAudio(path, _multiChannel, loadCallback) {
-    if (this.clips[path]) return this.clips[path];
-
+    if (this.#clips[path]) return this.#clips[path];
+    loadCallback = loadCallback || ((_path, _success, _event) => {});
     const audioSource = new WebAudioSource();
-    this.clips[path] = audioSource;
+    this.#clips[path] = audioSource;
 
     const request = new XMLHttpRequest();
     request.open("GET", path, true);
     request.responseType = "arraybuffer";
-
     request.onload = (event) => {
       this.audioContext.decodeAudioData(
         request.response,
         (buffer) => {
           audioSource.buffer = buffer;
-          if (loadCallback) loadCallback(path, true, event);
+          loadCallback(path, true, event);
         },
-        (event) => {
-          if (loadCallback) loadCallback(path, false, event);
-        }
+        (event) => loadCallback(path, false, event)
       );
     };
-    request.onerror = (ev) => {
-      if (loadCallback) loadCallback(path, false, ev);
-    };
+    request.onerror = (event) => loadCallback(path, false, event);
     request.send();
 
     return audioSource;
@@ -87,19 +82,19 @@ class SoundManager {
 
   loadHTML5Audio(path, multiChannel, loadCallback) {
     // Sound file already loaded?
-    if (this.clips[path]) {
+    if (this.#clips[path]) {
       // Loaded as WebAudio, but now requested as HTML5 Audio? Probably Music?
-      if (this.clips[path] instanceof WebAudioSource) return this.clips[path];
+      if (this.#clips[path] instanceof WebAudioSource) return this.#clips[path];
 
       // Only loaded as single channel and now requested as multichannel?
-      if (multiChannel && this.clips[path].length < Sound.channels) {
-        for (let i = this.clips[path].length; i < Sound.channels; i++) {
+      if (multiChannel && this.#clips[path].length < Sound.channels) {
+        for (let i = this.#clips[path].length; i < Sound.channels; i++) {
           const a = new Audio(path);
           a.load();
-          this.clips[path].push(a);
+          this.#clips[path].push(a);
         }
       }
-      return this.clips[path][0];
+      return this.#clips[path][0];
     }
 
     const clip = new Audio(path);
@@ -112,26 +107,21 @@ class SoundManager {
       // load callback
       if (this.#userAgent.device.mobile) setTimeout(() => loadCallback(path, true, null), 0);
       else {
-        clip.addEventListener(
-          "canplaythrough",
-          function cb(ev) {
-            clip.removeEventListener("canplaythrough", cb, false);
-            loadCallback(path, true, ev);
-          },
-          false
-        );
+        clip.addEventListener("canplaythrough", (ev) => loadCallback(path, true, ev), {
+          once: true,
+        });
         clip.addEventListener("error", (ev) => loadCallback(path, false, ev), false);
       }
     }
     clip.preload = "auto";
     clip.load();
 
-    this.clips[path] = [clip];
+    this.#clips[path] = [clip];
     if (multiChannel)
       for (let i = 1; i < Sound.channels; i++) {
         const a = new Audio(realPath);
         a.load();
-        this.clips[path].push(a);
+        this.#clips[path].push(a);
       }
 
     return clip;
@@ -139,7 +129,7 @@ class SoundManager {
 
   get(path) {
     // Find and return a channel that is not currently playing
-    const channels = this.clips[path];
+    const channels = this.#clips[path];
     // Is this a WebAudio source? We only ever have one for each Sound
     if (channels && channels instanceof WebAudioSource) return channels;
     // HTML5 Audio - find a channel that's not currently
