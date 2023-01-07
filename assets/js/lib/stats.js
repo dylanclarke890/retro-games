@@ -21,20 +21,31 @@ class Stats {
   };
 
   #containerElementStyles = [];
-  #target = null;
-  #containerWidth = 96;
   #containerHeight = 48;
-  #panelWidth = 92;
-  #panelHeight = 32;
-  #DOMElements = {};
+  #containerWidth = 96;
   #currentPanelIndex = 0;
-  #maxPanels = 2;
+  #DOMElements = {};
   #firstUpdate = true;
+  #maxPanels = 2;
+  #panelHeight = 32;
+  #panelWidth = 92;
+  #target = null;
+
+  framesThisSec = 0;
+  last = this.now;
+  lastFrame = this.now;
+  now = performance.now();
+  maxFps = 0;
+  minFps = 1000;
+  maxMs = 0;
+  minMs = 1000;
+  maxMem = 0;
+  minMem = 1000;
 
   constructor({ width, height, containerElementStyles, target } = {}) {
     this.#containerElementStyles = containerElementStyles;
-    this.#containerWidth = width ?? 96;
     this.#containerHeight = height ?? 48;
+    this.#containerWidth = width ?? 96;
     this.#panelHeight = (this.#containerHeight / 3) * 2;
     this.#panelWidth = this.#containerWidth - 4;
     this.#target = target;
@@ -44,13 +55,13 @@ class Stats {
   #setup() {
     const parent = document.createElement("div");
     this.#assignStyles(parent, {
+      cursor: "pointer",
       fontFamily: "Helvetica, Arial, sans-serif",
-      textAlign: "left",
       fontSize: "9px",
       opacity: "0.9",
-      width: `${this.#containerWidth}px`,
+      textAlign: "left",
       height: `${this.#containerHeight}px`,
-      cursor: "pointer",
+      width: `${this.#containerWidth}px`,
     });
     parent.addEventListener("click", () => this.#nextPanel());
     if (this.#containerElementStyles) this.#assignStyles(parent, this.#containerElementStyles);
@@ -59,7 +70,6 @@ class Stats {
 
     this.#createPanel("fps", true);
     this.#createPanel("ms", false);
-
     try {
       if (window.performance && performance.memory.totalJSHeapSize) {
         this.#createPanel("mem", false);
@@ -116,10 +126,10 @@ class Stats {
     const { r, g, b } = Stats.colorSchemes[panelType].bg;
     this.#assignStyles(div, {
       backgroundColor: `rgb(${Math.floor(r / 2)},${Math.floor(g / 2)},${Math.floor(b / 2)})`,
-      padding: "2px 0px 3px 0px",
+      boxSizing: "border-box",
       display,
       height: `${this.#containerHeight}px`,
-      boxSizing: "border-box",
+      padding: "2px 0px 3px 0px",
     });
     target.appendChild(div);
     return div;
