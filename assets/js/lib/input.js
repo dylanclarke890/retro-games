@@ -94,17 +94,16 @@ class Input {
     PERIOD: 190,
   };
 
+  #actions = {};
+  #bindings = {};
+  #isUsingAccelerometer = false;
+  #isUsingKeyboard = false;
+  #isUsingMouse = false;
+  #locks = {};
   #userAgent = null;
+  #presses = {};
+  #delayedKeyup = {};
 
-  bindings = {};
-  actions = {};
-  presses = {};
-  locks = {};
-  delayedKeyup = {};
-
-  isUsingMouse = false;
-  isUsingKeyboard = false;
-  isUsingAccelerometer = false;
   mouse = { x: 0, y: 0 };
   accel = { x: 0, y: 0, z: 0 };
 
@@ -119,8 +118,8 @@ class Input {
   }
 
   initMouse() {
-    if (this.isUsingMouse) return;
-    this.isUsingMouse = true;
+    if (this.#isUsingMouse) return;
+    this.#isUsingMouse = true;
     const canvas = this.system.canvas;
 
     canvas.addEventListener("wheel", (e) => this.mousewheel(e), false);
@@ -145,26 +144,26 @@ class Input {
   }
 
   initKeyboard() {
-    if (this.isUsingKeyboard) return;
-    this.isUsingKeyboard = true;
+    if (this.#isUsingKeyboard) return;
+    this.#isUsingKeyboard = true;
     window.addEventListener("keydown", (e) => this.keydown(e), false);
     window.addEventListener("keyup", (e) => this.keyup(e), false);
   }
 
   initAccelerometer() {
-    if (this.isUsingAccelerometer) return;
-    this.isUsingAccelerometer = true;
+    if (this.#isUsingAccelerometer) return;
+    this.#isUsingAccelerometer = true;
     window.addEventListener("devicemotion", (e) => this.devicemotion(e), false);
   }
 
   mousewheel(event) {
     const code = event.deltaY < 0 ? Input.KEY.MWHEEL_UP : Input.KEY.MWHEEL_DOWN;
-    const action = this.bindings[code];
+    const action = this.#bindings[code];
     if (!action) return;
 
-    this.actions[action] = true;
-    this.presses[action] = true;
-    this.delayedKeyup[action] = true;
+    this.#actions[action] = true;
+    this.#presses[action] = true;
+    this.#delayedKeyup[action] = true;
     event.stopPropagation();
     event.preventDefault();
   }
@@ -182,7 +181,7 @@ class Input {
   }
 
   contextmenu(event) {
-    if (!this.bindings[Input.KEY.MOUSE2]) return;
+    if (!this.#bindings[Input.KEY.MOUSE2]) return;
     event.stopPropagation();
     event.preventDefault();
   }
@@ -201,12 +200,12 @@ class Input {
     if (code < 0 && !this.#userAgent.device.mobile) window.focus();
     if (event.type == "touchstart" || event.type == "mousedown") this.mousemove(event);
 
-    const action = this.bindings[code];
+    const action = this.#bindings[code];
     if (!action) return;
-    this.actions[action] = true;
-    if (!this.locks[action]) {
-      this.presses[action] = true;
-      this.locks[action] = true;
+    this.#actions[action] = true;
+    if (!this.#locks[action]) {
+      this.#presses[action] = true;
+      this.#locks[action] = true;
     }
     event.preventDefault();
   }
@@ -220,9 +219,9 @@ class Input {
         ? Input.KEY.MOUSE2
         : Input.KEY.MOUSE1;
 
-    const action = this.bindings[code];
+    const action = this.#bindings[code];
     if (!action) return;
-    this.delayedKeyup[action] = true;
+    this.#delayedKeyup[action] = true;
     event.preventDefault();
   }
 
@@ -233,7 +232,7 @@ class Input {
   bind(key, action) {
     if (key < 0) this.initMouse();
     else if (key > 0) this.initKeyboard();
-    this.bindings[key] = action;
+    this.#bindings[key] = action;
   }
 
   bindTouch(selector, action) {
@@ -245,50 +244,50 @@ class Input {
   }
 
   unbind(key) {
-    const action = this.bindings[key];
-    this.delayedKeyup[action] = true;
-    this.bindings[key] = null;
+    const action = this.#bindings[key];
+    this.#delayedKeyup[action] = true;
+    this.#bindings[key] = null;
   }
 
   unbindAll() {
-    this.bindings = {};
-    this.actions = {};
-    this.presses = {};
-    this.locks = {};
-    this.delayedKeyup = {};
+    this.#bindings = {};
+    this.#actions = {};
+    this.#presses = {};
+    this.#locks = {};
+    this.#delayedKeyup = {};
   }
 
   state(action) {
-    return this.actions[action];
+    return this.#actions[action];
   }
 
   pressed(action) {
-    return this.presses[action];
+    return this.#presses[action];
   }
 
   released(action) {
-    return !!this.delayedKeyup[action];
+    return !!this.#delayedKeyup[action];
   }
 
   clearPressed() {
-    for (let action in this.delayedKeyup) {
-      this.actions[action] = false;
-      this.locks[action] = false;
+    for (let action in this.#delayedKeyup) {
+      this.#actions[action] = false;
+      this.#locks[action] = false;
     }
-    this.delayedKeyup = {};
-    this.presses = {};
+    this.#delayedKeyup = {};
+    this.#presses = {};
   }
 
   touchStart(event, action) {
-    this.actions[action] = true;
-    this.presses[action] = true;
+    this.#actions[action] = true;
+    this.#presses[action] = true;
     event.stopPropagation();
     event.preventDefault();
     return false;
   }
 
   touchEnd(event, action) {
-    this.delayedKeyup[action] = true;
+    this.#delayedKeyup[action] = true;
     event.stopPropagation();
     event.preventDefault();
     return false;
