@@ -1,14 +1,14 @@
 class GameRunner {
-  customGameOptions = null;
-  font = null;
+  #customGameOptions = null;
+  #font = null;
+  #loader = null;
+  #loop = null;
+  #mediaFactory = null;
+  #soundManager = null;
+
   game = null;
-  loader = null;
-  loop = null;
-  mediaFactory = null;
   ready = false;
-  soundManager = null;
   system = null;
-  userAgent = UserAgent.info;
 
   constructor({
     canvasId,
@@ -23,19 +23,19 @@ class GameRunner {
     ...customGameOptions
   } = {}) {
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
-    this.soundManager = new SoundManager(this);
-    this.mediaFactory = new MediaFactory({ system: this.system, soundManager: this.soundManager });
-    this.loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
-    this.font = this.mediaFactory.createFont(font);
+    this.#soundManager = new SoundManager(this);
+    this.#mediaFactory = new MediaFactory({ system: this.system, soundManager: this.#soundManager });
+    this.#loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
+    this.#font = this.#mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;
 
     this.ready = true;
     loaderClass ??= GameLoader;
-    this.loader = new loaderClass({
+    this.#loader = new loaderClass({
       runner: this,
       gameClass,
     });
-    this.loader.load();
+    this.#loader.load();
   }
 
   setGame(gameClass) {
@@ -46,10 +46,10 @@ class GameRunner {
   setGameNow(gameClass) {
     this.game = new gameClass({
       system: this.system,
-      font: this.font,
-      mediaFactory: this.mediaFactory,
-      ...this.customGameOptions,
+      font: this.#font,
+      mediaFactory: this.#mediaFactory,
+      ...this.#customGameOptions,
     });
-    this.loop.start();
+    this.#loop.start();
   }
 }
