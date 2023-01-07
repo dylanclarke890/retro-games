@@ -1,9 +1,12 @@
 class MediaFactory {
+  #system = null;
+  #soundManager = null;
+
   constructor({ system, soundManager } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ soundManager });
-    this.system = system;
-    this.soundManager = soundManager;
+    this.#system = system;
+    this.#soundManager = soundManager;
   }
 
   #createAsset(path, data, type) {
@@ -16,21 +19,21 @@ class MediaFactory {
     let asset;
     switch (type) {
       case "font":
-        asset = new Font({ path, system: this.system, ...data });
+        asset = new Font({ path, system: this.#system, ...data });
         break;
       case "sound":
-        asset = new Sound({ path, soundManager: this.soundManager, ...data });
+        asset = new Sound({ path, soundManager: this.#soundManager, ...data });
         break;
       case "animation":
-        asset = new GameAnimationSheet({ path, system: this.system, ...data });
+        asset = new GameAnimationSheet({ path, system: this.#system, ...data });
         break;
       case "image":
-        asset = new GameImage({ path, system: this.system, ...data });
+        asset = new GameImage({ path, system: this.#system, ...data });
         break;
       default:
         throw new Error(`Couldn't determine asset type of ${type}`);
     }
-    // We don't want to overwrite a cached image with the same path.
+    // We don't want to overwrite a cached image with an animation.
     if (type !== "animation") Register.cacheAsset(path, asset);
     return asset;
   }
