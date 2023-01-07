@@ -173,40 +173,40 @@ class Debug {
   }
 }
 
-ig.DebugPanel = ig.Class.extend({
-  active: false,
-  container: null,
-  options: [],
-  panels: [],
-  label: "",
-  name: "",
+class DebugPanel {
+  active = false;
+  container = null;
+  options = [];
+  panels = [];
+  label = "";
+  name = "";
 
-  init: function (name, label) {
+  constructor(name, label) {
     this.name = name;
     this.label = label;
     this.container = ig.$new("div");
     this.container.className = "ig_debug_panel " + this.name;
-  },
+  }
 
-  toggle: function (active) {
+  toggle(active) {
     this.active = active;
     this.container.style.display = active ? "block" : "none";
-  },
+  }
 
-  addPanel: function (panel) {
+  addPanel(panel) {
     this.panels.push(panel);
     this.container.appendChild(panel.container);
-  },
+  }
 
-  addOption: function (option) {
+  addOption(option) {
     this.options.push(option);
     this.container.appendChild(option.container);
-  },
+  }
 
-  ready: function () {},
-  beforeRun: function () {},
-  afterRun: function () {},
-});
+  ready() {}
+  beforeRun() {}
+  afterRun() {}
+}
 
 ig.DebugOption = ig.Class.extend({
   name: "",
