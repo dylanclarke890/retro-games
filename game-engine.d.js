@@ -1,5 +1,9 @@
 // #region DEBUG
 /// <reference path="assets/js/debug/performance.js"/>
+/// <reference path="assets/js/debug/debug-menu.js"/>
+/// <reference path="assets/js/debug/panels/entities.js"/>
+/// <reference path="assets/js/debug/panels/graph.js"/>
+/// <reference path="assets/js/debug/panels/maps.js"/>
 // #endregion DEBUG
 
 // #region LIB
