@@ -31,11 +31,9 @@ class SoundManager {
 
     if (Sound.enabled && Sound.useWebAudio) {
       const canvas = this.runner.system.canvas;
-      canvas.addEventListener("touchstart", () => this.unlockWebAudio(), {
-        once: true,
-        passive: true,
-      });
-      canvas.addEventListener("mousedown", () => this.unlockWebAudio(), { once: true });
+      const eventSettings = { once: true, passive: true };
+      canvas.addEventListener("touchstart", () => this.unlockWebAudio(), eventSettings);
+      canvas.addEventListener("mousedown", () => this.unlockWebAudio(), eventSettings);
     }
   }
 
@@ -158,22 +156,22 @@ class GameAudio {
 }
 
 class Music extends GameAudio {
-  tracks = [];
-  namedTracks = {};
-  currentTrack = null;
-  currentIndex = 0;
-  random = false;
-  #volume = 1;
-  #loop = false;
+  #currentIndex = 0;
+  #currentTrack = null;
+  #tracks = [];
   #fadeInterval = 0;
   #fadeTimer = null;
+  #loop = false;
+  #namedTracks = {};
+  #random = false;
+  #volume = 1;
 
   get loop() {
     return {
       get: () => this.#loop,
       set: (value) => {
         this.#loop = value;
-        for (let i in this.tracks) this.tracks[i].loop = this.#loop;
+        for (let i in this.#tracks) this.#tracks[i].loop = this.#loop;
       },
     };
   }
@@ -183,7 +181,7 @@ class Music extends GameAudio {
       get: () => this.#volume,
       set: (value) => {
         this.#volume = value.constrain(0, 1);
-        for (let i in this.tracks) this.tracks[i].volume = this.#volume;
+        for (let i in this.#tracks) this.#tracks[i].volume = this.#volume;
       },
     };
   }
@@ -203,48 +201,48 @@ class Music extends GameAudio {
     track.loop = this.#loop;
     track.volume = this.#volume;
     track.addEventListener("ended", () => this.#endedCallback, false);
-    this.tracks.push(track);
+    this.#tracks.push(track);
 
-    if (name) this.namedTracks[name] = track;
-    if (!this.currentTrack) this.currentTrack = track;
+    if (name) this.#namedTracks[name] = track;
+    if (!this.#currentTrack) this.#currentTrack = track;
   }
 
   next() {
-    if (!this.tracks.length) return;
+    if (!this.#tracks.length) return;
     this.stop();
-    this.currentIndex = this.random
-      ? Math.floor(Math.random() * this.tracks.length)
-      : (this.currentIndex + 1) % this.tracks.length;
-    this.currentTrack = this.tracks[this.currentIndex];
+    this.#currentIndex = this.#random
+      ? Math.floor(Math.random() * this.#tracks.length)
+      : (this.#currentIndex + 1) % this.#tracks.length;
+    this.#currentTrack = this.#tracks[this.#currentIndex];
     this.play();
   }
 
   pause() {
-    if (!this.currentTrack) return;
-    this.currentTrack.pause();
+    if (!this.#currentTrack) return;
+    this.#currentTrack.pause();
   }
 
   stop() {
-    if (!this.currentTrack) return;
-    this.currentTrack.pause();
-    this.currentTrack.currentTime = 0;
+    if (!this.#currentTrack) return;
+    this.#currentTrack.pause();
+    this.#currentTrack.currentTime = 0;
   }
 
   play(name) {
     // If a name was provided, stop playing the current track (if any)
     // and play the named track
-    if (name && this.namedTracks[name]) {
-      const newTrack = this.namedTracks[name];
-      if (newTrack !== this.currentTrack) {
+    if (name && this.#namedTracks[name]) {
+      const newTrack = this.#namedTracks[name];
+      if (newTrack !== this.#currentTrack) {
         this.stop();
-        this.currentTrack = newTrack;
+        this.#currentTrack = newTrack;
       }
-    } else if (!this.currentTrack) return;
-    this.currentTrack.play();
+    } else if (!this.#currentTrack) return;
+    this.#currentTrack.play();
   }
 
   fadeOut(time) {
-    if (!this.currentTrack) return;
+    if (!this.#currentTrack) return;
     clearInterval(this.#fadeInterval);
     this.#fadeTimer = new Timer(time);
     this.#fadeInterval = setInterval(() => this.#fadeStep(), 50);
@@ -253,12 +251,11 @@ class Music extends GameAudio {
   #fadeStep() {
     const v =
       this.#fadeTimer.delta().map(-this.#fadeTimer.target, 0, 1, 0).constrain(0, 1) * this.#volume;
-
     if (v <= 0.01) {
       this.stop();
-      this.currentTrack.volume = this.#volume;
+      this.#currentTrack.volume = this.#volume;
       clearInterval(this.#fadeInterval);
-    } else this.currentTrack.volume = v;
+    } else this.#currentTrack.volume = v;
   }
 
   #endedCallback() {
@@ -269,81 +266,70 @@ class Music extends GameAudio {
 
 class Sound extends GameAudio {
   static FORMAT = {
-    MP3: { ext: "mp3", mime: "audio/mpeg" },
     M4A: { ext: "m4a", mime: "audio/mp4; codecs=mp4a.40.2" },
+    MP3: { ext: "mp3", mime: "audio/mpeg" },
     OGG: { ext: "ogg", mime: "audio/ogg; codecs=vorbis" },
     WEBM: { ext: "webm", mime: "audio/webm; codecs=vorbis" },
     CAF: { ext: "caf", mime: "audio/x-caf" },
   };
-  static enabled = true;
-  static use = [Sound.FORMAT.M4A, Sound.FORMAT.OGG, Sound.FORMAT.MP3];
-  static useWebAudio = !!window.AudioContext;
   static channels = 4;
+  static enabled = true;
+  static use = Object.keys(Sound.FORMAT);
+  static useWebAudio = !!window.AudioContext;
+
+  #loop = false;
 
   path = "";
   volume = 1;
-  currentClip = null;
-  multiChannel = true;
-  #loop = false;
-
-  constructor({ path, multiChannel, soundManager }) {
-    super({ soundManager });
-    this.path = path;
-    this.multiChannel = !!multiChannel === true;
-    this.load();
-  }
+  #currentClip = null;
+  #multiChannel = true;
 
   get loop() {
     return {
       get: () => this.#loop,
       set: (value) => {
         this.#loop = value;
-        if (this.currentClip) this.currentClip.loop = this.#loop;
+        if (this.#currentClip) this.#currentClip.loop = this.#loop;
       },
     };
   }
 
-  load(loadCallback) {
-    if (!Sound.enabled) {
-      if (loadCallback) loadCallback(this.path, true);
-      return;
-    }
-    if (!this.soundManager.runner.ready) {
-      Register.preloadSound(this);
-      return;
-    }
+  constructor({ path, multiChannel, soundManager }) {
+    super({ soundManager });
+    Guard.againstNull({ path });
+    this.path = path;
+    this.#multiChannel = !!multiChannel;
+    this.load();
+  }
 
-    this.soundManager.load(this.path, this.multiChannel, loadCallback);
+  load(loadCallback) {
+    loadCallback = loadCallback || ((_path, _sucess) => {});
+    if (!Sound.enabled) loadCallback(this.path, true); // Probably mobile, no need to load.
+    else if (!this.soundManager.runner.ready) Register.preloadSound(this);
+    else this.soundManager.load(this.path, this.#multiChannel, loadCallback);
   }
 
   play() {
     if (!Sound.enabled) return;
-
-    this.currentClip = this.soundManager.get(this.path);
-    this.currentClip.loop = this.#loop;
-    this.currentClip.volume = this.soundManager.volume * this.volume;
-    this.currentClip.play();
+    this.#currentClip = this.soundManager.get(this.path);
+    this.#currentClip.loop = this.#loop;
+    this.#currentClip.volume = this.soundManager.volume * this.volume;
+    this.#currentClip.play();
   }
 
   stop() {
-    if (this.currentClip) {
-      this.currentClip.pause();
-      this.currentClip.currentTime = 0;
-    }
+    if (!this.#currentClip) return;
+    this.#currentClip.pause();
+    this.#currentClip.currentTime = 0;
   }
 }
 
 class WebAudioSource extends GameAudio {
-  #sources = [];
   #gain = null;
-  buffer = null;
   #loop = false;
+  #sources = [];
 
-  constructor(opts) {
-    super(opts);
-    this.#gain = this.soundManager.audioContext.createGain();
-    this.#gain.connect(this.soundManager.audioContext.destination);
-  }
+  buffer = null;
 
   get loop() {
     return {
@@ -360,6 +346,12 @@ class WebAudioSource extends GameAudio {
       get: () => this.#gain.gain.value,
       set: (value) => (this.#gain.gain.value = value.constrain(0, 1)),
     };
+  }
+
+  constructor(opts) {
+    super(opts);
+    this.#gain = this.soundManager.audioContext.createGain();
+    this.#gain.connect(this.soundManager.audioContext.destination);
   }
 
   play() {
