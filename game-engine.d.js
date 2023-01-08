@@ -25,11 +25,9 @@
 // #endregion CORE
 
 // #region DEBUG
-/// <reference path="assets/js/debug/performance.js"/>
+/// <reference path="assets/js/debug/debug-panels.js"/>
 /// <reference path="assets/js/debug/debug-menu.js"/>
-/// <reference path="assets/js/debug/panels/entities.js"/>
-/// <reference path="assets/js/debug/panels/graph.js"/>
-/// <reference path="assets/js/debug/panels/maps.js"/>
+/// <reference path="assets/js/debug/performance.js"/>
 // #endregion DEBUG
 
 // #region CUSTOM
