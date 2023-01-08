@@ -143,7 +143,7 @@ class Debug {
   }
 
   afterRun() {
-    const frameTime = Date.now() - this.debugRealTime;
+    const frameTime = performance.now() - this.debugRealTime;
     this.debugTime = this.debugTime * 0.8 + frameTime * 0.2;
     if (this.activePanel) this.activePanel.afterRun();
     this.showNumber("ms", this.debugTime.toFixed(2));
