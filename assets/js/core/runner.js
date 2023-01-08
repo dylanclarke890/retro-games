@@ -57,3 +57,4 @@ class GameRunner {
     this.#loop.start();
   }
 }
+

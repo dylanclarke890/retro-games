@@ -26,13 +26,26 @@ class Debug {
   debugRealTime = performance.now();
 
   constructor() {
-    // Inject the Stylesheet
+    this.#injectStylesheet();
+    this.#createContainers();
+    // Set ig.log(), ig.assert() and ig.show()
+    if (window.console && window.console.log && window.console.assert) {
+      // Can't use .bind() on native functions in IE9 :/
+      ig.log = console.log.bind ? console.log.bind(console) : console.log;
+      ig.assert = console.assert.bind ? console.assert.bind(console) : console.assert;
+    }
+    ig.show = this.showNumber.bind(this);
+  }
+
+  #injectStylesheet() {
     const style = document.createElement("link");
     style.rel = "stylesheet";
     style.type = "text/css";
     style.href = "lib/impact/debug/debug.css"; // TODO
     document.body.appendChild(style);
+  }
 
+  #createContainers() {
     // Create the Debug Container
     this.container = document.createElement("div");
     this.container.className = "ig_debug";
@@ -49,14 +62,6 @@ class Debug {
     this.numberContainer = document.createElement("div");
     this.numberContainer.className = "debug-stats";
     this.panelMenu.appendChild(this.numberContainer);
-
-    // Set ig.log(), ig.assert() and ig.show()
-    if (window.console && window.console.log && window.console.assert) {
-      // Can't use .bind() on native functions in IE9 :/
-      ig.log = console.log.bind ? console.log.bind(console) : console.log;
-      ig.assert = console.assert.bind ? console.assert.bind(console) : console.assert;
-    }
-    ig.show = this.showNumber.bind(this);
   }
 
   addNumber(name) {

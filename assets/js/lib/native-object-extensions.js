@@ -115,4 +115,6 @@ class NativeExtensions {
   static #chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   static uniqueId = () =>
     Array.from({ length: 10 }, () => this.#chars[Math.floor(Math.random() * 52)]).join("");
+
+  overwriteMethod = (classDef, methodName) => {};
 }
