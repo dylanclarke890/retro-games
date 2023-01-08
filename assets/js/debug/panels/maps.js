@@ -127,9 +127,3 @@ class MapsDebugPanel extends DebugPanel {
     }
   }
 }
-
-ig.debug.addPanel({
-  type: ig.DebugMapsPanel,
-  name: "maps",
-  label: "Background Maps",
-});

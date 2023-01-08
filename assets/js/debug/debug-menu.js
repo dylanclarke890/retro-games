@@ -1,3 +1,27 @@
+const panels = [
+  {
+    type: DebugPanel,
+    name: "entities",
+    label: "Entities",
+    options: [
+      { name: "Checks & Collisions", object: Entity, property: "_debugEnableChecks" },
+      { name: "Show Collision Boxes", object: Entity, property: "_debugShowBoxes" },
+      { name: "Show Velocities", object: Entity, property: "_debugShowVelocities" },
+      { name: "Show Names & Targets", object: Entity, property: "_debugShowNames" },
+    ],
+  },
+  {
+    type: GraphDebugPanel,
+    name: "graph",
+    label: "Performance",
+  },
+  {
+    type: MapsDebugPanel,
+    name: "maps",
+    label: "Background Maps",
+  },
+];
+
 class Debug {
   options = {};
   panels = {};
@@ -67,18 +91,6 @@ class Debug {
     this.panelMenu.appendChild(this.numberContainer);
   }
 
-  addNumber(name) {
-    const numberSpan = document.createElement("span");
-    this.numberContainer.appendChild(numberSpan);
-    this.numberContainer.appendChild(document.createTextNode(name));
-    this.numbers[name] = numberSpan;
-  }
-
-  showNumber(name, number) {
-    if (!this.numbers[name]) this.addNumber(name);
-    this.numbers[name].textContent = number;
-  }
-
   addPanel(panelDef) {
     // Create the panel and options
     const panel = new panelDef.type(panelDef.name, panelDef.label);
@@ -114,10 +126,6 @@ class Debug {
     if (!inserted) this.panelMenu.appendChild(menuItem);
   }
 
-  showPanel(name) {
-    this.togglePanel(this.panels[name]);
-  }
-
   togglePanel(panel) {
     if (this.activePanel && this.activePanel !== panel) {
       this.activePanel.toggle(false);
@@ -129,6 +137,22 @@ class Debug {
     panel.toggle(active);
     panel.menuItem.className = "debug-menu-item" + (active ? " active" : "");
     if (active) this.activePanel = panel;
+  }
+
+  showPanel(name) {
+    this.togglePanel(this.panels[name]);
+  }
+
+  addNumber(name) {
+    const numberSpan = document.createElement("span");
+    this.numberContainer.appendChild(numberSpan);
+    this.numberContainer.appendChild(document.createTextNode(name));
+    this.numbers[name] = numberSpan;
+  }
+
+  showNumber(name, number) {
+    if (!this.numbers[name]) this.addNumber(name);
+    this.numbers[name].textContent = number;
   }
 
   ready() {

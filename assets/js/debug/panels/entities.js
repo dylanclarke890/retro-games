@@ -77,15 +77,3 @@ ig.Entity.checkPair = function (a, b) {
   if (!ig.Entity._debugEnableChecks) return;
   ig.Entity.oldCheckPair(a, b);
 };
-
-ig.debug.addPanel({
-  type: ig.DebugPanel,
-  name: "entities",
-  label: "Entities",
-  options: [
-    { name: "Checks & Collisions", object: Entity, property: "_debugEnableChecks" },
-    { name: "Show Collision Boxes", object: Entity, property: "_debugShowBoxes" },
-    { name: "Show Velocities", object: Entity, property: "_debugShowVelocities" },
-    { name: "Show Names & Targets", object: Entity, property: "_debugShowNames" },
-  ],
-});
