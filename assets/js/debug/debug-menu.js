@@ -1,17 +1,3 @@
-ig.System.inject({
-  // TODO
-  run: function () {
-    ig.debug.beforeRun();
-    this.parent();
-    ig.debug.afterRun();
-  },
-
-  setGameNow: function (gameClass) {
-    this.parent(gameClass);
-    ig.debug.ready();
-  },
-});
-
 class Debug {
   options = {};
   panels = {};
@@ -26,6 +12,7 @@ class Debug {
   debugRealTime = performance.now();
 
   constructor() {
+    this.#injectDebugMethods();
     this.#injectStylesheet();
     this.#createContainers();
     // Set ig.log(), ig.assert() and ig.show()
@@ -35,6 +22,22 @@ class Debug {
       ig.assert = console.assert.bind ? console.assert.bind(console) : console.assert;
     }
     ig.show = this.showNumber.bind(this);
+  }
+
+  #injectDebugMethods() {
+    ig.System.inject({
+      // TODO
+      run: function () {
+        ig.debug.beforeRun();
+        this.parent();
+        ig.debug.afterRun();
+      },
+
+      setGameNow: function (gameClass) {
+        this.parent(gameClass);
+        ig.debug.ready();
+      },
+    });
   }
 
   #injectStylesheet() {
