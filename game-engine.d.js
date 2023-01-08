@@ -1,11 +1,3 @@
-// #region DEBUG
-/// <reference path="assets/js/debug/performance.js"/>
-/// <reference path="assets/js/debug/debug-menu.js"/>
-/// <reference path="assets/js/debug/panels/entities.js"/>
-/// <reference path="assets/js/debug/panels/graph.js"/>
-/// <reference path="assets/js/debug/panels/maps.js"/>
-// #endregion DEBUG
-
 // #region LIB
 /// <reference path="assets/js/lib/polyfills.js"/>
 /// <reference path="assets/js/lib/native-object-extensions.js"/>
@@ -32,6 +24,16 @@
 /// <reference path="assets/js/core/game-loader.js"/>
 // #endregion CORE
 
+// #region DEBUG
+/// <reference path="assets/js/debug/performance.js"/>
+/// <reference path="assets/js/debug/debug-menu.js"/>
+/// <reference path="assets/js/debug/panels/entities.js"/>
+/// <reference path="assets/js/debug/panels/graph.js"/>
+/// <reference path="assets/js/debug/panels/maps.js"/>
+// #endregion DEBUG
+
+// #region CUSTOM
 /// <reference path="assets/js/pong-entities.js"/>
 /// <reference path="assets/js/level.js"/>
 /// <reference path="assets/js/my-game.js"/>
+// #endregion CUSTOM
