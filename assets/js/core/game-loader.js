@@ -8,7 +8,7 @@ class GameLoader {
   #status = 0;
   #unloaded = [];
 
-  constructor({ runner, gameClass, debugMode }) {
+  constructor({ runner, gameClass }) {
     Guard.againstNull({ runner });
     Guard.againstNull({ gameClass }).isInstanceOf(Game);
 
@@ -17,11 +17,6 @@ class GameLoader {
     this.#assetsToPreload = Register.getAssetsToPreload();
     for (let i = 0; i < this.#assetsToPreload.length; i++)
       this.#unloaded.push(this.#assetsToPreload[i].path);
-
-    if (debugMode) {
-      console.log("Loading debug mode...");
-      Debug.injectDebugMethods(runner.system, gameClass, Entity);
-    }
   }
 
   load() {

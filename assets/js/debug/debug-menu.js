@@ -22,7 +22,7 @@ const panels = [
   },
 ];
 
-class Debug {
+class DebugSystem {
   options = {};
   panels = {};
   numbers = {};
@@ -41,67 +41,83 @@ class Debug {
     this.system = system;
     this.#injectStylesheet();
     this.#createContainers();
-
     panels.forEach((p) => this.addPanel(p));
   }
 
-  static injectDebugMethods(systemClass, gameClass, entityClass) {
-    const debugThis = this;
+  static injectDebugMethods({
+    gameClass,
+    systemClass,
+    baseEntityClass,
+    gameLoopClass,
+    debugSystemInstance,
+  }) {
+    Guard.againstNull({ gameClass });
+    Guard.againstNull({ systemClass });
+    Guard.againstNull({ baseEntityClass });
+    Guard.againstNull({ gameLoopClass });
+    Guard.againstNull({ debugSystemInstance });
+
+    console.log(gameLoopClass.prototype);
+    // Game loop debug overrides.
+    gameLoopClass.prototype.baseStart = gameLoopClass.prototype.start;
+    gameLoopClass.prototype.start = function () {
+      debugSystemInstance.beforeRun();
+      this.baseStart();
+    };
+    gameLoopClass.prototype.baseStop = gameLoopClass.prototype.stop;
+    gameLoopClass.prototype.stop = function () {
+      this.baseStop();
+      debugSystemInstance.afterRun();
+    };
 
     // System debug overrides.
-    systemClass.prototype.baseRun = systemClass.prototype.run;
-    systemClass.prototype.run = function () {
-      debugThis.beforeRun();
-      this.baseRun();
-      debugThis.afterRun();
-    };
     systemClass.prototype.baseSetGameNow = systemClass.prototype.setGameNow;
     systemClass.prototype.setGameNow = function (gameClass) {
       this.baseSetGameNow(gameClass);
-      debugThis.ready();
+      debugSystemInstance.ready();
     };
 
     // Game debug overrides.
     gameClass.prototype.baseLoadLevel = gameClass.prototype.loadLevel;
     gameClass.prototype.loadLevel = function (data) {
       this.baseLoadLevel(data);
-      debugThis.panels.maps.load(this);
+      debugSystemInstance.panels.maps.load(this);
     };
 
     gameClass.prototype.baseDraw = gameClass.prototype.draw;
     gameClass.prototype.draw = function () {
-      debugThis.panels.graph.beginClock("draw");
+      debugSystemInstance.panels.graph.beginClock("draw");
       this.baseDraw();
-      debugThis.panels.graph.endClock("draw");
+      debugSystemInstance.panels.graph.endClock("draw");
     };
 
     gameClass.prototype.baseUpdate = gameClass.prototype.update;
     gameClass.prototype.update = function () {
-      debugThis.panels.graph.beginClock("update");
+      debugSystemInstance.panels.graph.beginClock("update");
       this.baseDraw();
-      debugThis.panels.graph.endClock("update");
+      debugSystemInstance.panels.graph.endClock("update");
     };
 
     gameClass.prototype.baseCheckEntities = gameClass.prototype.checkEntities;
     gameClass.prototype.checkEntities = function () {
-      debugThis.panels.graph.beginClock("checks");
+      debugSystemInstance.panels.graph.beginClock("checks");
       this.baseDraw();
-      debugThis.panels.graph.endClock("checks");
+      debugSystemInstance.panels.graph.endClock("checks");
     };
 
     // Entity debug overrides.
-    entityClass.prototype.debugColors = {
+    baseEntityClass.prototype.debugColors = {
       names: "#fff",
       velocities: "#0f0",
       boxes: "#f00",
     };
-    entityClass.prototype._debugEnableChecks = true;
-    entityClass.prototype._debugShowBoxes = false;
-    entityClass.prototype._debugShowVelocities = false;
-    entityClass.prototype._debugShowNames = false;
+    baseEntityClass.prototype._debugEnableChecks = true;
+    baseEntityClass.prototype._debugShowBoxes = false;
+    baseEntityClass.prototype._debugShowVelocities = false;
+    baseEntityClass.prototype._debugShowNames = false;
 
     // Entity Debug methods
-    entityClass.prototype._debugDrawLine = function (color, sx, sy, dx, dy) {
+    baseEntityClass.prototype._debugDrawLine = function (color, sx, sy, dx, dy) {
       const { ctx, drawPosition } = this.system;
       const { x, y } = this.game.screen.actual;
       ctx.strokeStyle = color;
@@ -113,9 +129,9 @@ class Debug {
       ctx.closePath();
     };
 
-    entityClass.prototype.baseDraw = entityClass.prototype.draw;
-    entityClass.prototype.draw = function () {
-      entityClass.prototype.baseDraw();
+    baseEntityClass.prototype.baseDraw = baseEntityClass.prototype.draw;
+    baseEntityClass.prototype.draw = function () {
+      baseEntityClass.prototype.baseDraw();
       const { ctx, drawPosition, scale } = this.system;
       // Collision Boxes
       if (Entity._debugShowBoxes) {
@@ -161,8 +177,8 @@ class Debug {
       }
     };
 
-    entityClass.prototype.baseCheckWith = entityClass.prototype.checkWith;
-    entityClass.prototype.checkWith = function (other) {
+    baseEntityClass.prototype.baseCheckWith = baseEntityClass.prototype.checkWith;
+    baseEntityClass.prototype.checkWith = function (other) {
       if (!this._debugEnableChecks) return;
       this.baseCheckWith(other);
     };
@@ -172,7 +188,7 @@ class Debug {
     const style = document.createElement("link");
     style.rel = "stylesheet";
     style.type = "text/css";
-    style.href = "lib/impact/debug/debug.css"; // TODO
+    style.href = "assets/js/debug/debug.css"; // TODO
     document.body.appendChild(style);
   }
 
