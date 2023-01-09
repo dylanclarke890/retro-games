@@ -1,16 +1,14 @@
 class DebugPanel {
   active = false;
   container = null;
-  game = null;
   label = "";
   name = "";
   options = [];
   panels = [];
   system = null;
 
-  constructor({ name, label, system, game }) {
+  constructor({ name, label, system }) {
     Guard.againstNull({ system });
-    Guard.againstNull({ game });
     this.name = name;
     this.label = label;
     this.container = document.createElement("div");
@@ -43,7 +41,7 @@ class MapsDebugPanel extends DebugPanel {
 
   constructor(opts) {
     super(opts);
-    this.load(this.game);
+    this.load();
   }
 
   load(game) {
@@ -70,12 +68,12 @@ class MapsDebugPanel extends DebugPanel {
       subPanel.addOption(new DebugOption("Pre Rendered", map, "preRender"));
       subPanel.addOption(new DebugOption("Show Chunks", map, "debugChunks"));
 
-      this.generateMiniMap(subPanel, map, i);
+      this.generateMiniMap(subPanel, map, i, game.clearColor);
       this.addPanel(subPanel);
     }
   }
 
-  generateMiniMap(panel, map, id) {
+  generateMiniMap(panel, map, id, clearColor) {
     const scale = this.system.scale; // we'll need this a lot
 
     // resize the tileset, so that one tile is 'scale' pixels wide and high
@@ -96,8 +94,8 @@ class MapsDebugPanel extends DebugPanel {
     mapCanvas.height = map.height * scale;
     const ctx = mapCanvas.getContext("2d");
 
-    if (this.game.clearColor) {
-      ctx.fillStyle = this.game.clearColor;
+    if (clearColor) {
+      ctx.fillStyle = clearColor;
       ctx.fillRect(0, 0, w, h);
     }
 

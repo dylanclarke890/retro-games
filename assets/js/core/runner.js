@@ -24,8 +24,10 @@ class GameRunner {
     font,
     ...customGameOptions
   } = {}) {
-    if (debugMode) Debug.injectDebugMethods(System, Game, Entity);
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
+    if (debugMode) {
+      new Debug({ system: this.system });
+    }
     this.#soundManager = new SoundManager(this);
     this.#mediaFactory = new MediaFactory({
       system: this.system,

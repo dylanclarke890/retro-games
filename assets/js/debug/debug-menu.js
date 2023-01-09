@@ -30,19 +30,22 @@ class Debug {
   panelMenu = null;
   numberContainer = null;
   activePanel = null;
+  system = null;
 
   debugTime = 0;
   debugTickAvg = 0.016;
   debugRealTime = performance.now();
 
-  constructor() {
-    panels.forEach((p) => this.addPanel(p));
-    this.#injectDebugMethods();
+  constructor({ system }) {
+    Guard.againstNull({ system });
+    this.system = system;
     this.#injectStylesheet();
     this.#createContainers();
+
+    panels.forEach((p) => this.addPanel(p));
   }
 
-  #injectDebugMethods(systemClass, gameClass, entityClass) {
+  static injectDebugMethods(systemClass, gameClass, entityClass) {
     const debugThis = this;
 
     // System debug overrides.
@@ -194,7 +197,11 @@ class Debug {
 
   addPanel(panelDef) {
     // Create the panel and options
-    const panel = new panelDef.type(panelDef.name, panelDef.label);
+    const panel = new panelDef.type({
+      name: panelDef.name,
+      label: panelDef.label,
+      system: this.system,
+    });
     if (panelDef.options) {
       for (let i = 0; i < panelDef.options.length; i++) {
         const { name, object, property } = panelDef.options[i];
