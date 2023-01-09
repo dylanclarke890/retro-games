@@ -1,19 +1,19 @@
 class Game {
   #autoSort = false;
-  #backgroundAnims = {};
-  #backgroundMaps = [];
   #cellSize = 64;
   #deferredKills = [];
   #doSortEntities = false;
   #entities = [];
   #levelToLoad = null;
-  #namedEntities = {};
   #sortBy = Game.SORT.Z_INDEX;
 
+  backgroundAnims = {};
+  backgroundMaps = [];
   clearColor = "#000000";
   collisionMap = CollisionMap.staticNoCollision;
   font = null;
   gravity = 0;
+  namedEntities = {};
   screen = {
     actual: { x: 0, y: 0 },
     rounded: { x: 0, y: 0 },
@@ -64,8 +64,8 @@ class Game {
     if (this.#doSortEntities || this.#autoSort) this.sortEntities();
 
     // update background animations
-    for (let tileset in this.#backgroundAnims) {
-      const anims = this.#backgroundAnims[tileset];
+    for (let tileset in this.backgroundAnims) {
+      const anims = this.backgroundAnims[tileset];
       for (let a in anims) anims[a].update();
     }
   }
@@ -82,8 +82,8 @@ class Game {
       y: drawPosition(this.screen.actual.y) / scale,
     };
     let mapIndex;
-    for (mapIndex = 0; mapIndex < this.#backgroundMaps.length; mapIndex++) {
-      const map = this.#backgroundMaps[mapIndex];
+    for (mapIndex = 0; mapIndex < this.backgroundMaps.length; mapIndex++) {
+      const map = this.backgroundMaps[mapIndex];
       // All foreground layers are drawn after the entities
       if (map.foreground) break;
       map.setScreenPos(this.screen.actual.x, this.screen.actual.y);
@@ -92,8 +92,8 @@ class Game {
 
     for (let i = 0; i < this.#entities.length; i++) this.#entities[i].draw();
 
-    for (mapIndex; mapIndex < this.#backgroundMaps.length; mapIndex++) {
-      const map = this.#backgroundMaps[mapIndex];
+    for (mapIndex; mapIndex < this.backgroundMaps.length; mapIndex++) {
+      const map = this.backgroundMaps[mapIndex];
       map.setScreenPos(this.screen.actual.x, this.screen.actual.y);
       map.draw();
     }
@@ -107,7 +107,7 @@ class Game {
 
     // Entities
     this.#entities = [];
-    this.#namedEntities = {};
+    this.namedEntities = {};
     for (let i = 0; i < data.entities.length; i++) {
       const { type, x, y, settings } = data.entities[i];
       this.spawnEntity(type, x, y, settings);
@@ -116,7 +116,7 @@ class Game {
 
     // Map Layer
     this.collisionMap = CollisionMap.staticNoCollision;
-    this.#backgroundMaps = [];
+    this.backgroundMaps = [];
 
     data.layer = data.layer || [];
     for (let i = 0; i < data.layer.length; i++) {
@@ -124,9 +124,9 @@ class Game {
       const shared = { system: this.system, tilesize: layer.tilesize, data: layer.data };
       if (layer.name == "collision") this.collisionMap = new CollisionMap({ ...shared });
       else
-        this.#backgroundMaps.push(
+        this.backgroundMaps.push(
           new BackgroundMap({
-            anims: this.#backgroundAnims[layer.tilesetName],
+            anims: this.backgroundAnims[layer.tilesetName],
             tileset: layer.tilesetName,
             ...shared,
             ...layer,
@@ -136,6 +136,7 @@ class Game {
 
     // Call post-init ready function on all entities
     for (let i = 0; i < this.#entities.length; i++) this.#entities[i].ready();
+    console.log("Finished");
   }
 
   loadLevelDeferred(data) {
@@ -144,13 +145,13 @@ class Game {
 
   getMapByName(name) {
     if (name === "collision") return this.collisionMap;
-    for (let i = 0; i < this.#backgroundMaps.length; i++)
-      if (this.#backgroundMaps[i].name === name) return this.#backgroundMaps[i];
+    for (let i = 0; i < this.backgroundMaps.length; i++)
+      if (this.backgroundMaps[i].name === name) return this.backgroundMaps[i];
     return null;
   }
 
   getEntityByName(name) {
-    return this.#namedEntities[name];
+    return this.namedEntities[name];
   }
 
   getEntitiesByType(type) {
@@ -169,7 +170,7 @@ class Game {
     if (!entityClass) throw new Error(`Can't spawn entity of type ${type}`);
     const ent = new entityClass({ x, y, game: this, settings });
     this.#entities.push(ent);
-    if (ent.name) this.#namedEntities[ent.name] = ent; // TODO: Register class
+    if (ent.name) this.namedEntities[ent.name] = ent; // TODO: Register class
     return ent;
   }
 
@@ -183,7 +184,7 @@ class Game {
   }
 
   removeEntity(ent) {
-    if (ent.name) delete this.#namedEntities[ent.name];
+    if (ent.name) delete this.namedEntities[ent.name];
     // We can not remove the entity from the entities[] array in the midst
     // of an update cycle, so remember all killed entities and remove
     // them later.

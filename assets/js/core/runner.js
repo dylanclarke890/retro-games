@@ -42,18 +42,6 @@ class GameRunner {
       gameClass,
       debugMode,
     });
-
-    if (debugMode) {
-      console.log("Loading debug mode...");
-      this.debugSystem = new DebugSystem({ system: this.system });
-      DebugSystem.injectDebugMethods({
-        systemClass: System,
-        gameClass,
-        baseEntityClass: Entity,
-        gameLoopClass: GameLoop,
-        debugSystemInstance: this.debugSystem,
-      });
-    }
     this.#loader.load();
   }
 

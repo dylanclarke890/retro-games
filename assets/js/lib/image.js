@@ -1,6 +1,5 @@
 class GameImage {
-  #data = null;
-
+  data = null;
   failed = false;
   height = 0;
   loadCallback = (_path, _loadingWasSuccessful) => {};
@@ -18,17 +17,17 @@ class GameImage {
   load(loadCallback) {
     if (!this.loaded && this.system.ready) {
       this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
-      this.#data = new Image();
-      this.#data.onload = (ev) => this.onload(ev);
-      this.#data.onerror = (ev) => this.onerror(ev);
-      this.#data.src = this.path;
+      this.data = new Image();
+      this.data.onload = (ev) => this.onload(ev);
+      this.data.onerror = (ev) => this.onerror(ev);
+      this.data.src = this.path;
     } else if (this.loaded) this.loadCallback(this.path, true);
     else Register.preloadImage(this);
   }
 
   onload(_event) {
-    this.width = this.#data.width;
-    this.height = this.#data.height;
+    this.width = this.data.width;
+    this.height = this.data.height;
     this.loaded = true;
     if (this.system.scale !== 1) this.resize();
     if (this.loadCallback) this.loadCallback(this.path, true);
@@ -46,7 +45,7 @@ class GameImage {
    * The scaled offscreen canvas becomes the image (data) of this object.*/
   resize() {
     const scale = this.system.scale;
-    const origPixels = this.system.getImagePixels(this.#data, 0, 0, this.width, this.height);
+    const origPixels = this.system.getImagePixels(this.data, 0, 0, this.width, this.height);
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
 
@@ -67,7 +66,7 @@ class GameImage {
       }
     }
     scaledCtx.putImageData(scaledPixels, 0, 0);
-    this.#data = scaled;
+    this.data = scaled;
   }
 
   draw(targetX, targetY, sourceX, sourceY, width, height) {
@@ -79,7 +78,7 @@ class GameImage {
     sourceY = sourceY ?? 0 * scale;
     width = (width ?? this.width) * scale;
     height = (height ?? this.height) * scale;
-    ctx.drawImage(this.#data, sourceX, sourceY, width, height, targetX, targetY, width, height);
+    ctx.drawImage(this.data, sourceX, sourceY, width, height, targetX, targetY, width, height);
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
@@ -102,7 +101,7 @@ class GameImage {
     }
 
     ctx.drawImage(
-      this.#data,
+      this.data,
       sourceX,
       sourceY,
       tileWidth,

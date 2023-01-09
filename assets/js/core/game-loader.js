@@ -1,5 +1,6 @@
 class GameLoader {
   #assetsToPreload = [];
+  #debugMode = false;
   #done = false;
   #gameClass = null;
   #intervalId = 0;
@@ -8,12 +9,13 @@ class GameLoader {
   #status = 0;
   #unloaded = [];
 
-  constructor({ runner, gameClass }) {
+  constructor({ runner, gameClass, debugMode }) {
     Guard.againstNull({ runner });
     Guard.againstNull({ gameClass }).isInstanceOf(Game);
 
     this.#runner = runner;
     this.#gameClass = gameClass;
+    this.#debugMode = debugMode;
     this.#assetsToPreload = Register.getAssetsToPreload();
     for (let i = 0; i < this.#assetsToPreload.length; i++)
       this.#unloaded.push(this.#assetsToPreload[i].path);
@@ -34,6 +36,17 @@ class GameLoader {
     if (this.#done) return;
     this.#done = true;
     clearInterval(this.#intervalId);
+    if (this.#debugMode) {
+      console.debug("Debugger: Loading...");
+      this.debugSystem = new DebugSystem({ system: this.#runner.system });
+      DebugSystem.injectDebugMethods({
+        systemClass: System,
+        gameClass: this.#gameClass,
+        baseEntityClass: Entity,
+        gameLoopClass: GameLoop,
+        debugSystemInstance: this.debugSystem,
+      });
+    }
     this.#runner.setGame(this.#gameClass);
     Register.clearPreloadCache();
   }

@@ -139,7 +139,9 @@ class BackgroundMap extends GameMap {
     /**  Workaround for Chrome 49 bug - handling many offscreen canvases
      * slows down the browser significantly so we convert the
      * canvas to an image instead. */
-    const image = new Image(chunk.width, chunk.height);
+    const image = new Image();
+    image.width = chunk.width;
+    image.height = chunk.height;
     image.src = chunk.toDataURL();
 
     return image;

@@ -57,7 +57,6 @@ class DebugSystem {
     Guard.againstNull({ gameLoopClass });
     Guard.againstNull({ debugSystemInstance });
 
-    console.log(gameLoopClass.prototype);
     // Game loop debug overrides.
     gameLoopClass.prototype.baseStart = gameLoopClass.prototype.start;
     gameLoopClass.prototype.start = function () {
@@ -94,14 +93,14 @@ class DebugSystem {
     gameClass.prototype.baseUpdate = gameClass.prototype.update;
     gameClass.prototype.update = function () {
       debugSystemInstance.panels.graph.beginClock("update");
-      this.baseDraw();
+      this.baseUpdate();
       debugSystemInstance.panels.graph.endClock("update");
     };
 
     gameClass.prototype.baseCheckEntities = gameClass.prototype.checkEntities;
     gameClass.prototype.checkEntities = function () {
       debugSystemInstance.panels.graph.beginClock("checks");
-      this.baseDraw();
+      this.baseCheckEntities();
       debugSystemInstance.panels.graph.endClock("checks");
     };
 
@@ -134,7 +133,7 @@ class DebugSystem {
       baseEntityClass.prototype.baseDraw();
       const { ctx, drawPosition, scale } = this.system;
       // Collision Boxes
-      if (Entity._debugShowBoxes) {
+      if (this._debugShowBoxes) {
         const { x, y } = this.game.screen.actual;
         ctx.strokeStyle = this.debugColors.boxes;
         ctx.lineWidth = 1.0;
@@ -147,14 +146,14 @@ class DebugSystem {
       }
 
       // Velocities
-      if (Entity._debugShowVelocities) {
+      if (this._debugShowVelocities) {
         const x = this.pos.x + this.size.x / 2;
         const y = this.pos.y + this.size.y / 2;
         this._debugDrawLine(this.debugColors.velocities, x, y, x + this.vel.x, y + this.vel.y);
       }
 
       // Names & Targets
-      if (Entity._debugShowNames) {
+      if (this._debugShowNames) {
         if (this.name) {
           const { x, y } = this.game.screen.actual;
           ctx.fillStyle = this.debugColors.names;

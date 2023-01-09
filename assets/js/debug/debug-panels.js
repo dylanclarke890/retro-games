@@ -9,6 +9,7 @@ class DebugPanel {
 
   constructor({ name, label, system }) {
     Guard.againstNull({ system });
+    this.system = system;
     this.name = name;
     this.label = label;
     this.container = document.createElement("div");
@@ -53,13 +54,14 @@ class MapsDebugPanel extends DebugPanel {
       return;
     }
 
+    console.debug("Debugger: Loading maps...");
     this.maps = game.backgroundMaps;
     this.mapScreens = [];
     this.container.innerHTML = "";
 
     for (let i = 0; i < this.maps.length; i++) {
       const map = this.maps[i];
-      const subPanel = new DebugPanel(i, `Layer ${i}`);
+      const subPanel = new DebugPanel({ name: i, label: `Layer ${i}`, system: this.system });
       const head = document.createElement("strong");
 
       head.textContent = `${i}: ${map.tiles.path}`;
