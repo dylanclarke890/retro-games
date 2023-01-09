@@ -36,130 +36,132 @@ class Debug {
   debugRealTime = performance.now();
 
   constructor() {
+    panels.forEach((p) => this.addPanel(p));
+    this.#injectDebugMethods();
     this.#injectStylesheet();
     this.#createContainers();
   }
 
-  static injectDebugMethods(systemClass, gameClass, entityClass) {
-    systemClass.inject({
-      // TODO
-      run: function () {
-        ig.debug.beforeRun();
-        this.parent();
-        ig.debug.afterRun();
-      },
+  #injectDebugMethods(systemClass, gameClass, entityClass) {
+    const debugThis = this;
 
-      setGameNow: function (gameClass) {
-        this.parent(gameClass);
-        ig.debug.ready();
-      },
-    });
+    // System debug overrides.
+    systemClass.prototype.baseRun = systemClass.prototype.run;
+    systemClass.prototype.run = function () {
+      debugThis.beforeRun();
+      this.baseRun();
+      debugThis.afterRun();
+    };
+    systemClass.prototype.baseSetGameNow = systemClass.prototype.setGameNow;
+    systemClass.prototype.setGameNow = function (gameClass) {
+      this.baseSetGameNow(gameClass);
+      debugThis.ready();
+    };
 
-    gameClass.inject({
-      loadLevel: function (data) {
-        this.parent(data);
-        ig.debug.panels.maps.load(this);
-      },
-    });
+    // Game debug overrides.
+    gameClass.prototype.baseLoadLevel = gameClass.prototype.loadLevel;
+    gameClass.prototype.loadLevel = function (data) {
+      this.baseLoadLevel(data);
+      debugThis.panels.maps.load(this);
+    };
 
-    gameClass.inject({
-      draw: function () {
-        ig.graph.beginClock("draw");
-        this.parent();
-        ig.graph.endClock("draw");
-      },
+    gameClass.prototype.baseDraw = gameClass.prototype.draw;
+    gameClass.prototype.draw = function () {
+      debugThis.panels.graph.beginClock("draw");
+      this.baseDraw();
+      debugThis.panels.graph.endClock("draw");
+    };
 
-      update: function () {
-        ig.graph.beginClock("update");
-        this.parent();
-        ig.graph.endClock("update");
-      },
+    gameClass.prototype.baseUpdate = gameClass.prototype.update;
+    gameClass.prototype.update = function () {
+      debugThis.panels.graph.beginClock("update");
+      this.baseDraw();
+      debugThis.panels.graph.endClock("update");
+    };
 
-      checkEntities: function () {
-        ig.graph.beginClock("checks");
-        this.parent();
-        ig.graph.endClock("checks");
-      },
-    });
+    gameClass.prototype.baseCheckEntities = gameClass.prototype.checkEntities;
+    gameClass.prototype.checkEntities = function () {
+      debugThis.panels.graph.beginClock("checks");
+      this.baseDraw();
+      debugThis.panels.graph.endClock("checks");
+    };
 
-    entityClass.inject({
-      colors: {
-        names: "#fff",
-        velocities: "#0f0",
-        boxes: "#f00",
-      },
-
-      draw: function () {
-        this.parent();
-
-        const { ctx, drawPosition, scale } = this.system; // TODO
-        // Collision Boxes
-        if (Entity._debugShowBoxes) {
-          ctx.strokeStyle = this.colors.boxes;
-          ctx.lineWidth = 1.0;
-          ctx.strokeRect(
-            drawPosition(this.pos.x.round() - ig.game.screen.x) - 0.5,
-            drawPosition(this.pos.y.round() - ig.game.screen.y) - 0.5,
-            this.size.x * scale,
-            this.size.y * scale
-          );
-        }
-
-        // Velocities
-        if (Entity._debugShowVelocities) {
-          const x = this.pos.x + this.size.x / 2;
-          const y = this.pos.y + this.size.y / 2;
-          this._debugDrawLine(this.colors.velocities, x, y, x + this.vel.x, y + this.vel.y);
-        }
-
-        // Names & Targets
-        if (Entity._debugShowNames) {
-          if (this.name) {
-            ctx.fillStyle = this.colors.names;
-            ctx.fillText(
-              this.name,
-              drawPosition(this.pos.x - ig.game.screen.x),
-              drawPosition(this.pos.y - ig.game.screen.y)
-            );
-          }
-
-          if (typeof this.target === "object") {
-            for (let t in this.target) {
-              const ent = ig.game.getEntityByName(this.target[t]);
-              if (!ent) continue;
-              this._debugDrawLine(
-                this.colors.names,
-                this.pos.x + this.size.x / 2,
-                this.pos.y + this.size.y / 2,
-                ent.pos.x + ent.size.x / 2,
-                ent.pos.y + ent.size.y / 2
-              );
-            }
-          }
-        }
-      },
-
-      _debugDrawLine: function (color, sx, sy, dx, dy) {
-        const { ctx, drawPosition } = this.system;
-        const { x, y } = this.game.screen.actual;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1.0;
-        ctx.beginPath();
-        ctx.moveTo(drawPosition(sx - x), drawPosition(sy - y));
-        ctx.lineTo(drawPosition(dx - x), drawPosition(dy - y));
-        ctx.stroke();
-        ctx.closePath();
-      },
-    });
-
+    // Entity debug overrides.
+    entityClass.prototype.debugColors = {
+      names: "#fff",
+      velocities: "#0f0",
+      boxes: "#f00",
+    };
     entityClass.prototype._debugEnableChecks = true;
     entityClass.prototype._debugShowBoxes = false;
     entityClass.prototype._debugShowVelocities = false;
     entityClass.prototype._debugShowNames = false;
-    entityClass.prototype.oldCheckPair = entityClass.prototype.checkPair;
-    entityClass.prototype.checkPair = function (a, b) {
-      if (!entityClass._debugEnableChecks) return;
-      entityClass.oldCheckPair(a, b);
+
+    // Entity Debug methods
+    entityClass.prototype._debugDrawLine = function (color, sx, sy, dx, dy) {
+      const { ctx, drawPosition } = this.system;
+      const { x, y } = this.game.screen.actual;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.0;
+      ctx.beginPath();
+      ctx.moveTo(drawPosition(sx - x), drawPosition(sy - y));
+      ctx.lineTo(drawPosition(dx - x), drawPosition(dy - y));
+      ctx.stroke();
+      ctx.closePath();
+    };
+
+    entityClass.prototype.baseDraw = entityClass.prototype.draw;
+    entityClass.prototype.draw = function () {
+      entityClass.prototype.baseDraw();
+      const { ctx, drawPosition, scale } = this.system;
+      // Collision Boxes
+      if (Entity._debugShowBoxes) {
+        const { x, y } = this.game.screen.actual;
+        ctx.strokeStyle = this.debugColors.boxes;
+        ctx.lineWidth = 1.0;
+        ctx.strokeRect(
+          drawPosition(this.pos.x.round() - x) - 0.5,
+          drawPosition(this.pos.y.round() - y) - 0.5,
+          this.size.x * scale,
+          this.size.y * scale
+        );
+      }
+
+      // Velocities
+      if (Entity._debugShowVelocities) {
+        const x = this.pos.x + this.size.x / 2;
+        const y = this.pos.y + this.size.y / 2;
+        this._debugDrawLine(this.debugColors.velocities, x, y, x + this.vel.x, y + this.vel.y);
+      }
+
+      // Names & Targets
+      if (Entity._debugShowNames) {
+        if (this.name) {
+          const { x, y } = this.game.screen.actual;
+          ctx.fillStyle = this.debugColors.names;
+          ctx.fillText(this.name, drawPosition(this.pos.x - x), drawPosition(this.pos.y - y));
+        }
+
+        if (typeof this.target === "object") {
+          for (let t in this.target) {
+            const ent = this.game.getEntityByName(this.target[t]);
+            if (!ent) continue;
+            this._debugDrawLine(
+              this.debugColors.names,
+              this.pos.x + this.size.x / 2,
+              this.pos.y + this.size.y / 2,
+              ent.pos.x + ent.size.x / 2,
+              ent.pos.y + ent.size.y / 2
+            );
+          }
+        }
+      }
+    };
+
+    entityClass.prototype.baseCheckWith = entityClass.prototype.checkWith;
+    entityClass.prototype.checkWith = function (other) {
+      if (!this._debugEnableChecks) return;
+      this.baseCheckWith(other);
     };
   }
 
