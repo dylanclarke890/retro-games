@@ -195,7 +195,7 @@ class GraphDebugPanel extends DebugPanel {
 
   addGraphMark(name, height) {
     const span = document.createElement("span");
-    span.className = "ig_debug_graph_mark";
+    span.className = "debug-graph-mark";
     span.textContent = name;
     span.style.top = height.round() + "px";
     this.container.appendChild(span);
@@ -203,15 +203,15 @@ class GraphDebugPanel extends DebugPanel {
 
   addClock(name, description, color) {
     const mark = document.createElement("span");
-    mark.className = "ig_debug_legend_color";
+    mark.className = "debug-legend-color";
     mark.style.backgroundColor = color;
 
     const number = document.createElement("span");
-    number.className = "ig_debug_legend_number";
+    number.className = "debug-legend-number";
     number.appendChild(document.createTextNode("0"));
 
     const legend = document.createElement("span");
-    legend.className = "ig_debug_legend";
+    legend.className = "debug-legend";
     legend.appendChild(mark);
     legend.appendChild(document.createTextNode(description + " ("));
     legend.appendChild(number);

@@ -38,6 +38,10 @@
   color: #888;
 }
 
+.debug-menu-item {
+  color: #fff;
+}
+
 .debug-menu-item:hover {
   cursor: pointer;
   background-color: #fff;
@@ -109,10 +113,6 @@
   margin-top: -12px;
 }
 
-.debug-legend {
-  color: #ccc;
-}
-
 .debug-label-mark {
   display: inline-block;
   width: 10px;
@@ -121,6 +121,10 @@
   transition: 0.1s linear;
   -webkit-transition: 0.1s linear;
   -moz-transition: 0.1s linear;
+}
+
+.debug-legend {
+  color: #ccc;
 }
 
 .debug-legend-color {

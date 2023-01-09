@@ -15,11 +15,11 @@ const panels = [
     name: "graph",
     label: "Performance",
   },
-  {
-    type: MapsDebugPanel,
-    name: "maps",
-    label: "Background Maps",
-  },
+  // {
+  //   type: MapsDebugPanel,
+  //   name: "maps",
+  //   label: "Background Maps",
+  // },
 ];
 
 class DebugSystem {
@@ -80,7 +80,7 @@ class DebugSystem {
     gameClass.prototype.baseLoadLevel = gameClass.prototype.loadLevel;
     gameClass.prototype.loadLevel = function (data) {
       this.baseLoadLevel(data);
-      debugSystemInstance.panels.maps.load(this);
+      // debugSystemInstance.panels.maps.load(this);
     };
 
     gameClass.prototype.baseDraw = gameClass.prototype.draw;
@@ -111,13 +111,13 @@ class DebugSystem {
       boxes: "#f00",
     };
     baseEntityClass.prototype._debugEnableChecks = true;
-    baseEntityClass.prototype._debugShowBoxes = false;
-    baseEntityClass.prototype._debugShowVelocities = false;
-    baseEntityClass.prototype._debugShowNames = false;
+    baseEntityClass.prototype._debugShowBoxes = true;
+    baseEntityClass.prototype._debugShowVelocities = true;
+    baseEntityClass.prototype._debugShowNames = true;
 
     // Entity Debug methods
     baseEntityClass.prototype._debugDrawLine = function (color, sx, sy, dx, dy) {
-      const { ctx, drawPosition } = this.system;
+      const { ctx, drawPosition } = this.game.system;
       const { x, y } = this.game.screen.actual;
       ctx.strokeStyle = color;
       ctx.lineWidth = 1.0;
@@ -130,8 +130,8 @@ class DebugSystem {
 
     baseEntityClass.prototype.baseDraw = baseEntityClass.prototype.draw;
     baseEntityClass.prototype.draw = function () {
-      baseEntityClass.prototype.baseDraw();
-      const { ctx, drawPosition, scale } = this.system;
+      this.baseDraw();
+      const { ctx, drawPosition, scale } = this.game.system;
       // Collision Boxes
       if (this._debugShowBoxes) {
         const { x, y } = this.game.screen.actual;

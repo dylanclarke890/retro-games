@@ -136,7 +136,6 @@ class Game {
 
     // Call post-init ready function on all entities
     for (let i = 0; i < this.#entities.length; i++) this.#entities[i].ready();
-    console.log("Finished");
   }
 
   loadLevelDeferred(data) {
