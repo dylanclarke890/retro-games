@@ -36,20 +36,12 @@ class Debug {
   debugRealTime = performance.now();
 
   constructor() {
-    this.#injectDebugMethods();
     this.#injectStylesheet();
     this.#createContainers();
-    // Set ig.log(), ig.assert() and ig.show()
-    if (window.console && window.console.log && window.console.assert) {
-      // Can't use .bind() on native functions in IE9 :/
-      ig.log = console.log.bind ? console.log.bind(console) : console.log;
-      ig.assert = console.assert.bind ? console.assert.bind(console) : console.assert;
-    }
-    ig.show = this.showNumber.bind(this);
   }
 
-  #injectDebugMethods() {
-    ig.System.inject({
+  static injectDebugMethods(systemClass, gameClass, entityClass) {
+    systemClass.inject({
       // TODO
       run: function () {
         ig.debug.beforeRun();
@@ -63,14 +55,14 @@ class Debug {
       },
     });
 
-    ig.Game.inject({
+    gameClass.inject({
       loadLevel: function (data) {
         this.parent(data);
         ig.debug.panels.maps.load(this);
       },
     });
 
-    ig.Game.inject({
+    gameClass.inject({
       draw: function () {
         ig.graph.beginClock("draw");
         this.parent();
@@ -90,7 +82,7 @@ class Debug {
       },
     });
 
-    Entity.inject({
+    entityClass.inject({
       colors: {
         names: "#fff",
         velocities: "#0f0",
@@ -149,25 +141,25 @@ class Debug {
 
       _debugDrawLine: function (color, sx, sy, dx, dy) {
         const { ctx, drawPosition } = this.system;
+        const { x, y } = this.game.screen.actual;
         ctx.strokeStyle = color;
         ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.moveTo(drawPosition(sx - ig.game.screen.x), drawPosition(sy - ig.game.screen.y));
-        ctx.lineTo(drawPosition(dx - ig.game.screen.x), drawPosition(dy - ig.game.screen.y));
+        ctx.moveTo(drawPosition(sx - x), drawPosition(sy - y));
+        ctx.lineTo(drawPosition(dx - x), drawPosition(dy - y));
         ctx.stroke();
         ctx.closePath();
       },
     });
 
-    ig.Entity._debugEnableChecks = true;
-    ig.Entity._debugShowBoxes = false;
-    ig.Entity._debugShowVelocities = false;
-    ig.Entity._debugShowNames = false;
-
-    ig.Entity.oldCheckPair = ig.Entity.checkPair;
-    ig.Entity.checkPair = function (a, b) {
-      if (!ig.Entity._debugEnableChecks) return;
-      ig.Entity.oldCheckPair(a, b);
+    entityClass.prototype._debugEnableChecks = true;
+    entityClass.prototype._debugShowBoxes = false;
+    entityClass.prototype._debugShowVelocities = false;
+    entityClass.prototype._debugShowNames = false;
+    entityClass.prototype.oldCheckPair = entityClass.prototype.checkPair;
+    entityClass.prototype.checkPair = function (a, b) {
+      if (!entityClass._debugEnableChecks) return;
+      entityClass.oldCheckPair(a, b);
     };
   }
 

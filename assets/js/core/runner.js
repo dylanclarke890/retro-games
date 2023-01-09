@@ -19,17 +19,19 @@ class GameRunner {
     height,
     scale,
     loaderClass,
-    showDebugStats,
+    debugMode,
+    showStats,
     font,
     ...customGameOptions
   } = {}) {
+    if (debugMode) Debug.injectDebugMethods(System, Game, Entity);
     this.system = new System({ runner: this, canvasId, width, height, scale, fps });
     this.#soundManager = new SoundManager(this);
     this.#mediaFactory = new MediaFactory({
       system: this.system,
       soundManager: this.#soundManager,
     });
-    this.#loop = new GameLoop({ runner: this, showDebugStats, targetFps: fps });
+    this.#loop = new GameLoop({ runner: this, showStats, targetFps: fps });
     this.#font = this.#mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;
 
@@ -57,4 +59,3 @@ class GameRunner {
     this.#loop.start();
   }
 }
-

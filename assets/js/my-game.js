@@ -30,7 +30,7 @@ const runner = new GameRunner({
   fps: 60,
   width: 768,
   height: 624,
-  showDebugStats: true,
+  showStats: true,
   font: {
     path: "assets/fonts/arcade-classic.TTF",
   },

@@ -8,17 +8,15 @@ class GameLoop {
   #targetFps = 60;
   #fpsInterval = 1000 / 60;
 
-  constructor({ runner, targetFps, showDebugStats }) {
+  constructor({ runner, targetFps, showStats }) {
     Guard.againstNull({ runner });
-    this.#runner = runner;
     this.#clock = new Timer();
-
-    // FPS properties
+    this.#runner = runner;
+    this.#lastFrame = -1;
     this.#targetFps = targetFps ?? 60;
     this.#fpsInterval = 1000 / this.#targetFps;
-    this.#lastFrame = -1;
 
-    if (showDebugStats) {
+    if (showStats) {
       // position stats in bottom right corner.
       const width = 96;
       const height = 48;
