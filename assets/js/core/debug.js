@@ -55,10 +55,10 @@ class GameDebugger {
       velocities: "#0f0",
       boxes: "#f00",
     };
-    entityProto._debugEnableChecks = true;
-    entityProto._debugShowBoxes = true;
-    entityProto._debugShowVelocities = true;
-    entityProto._debugShowNames = true;
+    entityProto._debugCollisionEnabled = true;
+    entityProto._debugShowHitbox = true;
+    entityProto._debugShowVelocity = true;
+    entityProto._debugShowName = true;
 
     // Entity Debug methods
     entityProto._debugDrawLine = function (color, sx, sy, dx, dy) {
@@ -78,7 +78,7 @@ class GameDebugger {
       this.baseDraw();
       const { ctx, drawPosition, scale } = this.game.system;
       // Collision Boxes
-      if (this._debugShowBoxes) {
+      if (this._debugShowHitbox) {
         const { x, y } = this.game.screen.actual;
         ctx.strokeStyle = this._debugColors.boxes;
         ctx.lineWidth = 1.0;
@@ -91,14 +91,14 @@ class GameDebugger {
       }
 
       // Velocities
-      if (this._debugShowVelocities) {
+      if (this._debugShowVelocity) {
         const x = this.pos.x + this.size.x / 2;
         const y = this.pos.y + this.size.y / 2;
         this._debugDrawLine(this._debugColors.velocities, x, y, x + this.vel.x, y + this.vel.y);
       }
 
       // Names & Targets
-      if (this._debugShowNames) {
+      if (this._debugShowName) {
         if (this.name) {
           const { x, y } = this.game.screen.actual;
           ctx.fillStyle = this._debugColors.names;
@@ -137,7 +137,7 @@ class GameDebugger {
 
     entityProto.baseCheckWith = entityProto.checkWith;
     entityProto.checkWith = function (other) {
-      if (!this._debugEnableChecks || !other._debugEnableChecks) return;
+      if (!this._debugCollisionEnabled || !other._debugCollisionEnabled) return;
       this.baseCheckWith(other);
     };
 
@@ -168,7 +168,7 @@ class GameDebugger {
       ? `
     <tr>
       <td>Show name</td>
-      <td id="debug-entity-show-name">${entity._debugShowNames}</td>
+      <td id="debug-entity-show-name">${entity._debugShowName}</td>
     <tr>
     `
       : "";
@@ -212,15 +212,15 @@ class GameDebugger {
         </tr>
         <tr>
           <td>Collision Enabled</td>
-          <td id="debug-entity-collision-on">${entity._debugEnableChecks}</td>
+          <td id="debug-entity-collision-on">${entity._debugCollisionEnabled}</td>
         </tr>
         <tr>
           <td>Show Velocity</td>
-          <td id="debug-entity-show-path">${entity._debugShowVelocities}</td>
+          <td id="debug-entity-show-path">${entity._debugShowVelocity}</td>
         </tr>
         <tr>
           <td>Show Hitbox</td>
-          <td id="debug-entity-show-hitbox">${entity._debugShowBoxes}</td>
+          <td id="debug-entity-show-hitbox">${entity._debugShowHitbox}</td>
         </tr>
         ${nameOption}
       </tbody>
@@ -228,17 +228,17 @@ class GameDebugger {
     `;
 
     document.getElementById("debug-entity-collision-on").addEventListener("click", () => {
-      entity._debugEnableChecks = !entity._debugEnableChecks;
+      entity._debugCollisionEnabled = !entity._debugCollisionEnabled;
     });
     document.getElementById("debug-entity-show-path").addEventListener("click", () => {
-      entity._debugShowVelocities = !entity._debugShowVelocities;
+      entity._debugShowVelocity = !entity._debugShowVelocity;
     });
     document.getElementById("debug-entity-show-hitbox").addEventListener("click", () => {
-      entity._debugShowBoxes = !entity._debugShowBoxes;
+      entity._debugShowHitbox = !entity._debugShowHitbox;
     });
     if (!entity.name) return;
     document.getElementById("debug-entity-show-name").addEventListener("click", () => {
-      entity._debugShowNames = !entity._debugShowNames;
+      entity._debugShowName = !entity._debugShowName;
     });
   }
 
@@ -256,17 +256,17 @@ class GameDebugger {
       <span>y: ${r(entity.vel.y)}</span>`;
 
     document.getElementById("debug-entity-collision-on").innerHTML = `
-    ${entity._debugEnableChecks}`;
+    ${entity._debugCollisionEnabled}`;
 
     document.getElementById("debug-entity-show-path").innerHTML = `
-    ${entity._debugShowVelocities}`;
+    ${entity._debugShowVelocity}`;
 
     document.getElementById("debug-entity-show-hitbox").innerHTML = `
-    ${entity._debugShowBoxes}`;
+    ${entity._debugShowHitbox}`;
 
     if (!entity.name) return;
     document.getElementById("debug-entity-show-name").innerHTML = `
-    ${entity._debugShowNames}`;
+    ${entity._debugShowName}`;
   }
 
   #isMouseWithinEntity(x, y, entity) {
