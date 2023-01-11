@@ -35,7 +35,7 @@ class GameLoop {
       });
     }
 
-    document.getElementById("game-stop").addEventListener("click", () => this.stop());
+    $el("#game-stop").addEventListener("click", () => this.stop());
   }
 
   start() {

@@ -16,7 +16,7 @@ class System {
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
-    this.canvas = document.getElementById(canvasId) ?? document.createElement("canvas");
+    this.canvas = $el("#" + canvasId) ?? document.createElement("canvas");
     this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");

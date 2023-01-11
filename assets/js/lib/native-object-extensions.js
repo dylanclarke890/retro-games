@@ -31,6 +31,10 @@ Number.prototype.toDeg = function () {
   return (this * 180) / Math.PI;
 };
 
+function $el(selector) {
+  return document.querySelector(selector);
+}
+
 Object.defineProperty(Array.prototype, "erase", {
   value: function (item) {
     for (let i = this.length; i--; )
