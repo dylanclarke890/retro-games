@@ -194,7 +194,7 @@ class DebugSystem {
   #createContainers() {
     // Create the Debug Container
     this.container = document.createElement("div");
-    this.container.className = "ig_debug";
+    this.container.className = "debug";
     document.body.appendChild(this.container);
 
     // Create and add the Menu Container

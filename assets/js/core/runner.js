@@ -59,4 +59,14 @@ class GameRunner {
     });
     this.#loop.start();
   }
+
+  launchDebugger() {
+    console.debug("GameDebugger: Loading...");
+    this.gameDebugger = new GameDebugger({
+      baseEntityClass: Entity,
+      game: this.game,
+      gameLoop: this.#loop,
+      system: this.system,
+    });
+  }
 }

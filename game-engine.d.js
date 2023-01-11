@@ -16,19 +16,14 @@
 // #endregion LIB
 
 // #region CORE
-/// <reference path="assets/js/core/game-loop.js"/>
+/// <reference path="assets/js/core/debug.js"/>
 /// <reference path="assets/js/core/entity.js"/>
-/// <reference path="assets/js/core/system.js"/>
 /// <reference path="assets/js/core/game.js"/>
-/// <reference path="assets/js/core/runner.js"/>
 /// <reference path="assets/js/core/game-loader.js"/>
+/// <reference path="assets/js/core/game-loop.js"/>
+/// <reference path="assets/js/core/runner.js"/>
+/// <reference path="assets/js/core/system.js"/>
 // #endregion CORE
-
-// #region DEBUG
-/// <reference path="assets/js/debug/debug-panels.js"/>
-/// <reference path="assets/js/debug/debug-menu.js"/>
-/// <reference path="assets/js/debug/performance.js"/>
-// #endregion DEBUG
 
 // #region CUSTOM
 /// <reference path="assets/js/pong-entities.js"/>

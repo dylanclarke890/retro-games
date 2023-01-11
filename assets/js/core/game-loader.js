@@ -36,19 +36,9 @@ class GameLoader {
     if (this.#done) return;
     this.#done = true;
     clearInterval(this.#intervalId);
-    if (this.#debugMode) {
-      console.debug("Debugger: Loading...");
-      this.debugSystem = new DebugSystem({ system: this.#runner.system });
-      DebugSystem.injectDebugMethods({
-        systemClass: System,
-        gameClass: this.#gameClass,
-        baseEntityClass: Entity,
-        gameLoopClass: GameLoop,
-        debugSystemInstance: this.debugSystem,
-      });
-    }
     this.#runner.setGame(this.#gameClass);
     Register.clearPreloadCache();
+    if (this.#debugMode) this.#runner.launchDebugger();
   }
 
   #drawLoadingScreen() {

@@ -3,7 +3,6 @@ class Game {
   #cellSize = 64;
   #deferredKills = [];
   #doSortEntities = false;
-  #entities = [];
   #levelToLoad = null;
   #sortBy = Game.SORT.Z_INDEX;
 
@@ -11,6 +10,7 @@ class Game {
   backgroundMaps = [];
   clearColor = "#000000";
   collisionMap = CollisionMap.staticNoCollision;
+  entities = [];
   font = null;
   gravity = 0;
   namedEntities = {};
@@ -49,8 +49,8 @@ class Game {
       this.#levelToLoad = null;
     }
 
-    for (let i = 0; i < this.#entities.length; i++) {
-      const ent = this.#entities[i];
+    for (let i = 0; i < this.entities.length; i++) {
+      const ent = this.entities[i];
       if (!ent.killed) ent.update();
     }
     this.checkEntities();
@@ -58,7 +58,7 @@ class Game {
     // remove all killed entities
     for (let i = 0; i < this.#deferredKills.length; i++) {
       this.#deferredKills[i].erase();
-      this.#entities.erase(this.#deferredKills[i]);
+      this.entities.erase(this.#deferredKills[i]);
     }
     this.#deferredKills = [];
     if (this.#doSortEntities || this.#autoSort) this.sortEntities();
@@ -90,7 +90,7 @@ class Game {
       map.draw();
     }
 
-    for (let i = 0; i < this.#entities.length; i++) this.#entities[i].draw();
+    for (let i = 0; i < this.entities.length; i++) this.entities[i].draw();
 
     for (mapIndex; mapIndex < this.backgroundMaps.length; mapIndex++) {
       const map = this.backgroundMaps[mapIndex];
@@ -106,7 +106,7 @@ class Game {
     };
 
     // Entities
-    this.#entities = [];
+    this.entities = [];
     this.namedEntities = {};
     for (let i = 0; i < data.entities.length; i++) {
       const { type, x, y, settings } = data.entities[i];
@@ -135,7 +135,7 @@ class Game {
     }
 
     // Call post-init ready function on all entities
-    for (let i = 0; i < this.#entities.length; i++) this.#entities[i].ready();
+    for (let i = 0; i < this.entities.length; i++) this.entities[i].ready();
   }
 
   loadLevelDeferred(data) {
@@ -156,8 +156,8 @@ class Game {
   getEntitiesByType(type) {
     const entityClass = Register.getEntityByType(type);
     const a = [];
-    for (let i = 0; i < this.#entities.length; i++) {
-      const ent = this.#entities[i];
+    for (let i = 0; i < this.entities.length; i++) {
+      const ent = this.entities[i];
       if (ent instanceof entityClass && !ent.killed) a.push(ent);
     }
     return a;
@@ -168,13 +168,13 @@ class Game {
     const entityClass = Register.getEntityByType(type);
     if (!entityClass) throw new Error(`Can't spawn entity of type ${type}`);
     const ent = new entityClass({ x, y, game: this, settings });
-    this.#entities.push(ent);
+    this.entities.push(ent);
     if (ent.name) this.namedEntities[ent.name] = ent; // TODO: Register class
     return ent;
   }
 
   sortEntities() {
-    this.#entities.sort(this.#sortBy);
+    this.entities.sort(this.#sortBy);
     this.#doSortEntities = false;
   }
 
@@ -205,8 +205,8 @@ class Game {
    * is maintained for each entity.*/
   checkEntities() {
     const hash = {};
-    for (let i = 0; i < this.#entities.length; i++) {
-      const entity = this.#entities[i];
+    for (let i = 0; i < this.entities.length; i++) {
+      const entity = this.entities[i];
       if (entity.skipCollisionChecks) continue;
 
       const checked = {},
