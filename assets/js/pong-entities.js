@@ -1,4 +1,5 @@
 class EntityBall extends Entity {
+  name = "Ball baby";
   size = { x: 48, y: 48 };
   vel = { x: 250, y: 100 };
   collides = Entity.COLLIDES.ACTIVE;

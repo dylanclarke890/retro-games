@@ -1,8 +1,8 @@
 class Font {
   static ALIGN = {
-    LEFT: 0,
-    RIGHT: 1,
-    CENTER: 2,
+    LEFT: 1,
+    RIGHT: 2,
+    CENTER: 3,
   };
 
   align = null;
@@ -61,7 +61,7 @@ class Font {
     if (align !== Font.ALIGN.LEFT) {
       const textWidth = this.sizeOf(text).width;
       if (align === Font.ALIGN.CENTER) x -= textWidth / 2;
-      else if (align === Font.ALIGN.RIGHT) x -= textWidth;
+      else if (align === Font.ALIGN.RIGHT) x += textWidth;
     }
 
     const ctx = this.system.ctx;
