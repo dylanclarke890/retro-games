@@ -19,8 +19,8 @@
 /// <reference path="assets/js/core/debug.js"/>
 /// <reference path="assets/js/core/entity.js"/>
 /// <reference path="assets/js/core/game.js"/>
-/// <reference path="assets/js/core/game-loader.js"/>
-/// <reference path="assets/js/core/game-loop.js"/>
+/// <reference path="assets/js/core/loader.js"/>
+/// <reference path="assets/js/core/loop.js"/>
 /// <reference path="assets/js/core/runner.js"/>
 /// <reference path="assets/js/core/system.js"/>
 // #endregion CORE
