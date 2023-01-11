@@ -12,19 +12,19 @@ class GameDebugger {
 
   constructor({ game, gameLoop, system, baseEntityClass }) {
     Guard.againstNull({ baseEntityClass });
-    Guard.againstNull({ gameClass: game });
-    Guard.againstNull({ gameLoopClass: gameLoop });
-    Guard.againstNull({ systemClass: system });
+    Guard.againstNull({ game });
+    Guard.againstNull({ gameLoop });
+    Guard.againstNull({ system });
     this.baseEntityClass = baseEntityClass;
     this.game = game;
     this.gameLoop = gameLoop;
     this.system = system;
 
-    this.createContainers();
-    this.attachDebugMethods();
+    this.#createContainers();
+    this.#attachDebugMethods();
   }
 
-  createContainers() {
+  #createContainers() {
     const style = document.createElement("link");
     style.rel = "stylesheet";
     style.type = "text/css";
@@ -43,9 +43,10 @@ class GameDebugger {
     toggleAllOptions.innerHTML = `
       <div>Collision<div>
     `;
+    document.body.prepend(toggleAllOptions);
   }
 
-  attachDebugMethods() {
+  #attachDebugMethods() {
     const gameDebugger = this;
 
     const entityProto = this.baseEntityClass.prototype;
