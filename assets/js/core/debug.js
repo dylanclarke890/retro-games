@@ -8,6 +8,7 @@ class GameDebugger {
   gameLoop = null;
   /** @type {Entity} */
   selectedEntity = null;
+  stats = null;
   DOMElements = {};
 
   constructor({ game, gameLoop, system, baseEntityClass }) {
@@ -37,16 +38,33 @@ class GameDebugger {
     this.DOMElements.selectedEntity = selectedEntity;
     document.body.prepend(selectedEntity);
 
-    const toggleAllOptions = document.createElement("div");
-    toggleAllOptions.id = "debug-entity-toggle-all";
-    // TODO
-    toggleAllOptions.innerHTML = `
-      <div>Collision<div>
-    `;
-    document.body.prepend(toggleAllOptions);
+    // const toggleAllOptions = document.createElement("div");
+    // toggleAllOptions.id = "debug-entity-toggle-all";
+    // // TODO
+    // toggleAllOptions.innerHTML = `
+    //   <div>Collision<div>
+    // `;
+    // document.body.prepend(toggleAllOptions);
+
+    // position stats in bottom right corner.
+    const width = 96;
+    const height = 48;
+    const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.system.canvas;
+    const statsPositionX = offsetLeft + offsetWidth - width;
+    const statsPositionY = offsetTop + offsetHeight - height;
+    this.stats = new Stats({
+      containerElementStyles: {
+        position: "absolute",
+        left: statsPositionX + "px",
+        top: statsPositionY - 18 + "px",
+      },
+      height,
+      target: document.body,
+      width,
+    });
   }
 
-  #attachDebugMethods() {
+  #injectEntityOverrides() {
     const gameDebugger = this;
 
     const entityProto = this.baseEntityClass.prototype;
@@ -155,6 +173,26 @@ class GameDebugger {
     });
   }
 
+  #injectSystemOverrides() {}
+  #injectGameOverrides() {}
+
+  #injectLoopOverrides() {
+    const loop = this.gameLoop;
+    const gameDebugger = this;
+    loop.baseMain = loop.main;
+    loop.main = function (timestamp) {
+      this.baseMain(timestamp);
+      gameDebugger.stats.update();
+    };
+  }
+
+  #attachDebugMethods() {
+    this.#injectEntityOverrides();
+    this.#injectSystemOverrides();
+    this.#injectGameOverrides();
+    this.#injectLoopOverrides();
+  }
+
   setSelectedEntity(entity) {
     console.debug("GameDebugger: Selected:", entity);
     this.selectedEntity = entity;
@@ -253,10 +291,10 @@ class GameDebugger {
       <span>y: ${r(entity.vel.y)}</span>`;
 
     $el("#debug-entity-collision-on").innerHTML = `${entity._debugCollisionEnabled}`;
-    $el("debug-entity-show-path").innerHTML = `${entity._debugShowVelocity}`;
-    $el("debug-entity-show-hitbox").innerHTML = `${entity._debugShowHitbox}`;
+    $el("#debug-entity-show-path").innerHTML = `${entity._debugShowVelocity}`;
+    $el("#debug-entity-show-hitbox").innerHTML = `${entity._debugShowHitbox}`;
     if (!entity.name) return;
-    $el("debug-entity-show-name").innerHTML = `${entity._debugShowName}`;
+    $el("#debug-entity-show-name").innerHTML = `${entity._debugShowName}`;
   }
 
   #isMouseWithinEntity(x, y, entity) {

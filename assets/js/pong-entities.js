@@ -21,6 +21,7 @@ class EntityBall extends Entity {
 }
 
 class EntityPaddle extends Entity {
+  name = "Paddle";
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;
   paddleSpeed = 150;

@@ -8,7 +8,7 @@ class GameLoop {
   #targetFps = 60;
   #fpsInterval = 1000 / 60;
 
-  constructor({ runner, targetFps, showStats }) {
+  constructor({ runner, targetFps }) {
     Guard.againstNull({ runner });
     this.#clock = new Timer();
     this.#runner = runner;
@@ -16,26 +16,8 @@ class GameLoop {
     this.#targetFps = targetFps ?? 60;
     this.#fpsInterval = 1000 / this.#targetFps;
 
-    if (showStats) {
-      // position stats in bottom right corner.
-      const width = 96;
-      const height = 48;
-      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.#runner.system.canvas;
-      const statsPositionX = offsetLeft + offsetWidth - width;
-      const statsPositionY = offsetTop + offsetHeight - height;
-      this.#stats = new Stats({
-        containerElementStyles: {
-          position: "absolute",
-          left: statsPositionX + "px",
-          top: statsPositionY + "px",
-        },
-        height,
-        target: document.body,
-        width,
-      });
-    }
-
-    $el("#game-stop").addEventListener("click", () => this.stop());
+    const stopBtn = $el("#game-stop");
+    if (stopBtn) stopBtn.addEventListener("click", () => this.stop());
   }
 
   start() {
