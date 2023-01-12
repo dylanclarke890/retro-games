@@ -1,7 +1,7 @@
 const levelOne = {
   entities: [
-    { type: "EntityPaddlePlayer", x: 24, y: 258, settings: {} },
-    { type: "EntityPaddleCpu", x: 680, y: 258, settings: {} },
+    { type: "EntityPaddleCpu", x: 47, y: 258, settings: {} },
+    { type: "EntityPaddleCpu", x: 657, y: 258, settings: {} },
     { type: "EntityBall", x: 400, y: 200, settings: {} },
   ],
 
