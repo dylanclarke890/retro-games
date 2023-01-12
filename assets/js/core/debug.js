@@ -23,6 +23,7 @@ class GameDebugger {
 
     this.#createContainers();
     this.#attachDebugMethods();
+    this.#updateActiveEntityList();
   }
 
   #createContainers() {
@@ -32,31 +33,38 @@ class GameDebugger {
     style.href = "assets/css/debug.css";
     document.body.appendChild(style);
 
+    const debugPanel = document.createElement("div");
+    debugPanel.id = "debug-panel";
+    this.DOMElements.panel = debugPanel;
+    document.body.prepend(debugPanel);
+
     const selectedEntity = document.createElement("div");
     selectedEntity.id = "debug-entity";
-    selectedEntity.innerHTML = "No Entity Selected.";
+    const heading = document.createElement("div");
+    heading.id = "debug-heading";
+    heading.innerHTML = "Selected Entity";
+    selectedEntity.append(heading);
+    selectedEntity.innerHTML += "No Entity Selected.";
     this.DOMElements.selectedEntity = selectedEntity;
-    document.body.prepend(selectedEntity);
+    debugPanel.append(selectedEntity);
 
-    // const toggleAllOptions = document.createElement("div");
-    // toggleAllOptions.id = "debug-entity-toggle-all";
-    // // TODO
-    // toggleAllOptions.innerHTML = `
-    //   <div>Collision<div>
-    // `;
-    // document.body.prepend(toggleAllOptions);
+    const activeEntityList = document.createElement("div");
+    activeEntityList.id = "debug-active-entities";
+    activeEntityList.innerHTML = `<div>No active entities.</div>`;
+    this.DOMElements.activeEntityList = activeEntityList;
+    debugPanel.append(activeEntityList);
 
     // position stats in bottom right corner.
     const width = 96;
     const height = 48;
     const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = this.system.canvas;
     const statsPositionX = offsetLeft + offsetWidth - width;
-    const statsPositionY = offsetTop + offsetHeight - height;
+    const statsPositionY = offsetTop - 55 + offsetHeight - height;
     this.stats = new Stats({
       containerElementStyles: {
         position: "absolute",
         left: statsPositionX + "px",
-        top: statsPositionY - 18 + "px",
+        top: statsPositionY + "px",
       },
       height,
       target: document.body,
@@ -174,7 +182,21 @@ class GameDebugger {
   }
 
   #injectSystemOverrides() {}
-  #injectGameOverrides() {}
+  #injectGameOverrides() {
+    const game = this.game;
+    const gameDebugger = this;
+    game.baseSpawnEntity = game.spawnEntity;
+    game.spawnEntity = function (type, x, y, settings) {
+      this.baseSpawnEntity(type, x, y, settings);
+      gameDebugger.#updateActiveEntityList();
+    };
+
+    game.baseRemoveEntity = game.removeEntity;
+    game.removeEntity = function (entity) {
+      this.baseRemoveEntity(entity);
+      gameDebugger.#updateActiveEntityList();
+    };
+  }
 
   #injectLoopOverrides() {
     const loop = this.gameLoop;
@@ -193,12 +215,47 @@ class GameDebugger {
     this.#injectLoopOverrides();
   }
 
+  #updateActiveEntityList() {
+    const entities = this.game.entities;
+    const container = $el("#debug-active-entities");
+    container.innerHTML = "";
+
+    const heading = document.createElement("div");
+    heading.id = "debug-heading";
+    heading.innerHTML = "Active Entities";
+    container.append(heading);
+    if (entities.length === 0) {
+      container.innerHTML += "No Active Entities";
+    }
+
+    const entityList = document.createElement("ul");
+    entityList.id = "debug-active-entities-list";
+
+    for (let i = 0; i < this.game.entities.length; i++) {
+      const e = this.game.entities[i];
+      const item = document.createElement("li");
+      item.classList.add("debug-active-entities-item");
+      item.innerHTML = `(#${e.id}) ${e.constructor.name}`;
+      item.addEventListener("click", () => this.setSelectedEntity(e));
+      entityList.append(item);
+    }
+    container.append(entityList);
+  }
+
   setSelectedEntity(entity) {
     console.debug("GameDebugger: Selected:", entity);
+
     this.selectedEntity = entity;
     const container = this.DOMElements.selectedEntity;
+    container.innerHTML = "";
+
+    const heading = document.createElement("div");
+    heading.id = "debug-heading";
+    heading.innerHTML = "Selected Entity";
+    container.append(heading);
+
     if (!this.selectedEntity) {
-      container.innerHTML = "No Entity Selected.";
+      container.innerHTML += "No Entity Selected.";
       return;
     }
 
@@ -212,7 +269,7 @@ class GameDebugger {
       : "";
 
     const r = Math.round;
-    container.innerHTML = `
+    container.innerHTML += `
     <table id="debug-entity-info">
       <thead>
         <tr>

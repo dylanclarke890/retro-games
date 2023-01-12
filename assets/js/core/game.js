@@ -169,7 +169,7 @@ class Game {
     if (!entityClass) throw new Error(`Can't spawn entity of type ${type}`);
     const ent = new entityClass({ x, y, game: this, settings });
     this.entities.push(ent);
-    if (ent.name) this.namedEntities[ent.name] = ent; // TODO: Register class
+    if (ent.name) this.namedEntities[ent.name] = ent;
     return ent;
   }
 
