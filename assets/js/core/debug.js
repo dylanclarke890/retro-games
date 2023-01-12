@@ -158,7 +158,7 @@ class GameDebugger {
     entityProto.baseUpdate = entityProto.update;
     entityProto.update = function () {
       this.baseUpdate();
-      gameDebugger.updateSelectedEntity();
+      gameDebugger.#updateSelectedEntity();
     };
 
     entityProto.baseCheckWith = entityProto.checkWith;
@@ -174,7 +174,7 @@ class GameDebugger {
       for (let i = 0; i < this.game.entities.length; i++) {
         const entity = this.game.entities[i];
         if (this.#isMouseWithinEntity(x, y, entity)) {
-          this.setSelectedEntity(entity);
+          this.#setSelectedEntity(entity);
           break;
         }
       }
@@ -226,6 +226,7 @@ class GameDebugger {
     container.append(heading);
     if (entities.length === 0) {
       container.innerHTML += "No Active Entities";
+      return;
     }
 
     const entityList = document.createElement("ul");
@@ -236,13 +237,13 @@ class GameDebugger {
       const item = document.createElement("li");
       item.classList.add("debug-active-entities-item");
       item.innerHTML = `(#${e.id}) ${e.constructor.name}`;
-      item.addEventListener("click", () => this.setSelectedEntity(e));
+      item.addEventListener("click", () => this.#setSelectedEntity(e));
       entityList.append(item);
     }
     container.append(entityList);
   }
 
-  setSelectedEntity(entity) {
+  #setSelectedEntity(entity) {
     console.debug("GameDebugger: Selected:", entity);
 
     this.selectedEntity = entity;
@@ -337,7 +338,7 @@ class GameDebugger {
     });
   }
 
-  updateSelectedEntity() {
+  #updateSelectedEntity() {
     if (!this.selectedEntity) return;
 
     const r = Math.round;
