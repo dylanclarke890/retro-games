@@ -1,12 +1,3 @@
-#debug-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  padding: 1rem;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
-
 .debug-heading {
   margin-bottom: 1rem;
   font-weight: bold;
@@ -25,19 +16,20 @@
   cursor: pointer;
 }
 
-#debug-entity {
+.debug-subpanel {
   background: rgb(56, 53, 53);
-  color: rgb(202, 199, 199);
   border-radius: 12px;
-  position: absolute;
-  top:0;
-  right:0;
-  width: max-content;
-  cursor: move;
+  color: rgb(202, 199, 199);
+  padding: 0.5rem 1rem 1rem 1rem;
 }
 
-#no-entity {
-  padding: 2rem;
+#debug-performance,
+#debug-entity,
+#debug-bulk-actions,
+#debug-active-entities {
+  position: absolute;
+  width: max-content;
+  cursor: move;
 }
 
 #debug-entity table {

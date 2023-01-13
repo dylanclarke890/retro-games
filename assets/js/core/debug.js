@@ -56,6 +56,7 @@ class GameDebugger {
   #newSelectedEntityContainer() {
     const selectedEntity = $new("div");
     selectedEntity.id = "debug-entity";
+    selectedEntity.classList.add("debug-subpanel");
     selectedEntity.append(this.#newHeading("Selected Entity"));
     selectedEntity.innerHTML += "<div id='no-entity'>No Entity Selected.</div>";
     this.DOMElements.selectedEntity = selectedEntity;
@@ -64,6 +65,7 @@ class GameDebugger {
 
   #newActiveEntitiesContainer() {
     const activeEntityList = $new("div");
+    activeEntityList.classList.add("debug-subpanel");
     activeEntityList.id = "debug-active-entities";
     activeEntityList.append(this.#newHeading("Active Entities"));
     activeEntityList.innerHTML = `<div>No active entities.</div>`;
@@ -74,6 +76,7 @@ class GameDebugger {
   #newBulkActionsContainer() {
     const bulkActions = $new("div");
     bulkActions.id = "debug-bulk-actions";
+    bulkActions.classList.add("debug-subpanel");
     bulkActions.append(this.#newHeading("Bulk Actions"));
 
     const { entityCollision, mapCollision, showNames, showVelocities, showHitboxes } = this.bulk;
@@ -101,6 +104,8 @@ class GameDebugger {
 
   #newStatsContainer() {
     const statsContainer = $new("div");
+    statsContainer.id = "debug-performance";
+    statsContainer.classList.add("debug-subpanel");
     statsContainer.append(this.#newHeading("Performance"));
     this.stats = new Stats({ target: statsContainer, height: 100, width: 200 });
     this.DOMElements.statsContainer = statsContainer;
@@ -121,31 +126,38 @@ class GameDebugger {
   }
 
   #addContainerEvents() {
-    const { selectedEntity } = this.DOMElements;
+    const { selectedEntity, statsContainer, bulkActions, activeEntityList } = this.DOMElements;
     selectedEntity.draggable = true;
     dragElement(selectedEntity);
+    statsContainer.draggable = true;
+    dragElement(statsContainer);
+    bulkActions.draggable = true;
+    dragElement(bulkActions);
+    activeEntityList.draggable = true;
+    dragElement(activeEntityList);
 
     const forEachEntity = (cb) => {
       for (let i = 0; i < this.game.entities.length; i++) cb(this.game.entities[i]);
     };
+
     $el("#debug-bulk-collision-on").parentElement.addEventListener("click", () => {
       this.bulk.entityCollision = !this.bulk.entityCollision;
-      console.log(this.game.entities.length);
-      forEachEntity((e) => {
-        e._debugCollisionWithEntity = this.bulk.entityCollision;
-      });
+      forEachEntity((e) => (e._debugCollisionWithEntity = this.bulk.entityCollision));
       this.#updateBulkActionsDisplay();
     });
+
     $el("#debug-bulk-show-path").parentElement.addEventListener("click", () => {
       this.bulk.showVelocities = !this.bulk.showVelocities;
       forEachEntity((e) => (e._debugShowVelocity = this.bulk.showVelocities));
       this.#updateBulkActionsDisplay();
     });
+
     $el("#debug-bulk-show-hitbox").parentElement.addEventListener("click", () => {
       this.bulk.showHitboxes = !this.bulk.showHitboxes;
       forEachEntity((e) => (e._debugShowHitbox = this.bulk.showHitboxes));
       this.#updateBulkActionsDisplay();
     });
+
     $el("#debug-bulk-show-name").parentElement.addEventListener("click", () => {
       this.bulk.showNames = !this.bulk.showNames;
       forEachEntity((e) => (e._debugShowName = this.bulk.showNames));
