@@ -30,6 +30,7 @@ class GameDebugger {
     this.system = system;
 
     this.#createContainers();
+    this.#addContainerEvents();
     this.#attachDebugMethods();
     this.#updateActiveEntityList();
   }
@@ -56,7 +57,7 @@ class GameDebugger {
     const selectedEntity = $new("div");
     selectedEntity.id = "debug-entity";
     selectedEntity.append(this.#newHeading("Selected Entity"));
-    selectedEntity.innerHTML += "<div>No Entity Selected.</div>";
+    selectedEntity.innerHTML += "<div id='no-entity'>No Entity Selected.</div>";
     this.DOMElements.selectedEntity = selectedEntity;
     return selectedEntity;
   }
@@ -76,24 +77,25 @@ class GameDebugger {
     bulkActions.append(this.#newHeading("Bulk Actions"));
 
     const { entityCollision, mapCollision, showNames, showVelocities, showHitboxes } = this.bulk;
-    const row = (name, val) => `
-      <tr>
+    const row = (name, val, idSuffix) => `
+      <tr class="toggle">
         <td>${name}</td>
-        <td>${boolToOnOff(val)}</td>
+        <td id="debug-bulk-${idSuffix}">${boolToOnOff(val)}</td>
       </tr>
     `;
     bulkActions.innerHTML += `
     <table>
       <tbody>
-        ${row("Entity Collision", entityCollision)}
-        ${row("Map Collision", mapCollision)}
-        ${row("Show Velocities", showVelocities)}
-        ${row("Show Names", showNames)}
-        ${row("Show Hitboxes", showHitboxes)}
+        ${row("Entity Collision", entityCollision, "collision-on")}
+        ${row("Map Collision", mapCollision, "map-collision")}
+        ${row("Show Velocities", showVelocities, "show-path")}
+        ${row("Show Names", showNames, "show-name")}
+        ${row("Show Hitboxes", showHitboxes, "show-hitbox")}
       </tbody>
     </table>
     `;
 
+    this.DOMElements.bulkActions = bulkActions;
     return bulkActions;
   }
 
@@ -101,6 +103,7 @@ class GameDebugger {
     const statsContainer = $new("div");
     statsContainer.append(this.#newHeading("Performance"));
     this.stats = new Stats({ target: statsContainer, height: 100, width: 200 });
+    this.DOMElements.statsContainer = statsContainer;
     return statsContainer;
   }
 
@@ -110,11 +113,44 @@ class GameDebugger {
     const debugPanel = $new("div");
     debugPanel.id = "debug-panel";
     this.DOMElements.panel = debugPanel;
+    debugPanel.append(this.#newStatsContainer());
+    debugPanel.append(this.#newBulkActionsContainer());
     debugPanel.append(this.#newSelectedEntityContainer());
     debugPanel.append(this.#newActiveEntitiesContainer());
-    debugPanel.append(this.#newBulkActionsContainer());
-    debugPanel.append(this.#newStatsContainer());
     document.body.prepend(debugPanel);
+  }
+
+  #addContainerEvents() {
+    const { selectedEntity } = this.DOMElements;
+    selectedEntity.draggable = true;
+    dragElement(selectedEntity);
+
+    const forEachEntity = (cb) => {
+      for (let i = 0; i < this.game.entities.length; i++) cb(this.game.entities[i]);
+    };
+    $el("#debug-bulk-collision-on").parentElement.addEventListener("click", () => {
+      this.bulk.entityCollision = !this.bulk.entityCollision;
+      console.log(this.game.entities.length);
+      forEachEntity((e) => {
+        e._debugCollisionWithEntity = this.bulk.entityCollision;
+      });
+      this.#updateBulkActionsDisplay();
+    });
+    $el("#debug-bulk-show-path").parentElement.addEventListener("click", () => {
+      this.bulk.showVelocities = !this.bulk.showVelocities;
+      forEachEntity((e) => (e._debugShowVelocity = this.bulk.showVelocities));
+      this.#updateBulkActionsDisplay();
+    });
+    $el("#debug-bulk-show-hitbox").parentElement.addEventListener("click", () => {
+      this.bulk.showHitboxes = !this.bulk.showHitboxes;
+      forEachEntity((e) => (e._debugShowHitbox = this.bulk.showHitboxes));
+      this.#updateBulkActionsDisplay();
+    });
+    $el("#debug-bulk-show-name").parentElement.addEventListener("click", () => {
+      this.bulk.showNames = !this.bulk.showNames;
+      forEachEntity((e) => (e._debugShowName = this.bulk.showNames));
+      this.#updateBulkActionsDisplay();
+    });
   }
 
   //#endregion Containers
@@ -128,7 +164,7 @@ class GameDebugger {
       velocities: "#0f0",
       boxes: "#f00",
     };
-    entityProto._debugCollisionEnabled = true;
+    entityProto._debugCollisionWithEntity = true;
     entityProto._debugShowHitbox = true;
     entityProto._debugShowVelocity = true;
     entityProto._debugShowName = true;
@@ -210,7 +246,7 @@ class GameDebugger {
 
     entityProto.baseCheckWith = entityProto.checkWith;
     entityProto.checkWith = function (other) {
-      if (!this._debugCollisionEnabled || !other._debugCollisionEnabled) return;
+      if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
       this.baseCheckWith(other);
     };
 
@@ -295,22 +331,14 @@ class GameDebugger {
     container.append(this.#newHeading("Selected Entity"));
 
     if (!this.selectedEntity) {
-      container.innerHTML += "No Entity Selected.";
+      container.innerHTML += "<div id='no-entity'>No Entity Selected.</div>";
       return;
     }
 
-    const nameOption = entity.name
-      ? `
-    <tr class="toggle">
-      <td>Show name</td>
-      <td id="debug-entity-show-name">${entity._debugShowName}</td>
-    <tr>
-    `
-      : "";
-
     const r = Math.round;
-    container.innerHTML += `
-    <table id="debug-entity-info">
+    const entityTable = $new("table");
+    entityTable.id = "debug-entity-info";
+    entityTable.innerHTML = `
       <thead>
         <tr>
           <th>${entity.constructor.name}</th>
@@ -342,28 +370,33 @@ class GameDebugger {
             <span>y: ${r(entity.vel.y)}</span>
           </td>
         </tr>
-        <tr>
-          <td style="text-align:center;">Options</td>
-        </tr>
-        <tr class="toggle">
-          <td>Collision Enabled</td>
-          <td id="debug-entity-collision-on">${entity._debugCollisionEnabled}</td>
-        </tr>
-        <tr class="toggle">
-          <td>Show Velocity</td>
-          <td id="debug-entity-show-path">${entity._debugShowVelocity}</td>
-        </tr>
-        <tr class="toggle">
-          <td>Show Hitbox</td>
-          <td id="debug-entity-show-hitbox">${entity._debugShowHitbox}</td>
-        </tr>
-        ${nameOption}
       </tbody>
-    </table>
+    `;
+    container.append(entityTable);
+
+    const entityOption = (name, val, idSuffix) => `
+    <div class="toggle">
+      <span>${name}</span>
+      <span id="debug-entity-${idSuffix}">${boolToOnOff(val)}</span>
+    </div>
+    `;
+    const { _debugShowVelocity, _debugShowHitbox, _debugShowName, _debugCollisionWithEntity } =
+      entity;
+    const nameOption = entity.name ? entityOption("Show Name", _debugShowName, "show-name") : "";
+
+    const debugOptions = $new("div");
+    debugOptions.id = "debug-entity-options";
+    debugOptions.innerHTML = `
+      ${entityOption("Entity Collision", _debugCollisionWithEntity, "collision-on")}
+      ${entityOption("Show Velocity", _debugShowVelocity, "show-path")}
+      ${entityOption("Show Hitbox", _debugShowHitbox, "show-hitbox")}
+      ${nameOption}
     `;
 
+    container.append(debugOptions);
+
     $el("#debug-entity-collision-on").parentElement.addEventListener("click", () => {
-      entity._debugCollisionEnabled = !entity._debugCollisionEnabled;
+      entity._debugCollisionWithEntity = !entity._debugCollisionWithEntity;
     });
     $el("#debug-entity-show-path").parentElement.addEventListener("click", () => {
       entity._debugShowVelocity = !entity._debugShowVelocity;
@@ -387,11 +420,20 @@ class GameDebugger {
     $el("#debug-entity-speed").innerHTML = `<span>x: ${r(entity.vel.x)}</span>
       <span>y: ${r(entity.vel.y)}</span>`;
 
-    $el("#debug-entity-collision-on").innerHTML = `${entity._debugCollisionEnabled}`;
-    $el("#debug-entity-show-path").innerHTML = `${entity._debugShowVelocity}`;
-    $el("#debug-entity-show-hitbox").innerHTML = `${entity._debugShowHitbox}`;
+    $el("#debug-entity-collision-on").textContent = `${boolToOnOff(
+      entity._debugCollisionWithEntity
+    )}`;
+    $el("#debug-entity-show-path").textContent = `${boolToOnOff(entity._debugShowVelocity)}`;
+    $el("#debug-entity-show-hitbox").textContent = `${boolToOnOff(entity._debugShowHitbox)}`;
     if (!entity.name) return;
-    $el("#debug-entity-show-name").innerHTML = `${entity._debugShowName}`;
+    $el("#debug-entity-show-name").textContent = `${boolToOnOff(entity._debugShowName)}`;
+  }
+
+  #updateBulkActionsDisplay() {
+    $el("#debug-bulk-collision-on").textContent = boolToOnOff(this.bulk.entityCollision);
+    $el("#debug-bulk-show-path").textContent = boolToOnOff(this.bulk.showVelocities);
+    $el("#debug-bulk-show-hitbox").textContent = boolToOnOff(this.bulk.showHitboxes);
+    $el("#debug-bulk-show-name").textContent = boolToOnOff(this.bulk.showNames);
   }
 
   #isMouseWithinEntity(x, y, entity) {

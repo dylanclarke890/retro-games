@@ -3,15 +3,14 @@
   top: 0;
   left: 0;
   padding: 1rem;
-}
-
-#debug-panel div:not(:first-child) {
-  margin-top: 1rem;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .debug-heading {
   margin-bottom: 1rem;
   font-weight: bold;
+  text-align: center;
 }
 
 #debug-active-entities-list {
@@ -26,6 +25,21 @@
   cursor: pointer;
 }
 
+#debug-entity {
+  background: rgb(56, 53, 53);
+  color: rgb(202, 199, 199);
+  border-radius: 12px;
+  position: absolute;
+  top:0;
+  right:0;
+  width: max-content;
+  cursor: move;
+}
+
+#no-entity {
+  padding: 2rem;
+}
+
 #debug-entity table {
   border-spacing: 10px 5px;
 }
@@ -38,4 +52,12 @@
 
 .toggle {
   cursor: pointer;
+}
+
+#debug-entity-options {
+  padding: 0;
+  margin: 0 0.7rem 0.7rem 0.7rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
 }
