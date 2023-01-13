@@ -16,7 +16,7 @@ class System {
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
-    this.canvas = $el("#" + canvasId) ?? document.createElement("canvas");
+    this.canvas = $el("#" + canvasId) ?? $new("canvas");
     this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");
@@ -77,7 +77,7 @@ class System {
 
   /** Normalizes getImageData to extract the real, actual pixels from an image. */
   getImagePixels(image, x, y, width, height) {
-    const canvas = document.createElement("canvas");
+    const canvas = $new("canvas");
     canvas.width = image.width;
     canvas.height = image.height;
     const ctx = canvas.getContext("2d");

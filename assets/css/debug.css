@@ -6,10 +6,10 @@
 }
 
 #debug-panel div:not(:first-child) {
-  margin-top: 3rem;
+  margin-top: 1rem;
 }
 
-#debug-heading {
+.debug-heading {
   margin-bottom: 1rem;
   font-weight: bold;
 }

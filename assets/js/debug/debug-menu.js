@@ -184,7 +184,7 @@ class DebugSystem {
   }
 
   #injectStylesheet() {
-    const style = document.createElement("link");
+    const style = $new("link");
     style.rel = "stylesheet";
     style.type = "text/css";
     style.href = "assets/js/debug/debug.css"; // TODO
@@ -193,19 +193,19 @@ class DebugSystem {
 
   #createContainers() {
     // Create the Debug Container
-    this.container = document.createElement("div");
+    this.container = $new("div");
     this.container.className = "debug";
     document.body.appendChild(this.container);
 
     // Create and add the Menu Container
-    this.panelMenu = document.createElement("div");
+    this.panelMenu = $new("div");
     this.panelMenu.innerHTML = '<div class="debug-head">Debug:</div>';
     this.panelMenu.className = "debug-panel-menu";
 
     this.container.appendChild(this.panelMenu);
 
     // Create and add the Stats Container
-    this.numberContainer = document.createElement("div");
+    this.numberContainer = $new("div");
     this.numberContainer.className = "debug-stats";
     this.panelMenu.appendChild(this.numberContainer);
   }
@@ -229,7 +229,7 @@ class DebugSystem {
     this.container.appendChild(panel.container);
 
     // Create the menu item
-    const menuItem = document.createElement("div");
+    const menuItem = $new("div");
     menuItem.className = "debug-menu-item";
     menuItem.textContent = panel.label;
     menuItem.addEventListener("click", () => this.togglePanel(panel), false);
@@ -267,7 +267,7 @@ class DebugSystem {
   }
 
   addNumber(name) {
-    const numberSpan = document.createElement("span");
+    const numberSpan = $new("span");
     this.numberContainer.appendChild(numberSpan);
     this.numberContainer.appendChild(document.createTextNode(name));
     this.numbers[name] = numberSpan;
@@ -321,12 +321,12 @@ class DebugOption {
     this.property = property;
     this.active = this.object[this.property];
 
-    this.container = document.createElement("div");
+    this.container = $new("div");
     this.container.className = "debug-option";
-    this.label = document.createElement("span");
+    this.label = $new("span");
     this.label.className = "debug-label";
     this.label.textContent = this.name;
-    this.mark = document.createElement("span");
+    this.mark = $new("span");
     this.mark.className = "debug-label-mark";
 
     this.container.appendChild(this.mark);

@@ -12,7 +12,7 @@ class DebugPanel {
     this.system = system;
     this.name = name;
     this.label = label;
-    this.container = document.createElement("div");
+    this.container = $new("div");
     this.container.className = `debug-panel ${this.name}`;
   }
 
@@ -62,7 +62,7 @@ class MapsDebugPanel extends DebugPanel {
     for (let i = 0; i < this.maps.length; i++) {
       const map = this.maps[i];
       const subPanel = new DebugPanel({ name: i, label: `Layer ${i}`, system: this.system });
-      const head = document.createElement("strong");
+      const head = $new("strong");
 
       head.textContent = `${i}: ${map.tiles.path}`;
       subPanel.container.appendChild(head);
@@ -79,7 +79,7 @@ class MapsDebugPanel extends DebugPanel {
     const scale = this.system.scale; // we'll need this a lot
 
     // resize the tileset, so that one tile is 'scale' pixels wide and high
-    const tsC = document.createElement("canvas");
+    const tsC = $new("canvas");
     const tsCtx = tsC.getContext("2d");
 
     const w = map.tiles.width * scale;
@@ -91,7 +91,7 @@ class MapsDebugPanel extends DebugPanel {
     tsCtx.drawImage(map.tiles.data, 0, 0, w, h, 0, 0, ws, hs);
 
     // create the minimap canvas
-    const mapCanvas = document.createElement("canvas");
+    const mapCanvas = $new("canvas");
     mapCanvas.width = map.width * scale;
     mapCanvas.height = map.height * scale;
     const ctx = mapCanvas.getContext("2d");
@@ -121,12 +121,12 @@ class MapsDebugPanel extends DebugPanel {
       }
     }
 
-    const mapContainer = document.createElement("div");
+    const mapContainer = $new("div");
     mapContainer.className = "debug-map-container";
     mapContainer.style.width = map.width * scale + "px";
     mapContainer.style.height = map.height * scale + "px";
 
-    const mapScreen = document.createElement("div");
+    const mapScreen = $new("div");
     mapScreen.className = "debug-map-screen";
     mapScreen.style.width = (this.system.width / map.tilesize) * scale - 2 + "px";
     mapScreen.style.height = (this.system.height / map.tilesize) * scale - 2 + "px";
@@ -174,7 +174,7 @@ class GraphDebugPanel extends DebugPanel {
     this.mark33ms = (this.height - (this.height / this.ms) * 33).round();
     this.msHeight = this.height / this.ms;
 
-    this.graph = document.createElement("canvas");
+    this.graph = $new("canvas");
     this.graph.width = window.innerWidth;
     this.graph.height = this.height;
     this.container.appendChild(this.graph);
@@ -194,7 +194,7 @@ class GraphDebugPanel extends DebugPanel {
   }
 
   addGraphMark(name, height) {
-    const span = document.createElement("span");
+    const span = $new("span");
     span.className = "debug-graph-mark";
     span.textContent = name;
     span.style.top = height.round() + "px";
@@ -202,15 +202,15 @@ class GraphDebugPanel extends DebugPanel {
   }
 
   addClock(name, description, color) {
-    const mark = document.createElement("span");
+    const mark = $new("span");
     mark.className = "debug-legend-color";
     mark.style.backgroundColor = color;
 
-    const number = document.createElement("span");
+    const number = $new("span");
     number.className = "debug-legend-number";
     number.appendChild(document.createTextNode("0"));
 
-    const legend = document.createElement("span");
+    const legend = $new("span");
     legend.className = "debug-legend";
     legend.appendChild(mark);
     legend.appendChild(document.createTextNode(description + " ("));

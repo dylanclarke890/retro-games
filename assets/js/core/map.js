@@ -110,7 +110,7 @@ class BackgroundMap extends GameMap {
     const tx = Math.floor((cx * this.chunkSize) / this.tilesize / this.system.scale),
       ty = Math.floor((cy * this.chunkSize) / this.tilesize / this.system.scale);
 
-    const chunk = document.createElement("canvas");
+    const chunk = $new("canvas");
     chunk.width = w;
     chunk.height = h;
 

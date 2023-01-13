@@ -53,7 +53,7 @@ class Stats {
   }
 
   #setup() {
-    const parent = document.createElement("div");
+    const parent = $new("div");
     this.#assignStyles(parent, {
       cursor: "pointer",
       fontFamily: "Helvetica, Arial, sans-serif",
@@ -122,7 +122,7 @@ class Stats {
   }
 
   #panelContainer(panelType, display, target) {
-    const div = document.createElement("div");
+    const div = $new("div");
     const { r, g, b } = Stats.colorSchemes[panelType].bg;
     this.#assignStyles(div, {
       backgroundColor: `rgb(${Math.floor(r / 2)},${Math.floor(g / 2)},${Math.floor(b / 2)})`,
@@ -136,7 +136,7 @@ class Stats {
   }
 
   #panelText(panelType, target) {
-    const div = document.createElement("div");
+    const div = $new("div");
     const { r, g, b } = Stats.colorSchemes[panelType].fg;
     div.innerHTML = `<strong>${panelType.toUpperCase()}</strong>`;
     this.#assignStyles(div, {
@@ -148,7 +148,7 @@ class Stats {
   }
 
   #panelCanvas({ r, g, b }, target) {
-    const canv = document.createElement("canvas");
+    const canv = $new("canvas");
     canv.width = this.#panelWidth;
     canv.height = this.#panelHeight;
     this.#assignStyles(canv, { display: "block", marginLeft: "3px" });

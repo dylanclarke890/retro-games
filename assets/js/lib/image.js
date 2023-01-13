@@ -49,7 +49,7 @@ class GameImage {
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
 
-    const scaled = document.createElement("canvas");
+    const scaled = $new("canvas");
     scaled.width = widthScaled;
     scaled.height = heightScaled;
     const scaledCtx = scaled.getContext("2d");

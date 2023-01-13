@@ -31,8 +31,22 @@ Number.prototype.toDeg = function () {
   return (this * 180) / Math.PI;
 };
 
+/**
+ * @returns {HTMLElement}
+ */
 function $el(selector) {
   return document.querySelector(selector);
+}
+
+/**
+ * @returns {HTMLElement}
+ */
+function $new(tagname, opts = null) {
+  return document.createElement(tagname, opts);
+}
+
+function boolToOnOff(bool) {
+  return bool ? "On" : "Off";
 }
 
 Object.defineProperty(Array.prototype, "erase", {
@@ -119,6 +133,4 @@ class NativeExtensions {
   static #chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   static uniqueId = () =>
     Array.from({ length: 10 }, () => this.#chars[Math.floor(Math.random() * 52)]).join("");
-
-  overwriteMethod = (classDef, methodName) => {};
 }
