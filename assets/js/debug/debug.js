@@ -105,7 +105,7 @@ class GameDebugger {
     statsContainer.id = "debug-performance";
     statsContainer.classList.add("debug-subpanel");
     statsContainer.append(this.#newHeading("Performance"));
-    this.stats = new Stats({ target: statsContainer, height: 100, width: 200 });
+    this.stats = new PerformanceStats({ target: statsContainer, height: 100, width: 200 });
     this.DOMElements.statsContainer = statsContainer;
     return statsContainer;
   }

@@ -13,7 +13,7 @@ class Color {
   }
 }
 
-class Stats {
+class PerformanceStats {
   static colorSchemes = {
     fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
     ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),
@@ -123,7 +123,7 @@ class Stats {
 
   #panelContainer(panelType, display, target) {
     const div = $new("div");
-    const { r, g, b } = Stats.colorSchemes[panelType].bg;
+    const { r, g, b } = PerformanceStats.colorSchemes[panelType].bg;
     this.#assignStyles(div, {
       backgroundColor: `rgb(${Math.floor(r / 2)},${Math.floor(g / 2)},${Math.floor(b / 2)})`,
       boxSizing: "border-box",
@@ -137,7 +137,7 @@ class Stats {
 
   #panelText(panelType, target) {
     const div = $new("div");
-    const { r, g, b } = Stats.colorSchemes[panelType].fg;
+    const { r, g, b } = PerformanceStats.colorSchemes[panelType].fg;
     div.innerHTML = `<strong>${panelType.toUpperCase()}</strong>`;
     this.#assignStyles(div, {
       color: `rgb(${r},${g},${b})`,
@@ -168,7 +168,7 @@ class Stats {
     this.#DOMElements[name] = {};
     this.#DOMElements[name].div = div;
     this.#DOMElements[name].text = this.#panelText(name, div);
-    const [ctx, data] = this.#panelCanvas(Stats.colorSchemes[name].bg, div);
+    const [ctx, data] = this.#panelCanvas(PerformanceStats.colorSchemes[name].bg, div);
     this.#DOMElements[name].ctx = ctx;
     this.#DOMElements[name].data = data;
   }
@@ -219,7 +219,7 @@ class Stats {
     this.#drawPanelData(
       ms.data.data,
       Math.min(30, 30 - (msValue / 200) * 30),
-      Stats.colorSchemes.ms
+      PerformanceStats.colorSchemes.ms
     );
     ms.text.innerHTML = `<strong>${msValue} MS</strong>(${this.minMs}-${this.maxMs})`;
     ms.ctx.putImageData(ms.data, 0, 0);
@@ -233,7 +233,7 @@ class Stats {
     this.#drawPanelData(
       fps.data.data,
       Math.min(30, 30 - (fpsValue / 100) * 30),
-      Stats.colorSchemes.fps
+      PerformanceStats.colorSchemes.fps
     );
     fps.text.innerHTML = `<strong>${fpsValue} FPS</strong> (${this.minFps}-${this.maxFps})`;
     fps.ctx.putImageData(fps.data, 0, 0);
@@ -246,7 +246,11 @@ class Stats {
     const memValue = Math.round(performance.memory.usedJSHeapSize * 9.54e-7);
     this.minMem = Math.min(this.minMem, memValue);
     this.maxMem = Math.max(this.maxMem, memValue);
-    this.#drawPanelData(mem.data.data, Math.min(30, 30 - memValue / 2), Stats.colorSchemes.mem);
+    this.#drawPanelData(
+      mem.data.data,
+      Math.min(30, 30 - memValue / 2),
+      PerformanceStats.colorSchemes.mem
+    );
     mem.text.innerHTML = `<strong>${memValue} MEM</strong> (${this.minMem}-${this.maxMem})`;
     mem.ctx.putImageData(mem.data, 0, 0);
   }
