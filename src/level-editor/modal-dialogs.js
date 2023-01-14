@@ -1,106 +1,101 @@
-ig.module("weltmeister.modal-dialogs")
-  .requires("weltmeister.select-file-dropdown")
-  .defines(function () {
-    "use strict";
+class ModalDialog {
+  onOk = null;
+  onCancel = null;
 
-    wm.ModalDialog = ig.Class.extend({
-      onOk: null,
-      onCancel: null,
+  text = "";
+  okText = "";
+  cancelText = "";
 
-      text: "",
-      okText: "",
-      cancelText: "",
+  /** @type {HTMLDivElement} */
+  background = null;
+  /** @type {HTMLDivElement} */
+  dialogBox = null;
+  /** @type {HTMLDivElement} */
+  buttonDiv = null;
 
-      background: null,
-      dialogBox: null,
-      buttonDiv: null,
+  constructor(text, okText, cancelText) {
+    this.text = text;
+    this.okText = okText || "OK";
+    this.cancelText = cancelText || "Cancel";
+    this.background = $new("div");
+    this.background.classList.add("modalDialogBackground");
+    this.dialogBox = $new("div");
+    this.dialogBox.classList.add("modalDialogBox");
+    this.background.append(this.dialogBox);
+    document.body.append(this.background);
+    this.initDialog();
+  }
 
-      init: function (text, okText, cancelText) {
-        this.text = text;
-        this.okText = okText || "OK";
-        this.cancelText = cancelText || "Cancel";
+  initDialog() {
+    this.buttonDiv = $new("div");
+    this.buttonDiv.classList.add("modalDialogButtons");
 
-        this.background = $("<div/>", { class: "modalDialogBackground" });
-        this.dialogBox = $("<div/>", { class: "modalDialogBox" });
-        this.background.append(this.dialogBox);
-        $("body").append(this.background);
+    const okButton = $new("button");
+    okButton.classList.add("button");
+    okButton.textContent = this.okText;
+    const cancelButton = $new("button");
+    cancelButton.classList.add("button");
+    cancelButton.textContent = this.cancelText;
 
-        this.initDialog();
-      },
+    okButton.addEventListener("click", () => this.clickOk());
+    this.buttonDiv.append(okButton);
+    cancelButton.addEventListener("click", () => this.clickCancel());
+    this.buttonDiv.append(cancelButton);
 
-      initDialog: function () {
-        this.buttonDiv = $("<div/>", { class: "modalDialogButtons" });
-        var okButton = $("<input/>", { type: "button", class: "button", value: this.okText });
-        var cancelButton = $("<input/>", {
-          type: "button",
-          class: "button",
-          value: this.cancelText,
-        });
+    this.dialogBox.innerHTML = '<div class="modalDialogText">' + this.text + "</div>";
+    this.dialogBox.append(this.buttonDiv);
+  }
 
-        okButton.bind("click", this.clickOk.bind(this));
-        cancelButton.bind("click", this.clickCancel.bind(this));
+  clickOk() {
+    if (this.onOk) this.onOk(this);
+    this.close();
+  }
 
-        this.buttonDiv.append(okButton).append(cancelButton);
+  clickCancel() {
+    if (this.onCancel) this.onCancel(this);
+    this.close();
+  }
 
-        this.dialogBox.html('<div class="modalDialogText">' + this.text + "</div>");
-        this.dialogBox.append(this.buttonDiv);
-      },
+  open() {
+    // TODO
+    this.background.fadeIn(100);
+  }
 
-      clickOk: function () {
-        if (this.onOk) {
-          this.onOk(this);
-        }
-        this.close();
-      },
+  close() {
+    // TODO
+    this.background.fadeOut(100);
+  }
+}
 
-      clickCancel: function () {
-        if (this.onCancel) {
-          this.onCancel(this);
-        }
-        this.close();
-      },
+class ModalDialogPathSelect extends ModalDialog {
+  pathDropdown = null;
+  pathInput = null;
+  fileType = "";
 
-      open: function () {
-        this.background.fadeIn(100);
-      },
+  constructor(text, okText, type) {
+    this.fileType = type || "";
+    this.parent(text, okText || "Select");
+  }
 
-      close: function () {
-        this.background.fadeOut(100);
-      },
-    });
+  setPath(path) {
+    const dir = path.replace(/\/[^\/]*$/, "");
+    this.pathInput.val(path);
+    this.pathDropdown.loadDir(dir);
+  }
 
-    wm.ModalDialogPathSelect = wm.ModalDialog.extend({
-      pathDropdown: null,
-      pathInput: null,
-      fileType: "",
+  initDialog() {
+    this.parent();
+    this.pathInput = $("<input/>", { type: "text", class: "modalDialogPath" });
+    this.buttonDiv.before(this.pathInput);
+    this.pathDropdown = new wm.SelectFileDropdown(
+      this.pathInput,
+      wm.config.api.browse,
+      this.fileType
+    );
+  }
 
-      init: function (text, okText, type) {
-        this.fileType = type || "";
-        this.parent(text, okText || "Select");
-      },
-
-      setPath: function (path) {
-        var dir = path.replace(/\/[^\/]*$/, "");
-        this.pathInput.val(path);
-        this.pathDropdown.loadDir(dir);
-      },
-
-      initDialog: function () {
-        this.parent();
-        this.pathInput = $("<input/>", { type: "text", class: "modalDialogPath" });
-        this.buttonDiv.before(this.pathInput);
-        this.pathDropdown = new wm.SelectFileDropdown(
-          this.pathInput,
-          wm.config.api.browse,
-          this.fileType
-        );
-      },
-
-      clickOk: function () {
-        if (this.onOk) {
-          this.onOk(this, this.pathInput.val());
-        }
-        this.close();
-      },
-    });
-  });
+  clickOk() {
+    if (this.onOk) this.onOk(this, this.pathInput.val());
+    this.close();
+  }
+}
