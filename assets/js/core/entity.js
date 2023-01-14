@@ -131,37 +131,40 @@ class Entity {
 
   handleMovementTrace(res) {
     this.standing = false;
-
-    if (res.collision.y) {
-      if (this.bounciness > 0 && Math.abs(this.vel.y) > this.minBounceVelocity)
-        this.vel.y *= -this.bounciness;
-      else {
-        if (this.vel.y > 0) this.standing = true;
-        this.vel.y = 0;
-      }
-    }
-    if (res.collision.x) {
-      if (this.bounciness > 0 && Math.abs(this.vel.x) > this.minBounceVelocity)
-        this.vel.x *= -this.bounciness;
-      else this.vel.x = 0;
-    }
-    if (res.collision.slope) {
-      const slope = res.collision.slope;
-      if (this.bounciness > 0) {
-        const proj = this.vel.x * slope.nx + this.vel.y * slope.ny;
-        this.vel.x = (this.vel.x - slope.nx * proj * 2) * this.bounciness;
-        this.vel.y = (this.vel.y - slope.ny * proj * 2) * this.bounciness;
-      } else {
-        const lengthSquared = slope.x * slope.x + slope.y * slope.y;
-        const dot = (this.vel.x * slope.x + this.vel.y * slope.y) / lengthSquared;
-        this.vel.x = slope.x * dot;
-        this.vel.y = slope.y * dot;
-        const angle = Math.atan2(slope.x, slope.y);
-        if (angle > this.slopeStanding.min && angle < this.slopeStanding.max) this.standing = true;
-      }
-    }
-
+    if (res.collision.y) this.handleMapCollisionOnYAxis();
+    if (res.collision.x) this.handleMapCollisionOnYAxis();
+    if (res.collision.slope) this.handleMapCollisionOnSlope(res.collision.slope);
     this.pos = res.pos;
+  }
+
+  handleMapCollisionOnYAxis() {
+    if (this.bounciness > 0 && Math.abs(this.vel.y) > this.minBounceVelocity)
+      this.vel.y *= -this.bounciness;
+    else {
+      if (this.vel.y > 0) this.standing = true;
+      this.vel.y = 0;
+    }
+  }
+
+  handleMapCollisionOnXAxis() {
+    if (this.bounciness > 0 && Math.abs(this.vel.x) > this.minBounceVelocity)
+      this.vel.x *= -this.bounciness;
+    else this.vel.x = 0;
+  }
+
+  handleMapCollisionOnSlope(slope) {
+    if (this.bounciness > 0) {
+      const proj = this.vel.x * slope.nx + this.vel.y * slope.ny;
+      this.vel.x = (this.vel.x - slope.nx * proj * 2) * this.bounciness;
+      this.vel.y = (this.vel.y - slope.ny * proj * 2) * this.bounciness;
+    } else {
+      const lengthSquared = slope.x * slope.x + slope.y * slope.y;
+      const dot = (this.vel.x * slope.x + this.vel.y * slope.y) / lengthSquared;
+      this.vel.x = slope.x * dot;
+      this.vel.y = slope.y * dot;
+      const angle = Math.atan2(slope.x, slope.y);
+      if (angle > this.slopeStanding.min && angle < this.slopeStanding.max) this.standing = true;
+    }
   }
 
   draw() {

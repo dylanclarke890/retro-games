@@ -13,7 +13,8 @@ class GameDebugger {
 
   bulk = {
     entityCollision: true,
-    mapCollision: true,
+    mapCollisionX: true,
+    mapCollisionY: true,
     showNames: true,
     showVelocities: true,
     showHitboxes: true,
@@ -79,7 +80,14 @@ class GameDebugger {
     bulkActions.classList.add("debug-subpanel");
     bulkActions.append(this.#newHeading("Bulk Actions"));
 
-    const { entityCollision, mapCollision, showNames, showVelocities, showHitboxes } = this.bulk;
+    const {
+      entityCollision,
+      mapCollisionX,
+      mapCollisionY,
+      showNames,
+      showVelocities,
+      showHitboxes,
+    } = this.bulk;
     const row = (name, val, idSuffix) => `
       <tr class="toggle">
         <td>${name}</td>
@@ -89,11 +97,12 @@ class GameDebugger {
     bulkActions.innerHTML += `
     <table>
       <tbody>
-        ${row("Entity Collision", entityCollision, "collision-on")}
-        ${row("Map Collision", mapCollision, "map-collision")}
-        ${row("Show Velocities", showVelocities, "show-path")}
         ${row("Show Names", showNames, "show-name")}
         ${row("Show Hitboxes", showHitboxes, "show-hitbox")}
+        ${row("Show Velocities", showVelocities, "show-path")}
+        ${row("Entity Collision", entityCollision, "collision-on")}
+        ${row("Map Collision X", mapCollisionX, "map-collision-x")}
+        ${row("Map Collision Y", mapCollisionY, "map-collision-y")}
       </tbody>
     </table>
     `;
@@ -122,6 +131,10 @@ class GameDebugger {
     debugPanel.append(this.#newBulkActionsContainer());
     debugPanel.append(this.#newSelectedEntityContainer());
     debugPanel.append(this.#newActiveEntitiesContainer());
+    /*active - left 12 top 20
+    bulk - left 197 top 5
+    performance - left 7 top 185
+    selected - left 67 top 352 */
     document.body.prepend(debugPanel);
   }
 
@@ -176,10 +189,12 @@ class GameDebugger {
       velocities: "#0f0",
       boxes: "#f00",
     };
-    entityProto._debugCollisionWithEntity = true;
     entityProto._debugShowHitbox = true;
     entityProto._debugShowVelocity = true;
     entityProto._debugShowName = true;
+    entityProto._debugCollisionWithEntity = true;
+    entityProto._debugCollisionWithMapOnX = true;
+    entityProto._debugCollisionWithMapOnY = false;
 
     // Entity Debug methods
     entityProto._debugDrawLine = function (color, sx, sy, dx, dy) {
@@ -260,6 +275,19 @@ class GameDebugger {
     entityProto.checkWith = function (other) {
       if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
       this.baseCheckWith(other);
+    };
+
+    // Map collision Y
+    entityProto.baseHandleMapCollisionOnYAxis = entityProto.handleMapCollisionOnYAxis;
+    entityProto.handleMapCollisionOnYAxis = function () {
+      if (!this._debugCollisionWithMapOnY) return;
+      this.baseHandleMapCollisionOnYAxis();
+    };
+    // Map collision X
+    entityProto.baseHandleMapCollisionOnXAxis = entityProto.handleMapCollisionOnXAxis;
+    entityProto.handleMapCollisionOnXAxis = function () {
+      if (!this._debugCollisionWithMapOnX) return;
+      this.baseHandleMapCollisionOnXAxis();
     };
 
     const canvas = this.system.canvas;
