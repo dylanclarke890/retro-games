@@ -1,6 +1,3 @@
-var wm = {};
-wm.entityFiles = [];
-
 class LevelEditor {
   mode = null;
   MODE = {
@@ -358,15 +355,15 @@ class LevelEditor {
     data.entities = this.entities.getSaveData();
     data.layer = [];
 
-    var resources = [];
-    for (var i = 0; i < this.layers.length; i++) {
-      var layer = this.layers[i];
+    const resources = [];
+    for (let i = 0; i < this.layers.length; i++) {
+      const layer = this.layers[i];
       data.layer.push(layer.getSaveData());
       if (layer.name !== "collision") resources.push(layer.tiles.path);
     }
 
     const dataString = JSON.stringify(data);
-    if (wm.config.project.prettyPrint) dataString = JSONFormat(dataString);
+    if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
 
     const postString =
       "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
@@ -393,42 +390,36 @@ class LevelEditor {
   //#region Layers
 
   addLayer() {
-    var name = "new_layer_" + this.layers.length;
-    var newLayer = new wm.EditMap(name, wm.config.layerDefaults.tilesize);
-    newLayer.resize(wm.config.layerDefaults.width, wm.config.layerDefaults.height);
+    const name = "new_layer_" + this.layers.length;
+    const newLayer = new EditMap(name, this.config.layerDefaults.tilesize);
+    newLayer.resize(this.config.layerDefaults.width, this.config.layerDefaults.height);
     newLayer.setScreenPos(this.screen.x, this.screen.y);
     this.layers.push(newLayer);
     this.setActiveLayer(name);
     this.updateLayerSettings();
-
     this.reorderLayers();
-
     $("#layers").sortable("refresh");
   }
 
   removeLayer() {
-    var name = this.activeLayer.name;
-    if (name == "entities") {
-      return false;
-    }
+    const name = this.activeLayer.name;
+    if (name === "entities") return false;
     this.activeLayer.destroy();
-    for (var i = 0; i < this.layers.length; i++) {
-      if (this.layers[i].name == name) {
-        this.layers.splice(i, 1);
-        this.reorderLayers();
-        $("#layers").sortable("refresh");
-        this.setActiveLayer("entities");
-        return true;
-      }
+    for (let i = 0; i < this.layers.length; i++) {
+      if (this.layers[i].name !== name) continue;
+      this.layers.splice(i, 1);
+      this.reorderLayers();
+      $("#layers").sortable("refresh");
+      this.setActiveLayer("entities");
+      return true;
     }
     return false;
   }
 
   getLayerWithName(name) {
-    for (var i = 0; i < this.layers.length; i++) {
-      if (this.layers[i].name == name) {
-        return this.layers[i];
-      }
+    for (let i = 0; i < this.layers.length; i++) {
+      if (this.layers[i].name !== name) continue;
+      return this.layers[i];
     }
     return null;
   }
@@ -813,12 +804,8 @@ class LevelEditor {
 // zooming out.
 ig.Image.inject({
   resize(scale) {
-    if (!this.loaded) {
-      return;
-    }
-    if (!this.scaleCache) {
-      this.scaleCache = {};
-    }
+    if (!this.loaded) return;
+    if (!this.scaleCache) this.scaleCache = {};
     if (this.scaleCache["x" + scale]) {
       this.data = this.scaleCache["x" + scale];
       return;
@@ -854,7 +841,7 @@ ig.Image.inject({
   },
 });
 
-// Create a custom loader, to skip sound files and the run loop creation
+/** Custom loader, used to skip sound files and the run loop creation. */
 class LevelEditorLoader extends GameLoader {
   constructor({ config, ...opts }) {
     super(opts);
