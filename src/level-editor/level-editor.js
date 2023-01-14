@@ -855,44 +855,56 @@ ig.Image.inject({
 });
 
 // Create a custom loader, to skip sound files and the run loop creation
-wm.Loader = ig.Loader.extend({
-  end() {
-    if (this.done) {
-      return;
-    }
+class LevelEditorLoader extends GameLoader {
+  constructor({ config, ...opts }) {
+    super(opts);
+    Guard.againstNull({ config });
+    this.config = config;
+  }
 
-    clearInterval(this._intervalId);
+  end() {
+    if (this.done) return;
+    clearInterval(this.intervalId);
     this.done = true;
-    ig.system.clear(wm.config.colors.clear);
-    ig.game = new this.gameClass();
-  },
+    this.runner.system.clear(this.config.colors.clear);
+    this.runner.setGame(this.gameClass);
+  }
 
   loadResource(res) {
-    if (res instanceof ig.Sound) {
-      this._unloaded.erase(res.path);
-    } else {
-      this.parent(res);
-    }
-  },
-});
+    if (res instanceof Sound) this._unloaded.erase(res.path);
+    // TODO
+    else super().loadResource(res);
+  }
+}
 
-// Define a dummy module to load all plugins
-ig.module("LevelEditor.loader")
-  .requires.apply(ig, wm.config.plugins)
-  .defines(function () {
-    // Init!
-    ig.system = new ig.System(
-      "#canvas",
-      1,
-      Math.floor(LevelEditor.getMaxWidth() / wm.config.view.zoom),
-      Math.floor(LevelEditor.getMaxHeight() / wm.config.view.zoom),
-      wm.config.view.zoom
-    );
+class LevelEditorRunner {
+  system = null;
+  input = null;
+  soundManager = null;
+  ready = false;
+  config = null;
+  loader = null;
 
-    ig.input = new wm.EventedInput();
-    ig.soundManager = new ig.SoundManager();
-    ig.ready = true;
+  constructor(config) {
+    this.system = new System({
+      runner: this,
+      canvasId: "canvas",
+      fps: 1,
+      width: Math.floor(LevelEditor.getMaxWidth() / config.view.zoom),
+      height: Math.floor(LevelEditor.getMaxHeight() / config.view.zoom),
+      scale: config.view.zoom,
+    });
 
-    var loader = new wm.Loader(wm.LevelEditor, ig.resources);
-    loader.load();
-  });
+    this.input = new EventedInput({ system: this.system });
+    this.soundManager = new SoundManager({ runner: this });
+    this.ready = true;
+
+    this.loader = new LevelEditorLoader({
+      config,
+      debugMode: false,
+      gameClass: wm.LevelEditor,
+      runner: this,
+    });
+    this.loader.load();
+  }
+}
