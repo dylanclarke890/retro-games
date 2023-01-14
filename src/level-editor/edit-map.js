@@ -140,8 +140,7 @@ class EditMap extends BackgroundMap {
 
   //#endregion UI
 
-  // -------------------------------------------------------------------------
-  // Selecting
+  //#region Selecting
 
   beginSelecting(x, y) {
     this.isSelecting = true;
@@ -149,17 +148,14 @@ class EditMap extends BackgroundMap {
   }
 
   endSelecting(x, y) {
-    var r = this.getSelectionRect(x, y);
+    const r = this.getSelectionRect(x, y);
 
-    var brush = [];
-    for (var ty = r.y; ty < r.y + r.h; ty++) {
-      var row = [];
-      for (var tx = r.x; tx < r.x + r.w; tx++) {
-        if (tx < 0 || ty < 0 || tx >= this.width || ty >= this.height) {
-          row.push(0);
-        } else {
-          row.push(this.data[ty][tx]);
-        }
+    const brush = [];
+    for (let ty = r.y; ty < r.y + r.h; ty++) {
+      const row = [];
+      for (let tx = r.x; tx < r.x + r.w; tx++) {
+        if (tx < 0 || ty < 0 || tx >= this.width || ty >= this.height) row.push(0);
+        else row.push(this.data[ty][tx]);
       }
       brush.push(row);
     }
@@ -169,10 +165,9 @@ class EditMap extends BackgroundMap {
   }
 
   getSelectionRect(x, y) {
-    var sx = this.selectionBegin ? this.selectionBegin.x : x,
+    const sx = this.selectionBegin ? this.selectionBegin.x : x,
       sy = this.selectionBegin ? this.selectionBegin.y : y;
-
-    var txb = Math.floor((sx + this.scroll.x) / this.tilesize),
+    const txb = Math.floor((sx + this.scroll.x) / this.tilesize),
       tyb = Math.floor((sy + this.scroll.y) / this.tilesize),
       txe = Math.floor((x + this.scroll.x) / this.tilesize),
       tye = Math.floor((y + this.scroll.y) / this.tilesize);
@@ -185,21 +180,19 @@ class EditMap extends BackgroundMap {
     };
   }
 
-  // -------------------------------------------------------------------------
-  // Drawing
+  //#endregion Selecting
+
+  //#region Drawing
 
   draw() {
-    // For performance reasons, repeated background maps are not drawn
-    // when zoomed out
-    if (this.visible && !(wm.config.view.zoom < 1 && this.repeat)) {
-      this.drawTiled();
-    }
+    // For performance reasons, repeated background maps are not drawn when zoomed out
+    if (this.visible && !(wm.config.view.zoom < 1 && this.repeat)) this.drawTiled();
 
-    // Grid
+    // Grid TODO
     if (this.active && wm.config.view.grid) {
-      var x = -ig.system.getDrawPos(this.scroll.x % this.tilesize) - 0.5;
-      var y = -ig.system.getDrawPos(this.scroll.y % this.tilesize) - 0.5;
-      var step = this.tilesize * ig.system.scale;
+      let x = -ig.system.getDrawPos(this.scroll.x % this.tilesize) - 0.5;
+      let y = -ig.system.getDrawPos(this.scroll.y % this.tilesize) - 0.5;
+      const step = this.tilesize * ig.system.scale;
 
       ig.system.context.beginPath();
       for (x; x < ig.system.realWidth; x += step) {
@@ -213,10 +206,6 @@ class EditMap extends BackgroundMap {
       ig.system.context.strokeStyle = wm.config.colors.secondary;
       ig.system.context.stroke();
       ig.system.context.closePath();
-
-      // Not calling beginPath() again has some weird performance issues
-      // in Firefox 5. closePath has no effect. So to make it happy:
-      ig.system.context.beginPath();
     }
 
     // Bounds
@@ -233,10 +222,8 @@ class EditMap extends BackgroundMap {
   }
 
   getCursorOffset() {
-    var w = this.brush[0].length;
-    var h = this.brush.length;
-
-    //return {x:0, y:0};
+    const w = this.brush[0].length;
+    const h = this.brush.length;
     return {
       x: (w / 2 - 0.5).toInt() * this.tilesize,
       y: (h / 2 - 0.5).toInt() * this.tilesize,
@@ -245,7 +232,7 @@ class EditMap extends BackgroundMap {
 
   drawCursor(x, y) {
     if (this.isSelecting) {
-      var r = this.getSelectionRect(x, y);
+      const r = this.getSelectionRect(x, y);
 
       ig.system.context.lineWidth = 1;
       ig.system.context.strokeStyle = wm.config.colors.selection;
@@ -256,14 +243,12 @@ class EditMap extends BackgroundMap {
         r.h * this.tilesize * ig.system.scale + 1
       );
     } else {
-      var w = this.brush[0].length;
-      var h = this.brush.length;
-
-      var co = this.getCursorOffset();
-
-      var cx =
+      const w = this.brush[0].length;
+      const h = this.brush.length;
+      const co = this.getCursorOffset();
+      const cx =
         Math.floor((x + this.scroll.x) / this.tilesize) * this.tilesize - this.scroll.x - co.x;
-      var cy =
+      const cy =
         Math.floor((y + this.scroll.y) / this.tilesize) * this.tilesize - this.scroll.y - co.y;
 
       ig.system.context.lineWidth = 1;
@@ -276,19 +261,20 @@ class EditMap extends BackgroundMap {
       );
 
       ig.system.context.globalAlpha = 0.5;
-      for (var ty = 0; ty < h; ty++) {
-        for (var tx = 0; tx < w; tx++) {
-          var t = this.brush[ty][tx];
-          if (t) {
-            var px = cx + tx * this.tilesize;
-            var py = cy + ty * this.tilesize;
-            this.tiles.drawTile(px, py, t - 1, this.tilesize);
-          }
+      for (let ty = 0; ty < h; ty++) {
+        for (let tx = 0; tx < w; tx++) {
+          const t = this.brush[ty][tx];
+          if (!t) continue;
+          const px = cx + tx * this.tilesize;
+          const py = cy + ty * this.tilesize;
+          this.tiles.drawTile(px, py, t - 1, this.tilesize);
         }
       }
       ig.system.context.globalAlpha = 1;
     }
   }
+
+  // #endregion Drawing
 }
 
 class AutoResizedImage extends GameImage {
@@ -303,11 +289,11 @@ class AutoResizedImage extends GameImage {
     this.width = Math.ceil(this.data.width * this.internalScale);
     this.height = Math.ceil(this.data.height * this.internalScale);
 
-    if (this.internalScale != 1) {
-      var scaled = ig.$new("canvas");
+    if (this.internalScale !== 1) {
+      const scaled = ig.$new("canvas");
       scaled.width = this.width;
       scaled.height = this.height;
-      var scaledCtx = scaled.getContext("2d");
+      const scaledCtx = scaled.getContext("2d");
 
       scaledCtx.drawImage(
         this.data,
@@ -324,12 +310,7 @@ class AutoResizedImage extends GameImage {
     }
 
     this.loaded = true;
-    if (ig.system.scale != 1) {
-      this.resize(ig.system.scale);
-    }
-
-    if (this.loadCallback) {
-      this.loadCallback(this.path, true);
-    }
+    if (ig.system.scale !== 1) this.resize(ig.system.scale);
+    if (this.loadCallback) this.loadCallback(this.path, true);
   }
 }
