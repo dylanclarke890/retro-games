@@ -12,12 +12,10 @@ class GameDebugger {
   DOMElements = {};
 
   bulk = {
-    entityCollision: true,
-    mapCollisionX: true,
-    mapCollisionY: true,
     showNames: true,
     showVelocities: true,
     showHitboxes: true,
+    entityCollision: true,
   };
 
   constructor({ game, gameLoop, system, baseEntityClass }) {
@@ -80,14 +78,7 @@ class GameDebugger {
     bulkActions.classList.add("debug-subpanel");
     bulkActions.append(this.#newHeading("Bulk Actions"));
 
-    const {
-      entityCollision,
-      mapCollisionX,
-      mapCollisionY,
-      showNames,
-      showVelocities,
-      showHitboxes,
-    } = this.bulk;
+    const { entityCollision, showNames, showVelocities, showHitboxes } = this.bulk;
     const row = (name, val, idSuffix) => `
       <tr class="toggle">
         <td>${name}</td>
@@ -101,8 +92,6 @@ class GameDebugger {
         ${row("Show Hitboxes", showHitboxes, "show-hitbox")}
         ${row("Show Velocities", showVelocities, "show-path")}
         ${row("Entity Collision", entityCollision, "collision-on")}
-        ${row("Map Collision X", mapCollisionX, "map-collision-x")}
-        ${row("Map Collision Y", mapCollisionY, "map-collision-y")}
       </tbody>
     </table>
     `;
@@ -144,14 +133,14 @@ class GameDebugger {
     dragElement(statsContainer);
     dragElement(bulkActions);
     dragElement(activeEntityList);
-    selectedEntity.style.left = "67px";
-    selectedEntity.style.top = "368px";
-    statsContainer.style.left = "7px";
-    statsContainer.style.top = "202px";
+    selectedEntity.style.left = "51px";
+    selectedEntity.style.top = "344px";
+    statsContainer.style.left = "74px";
+    statsContainer.style.top = "10px";
     bulkActions.style.left = "197px";
-    bulkActions.style.top = "5px";
+    bulkActions.style.top = "182px";
     activeEntityList.style.left = "12px";
-    activeEntityList.style.top = "20px";
+    activeEntityList.style.top = "182px";
 
     const forEachEntity = (cb) => {
       for (let i = 0; i < this.game.entities.length; i++) cb(this.game.entities[i]);
@@ -180,18 +169,6 @@ class GameDebugger {
       forEachEntity((e) => (e._debugShowName = this.bulk.showNames));
       this.#updateBulkActionsDisplay();
     });
-
-    $el("#debug-bulk-map-collision-x").parentElement.addEventListener("click", () => {
-      this.bulk.mapCollisionX = !this.bulk.mapCollisionX;
-      forEachEntity((e) => (e._debugCollisionWithMapOnX = this.bulk.mapCollisionX));
-      this.#updateBulkActionsDisplay();
-    });
-
-    $el("#debug-bulk-map-collision-y").parentElement.addEventListener("click", () => {
-      this.bulk.mapCollisionY = !this.bulk.mapCollisionY;
-      forEachEntity((e) => (e._debugCollisionWithMapOnY = this.bulk.mapCollisionY));
-      this.#updateBulkActionsDisplay();
-    });
   }
 
   //#endregion Containers
@@ -209,8 +186,6 @@ class GameDebugger {
     entityProto._debugShowVelocity = true;
     entityProto._debugShowName = true;
     entityProto._debugCollisionWithEntity = true;
-    entityProto._debugCollisionWithMapOnX = true;
-    entityProto._debugCollisionWithMapOnY = true;
 
     // Entity Debug methods
     entityProto._debugDrawLine = function (color, sx, sy, dx, dy) {
@@ -291,19 +266,6 @@ class GameDebugger {
     entityProto.checkWith = function (other) {
       if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
       this.baseCheckWith(other);
-    };
-
-    // Map collision Y
-    entityProto.baseHandleMapCollisionOnYAxis = entityProto.handleMapCollisionOnYAxis;
-    entityProto.handleMapCollisionOnYAxis = function () {
-      if (!this._debugCollisionWithMapOnY) return;
-      this.baseHandleMapCollisionOnYAxis();
-    };
-    // Map collision X
-    entityProto.baseHandleMapCollisionOnXAxis = entityProto.handleMapCollisionOnXAxis;
-    entityProto.handleMapCollisionOnXAxis = function () {
-      if (!this._debugCollisionWithMapOnX) return;
-      this.baseHandleMapCollisionOnXAxis();
     };
 
     const canvas = this.system.canvas;
@@ -443,10 +405,10 @@ class GameDebugger {
     const debugOptions = $new("div");
     debugOptions.id = "debug-entity-options";
     debugOptions.innerHTML = `
-      ${entityOption("Entity Collision", _debugCollisionWithEntity, "collision-on")}
-      ${entityOption("Show Velocity", _debugShowVelocity, "show-path")}
-      ${entityOption("Show Hitbox", _debugShowHitbox, "show-hitbox")}
       ${nameOption}
+      ${entityOption("Show Hitbox", _debugShowHitbox, "show-hitbox")}
+      ${entityOption("Show Velocity", _debugShowVelocity, "show-path")}
+      ${entityOption("Entity Collision", _debugCollisionWithEntity, "collision-on")}
     `;
 
     container.append(debugOptions);
