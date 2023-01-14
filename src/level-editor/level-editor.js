@@ -134,7 +134,6 @@ class LevelEditor {
       const index = parseInt(key);
       const name = $("#layers div.layer:nth-child(" + index + ") span.name").text();
       const layer = name === "entities" ? this.entities : this.getLayerWithName(name);
-
       if (!layer) return;
       if (event.shiftKey) layer.toggleVisibility();
       else this.setActiveLayer(layer.name);
@@ -169,72 +168,71 @@ class LevelEditor {
 
   setWindowTitle() {
     document.title = this.fileName + (this.modified ? " * " : " - ") + "LevelEditor";
-    $("span.headerTitle").text(this.fileName);
-    $("span.unsavedTitle").text(this.modified ? "*" : "");
+    document.querySelectorAll("span.headerTitle").forEach((v) => (v.textContent = this.fileName));
+    document
+      .querySelectorAll("span.unsavedTitle")
+      .forEach((v) => (v.textContent = this.modified ? "*" : ""));
   }
 
   confirmClose(event) {
-    var rv = undefined;
-    if (this.modified && wm.config.askBeforeClose) {
-      rv = "There are some unsaved changes. Leave anyway?";
-    }
-    event.returnValue = rv;
-    return rv;
+    const returnValue = undefined;
+    if (this.modified && this.config.askBeforeClose) returnValue = "Unsaved changes. Leave anyway?";
+    event.returnValue = returnValue;
+    return returnValue;
   }
 
   resize() {
-    ig.system.resize(
-      Math.floor(wm.LevelEditor.getMaxWidth() / wm.config.view.zoom),
-      Math.floor(wm.LevelEditor.getMaxHeight() / wm.config.view.zoom),
-      wm.config.view.zoom
+    const system = this.system;
+    const config = this.config;
+    system.resize(
+      Math.floor(LevelEditor.getMaxWidth() / config.view.zoom),
+      Math.floor(LevelEditor.getMaxHeight() / config.view.zoom),
+      config.view.zoom
     );
-    ig.system.context.textBaseline = "top";
-    ig.system.context.font = wm.config.labels.font;
+    system.ctx.textBaseline = "top";
+    system.ctx.font = config.labels.font;
     this.draw();
   }
 
   scroll(x, y) {
+    const scale = this.system.scale;
     this.screen.x -= x;
     this.screen.y -= y;
 
-    this._rscreen.x = Math.round(this.screen.x * ig.system.scale) / ig.system.scale;
-    this._rscreen.y = Math.round(this.screen.y * ig.system.scale) / ig.system.scale;
-    for (var i = 0; i < this.layers.length; i++) {
+    this._rscreen.x = Math.round(this.screen.x * scale) / scale;
+    this._rscreen.y = Math.round(this.screen.y * scale) / scale;
+    for (let i = 0; i < this.layers.length; i++)
       this.layers[i].setScreenPos(this.screen.x, this.screen.y);
-    }
   }
 
   drag() {
-    var dx = ig.input.mouse.x - this.mouseLast.x,
-      dy = ig.input.mouse.y - this.mouseLast.y;
+    const dx = this.input.mouse.x - this.mouseLast.x,
+      dy = this.input.mouse.y - this.mouseLast.y;
     this.scroll(dx, dy);
   }
 
   touchScroll(event) {
+    const scale = this.system.scale;
     event.preventDefault();
-
-    this.scroll(-event.deltaX / ig.system.scale, -event.deltaY / ig.system.scale);
+    this.scroll(-event.deltaX / scale, -event.deltaY / scale);
     this.draw();
     return false;
   }
 
   zoom(delta) {
-    var z = wm.config.view.zoom;
-    var mx = ig.input.mouse.x * z,
-      my = ig.input.mouse.y * z;
+    const config = this.config;
+    const z = config.view.zoom;
+    const mx = this.input.mouse.x * z,
+      my = this.input.mouse.y * z;
 
     if (z <= 1) {
-      if (delta < 0) {
-        z /= 2;
-      } else {
-        z *= 2;
-      }
-    } else {
-      z += delta;
-    }
+      if (delta < 0) z /= 2;
+      else z *= 2;
+    } else z += delta;
 
-    wm.config.view.zoom = z.limit(wm.config.view.zoomMin, wm.config.view.zoomMax);
-    wm.config.labels.step = Math.round(this.labelsStep / wm.config.view.zoom);
+    config.view.zoom = z.constrain(config.view.zoomMin, config.view.zoomMax);
+    config.labels.step = Math.round(this.labelsStep / config.view.zoom);
+    // TODO
     $("#zoomIndicator")
       .text(wm.config.view.zoom + "x")
       .stop(true, true)
@@ -243,22 +241,21 @@ class LevelEditor {
       .fadeOut();
 
     // Adjust mouse pos and screen coordinates
-    ig.input.mouse.x = mx / wm.config.view.zoom;
-    ig.input.mouse.y = my / wm.config.view.zoom;
+    this.input.mouse.x = mx / config.view.zoom;
+    this.input.mouse.y = my / config.view.zoom;
     this.drag();
 
-    for (var i in ig.Image.cache) {
-      ig.Image.cache[i].resize(wm.config.view.zoom);
-    }
+    // for (let i in ig.Image.cache) {
+    //   ig.Image.cache[i].resize(wm.config.view.zoom);
+    // } // TODO
 
     this.resize();
   }
 
-  // -------------------------------------------------------------------------
-  // Loading
+  //#region Loading
 
   loadNew() {
-    $.cookie("wmLastLevel", null);
+    setCookie("wmLastLevel", null);
     while (this.layers.length) {
       this.layers[0].destroy();
       this.layers.splice(0, 1);
@@ -266,34 +263,34 @@ class LevelEditor {
     this.screen = { x: 0, y: 0 };
     this.entities.clear();
     this.fileName = "untitled.js";
-    this.filePath = wm.config.project.levelPath + "untitled.js";
+    this.filePath = this.config.project.levelPath + "untitled.js";
     this.levelData = {};
     this.saveDialog.setPath(this.filePath);
     this.resetModified();
     this.draw();
   }
 
-  load(dialog, path) {
+  load(_dialog, path) {
     this.filePath = path;
     this.saveDialog.setPath(path);
     this.fileName = path.replace(/^.*\//, "");
 
-    var req = $.ajax({
+    $.ajax({
       url: path + "?nocache=" + Math.random(),
       dataType: "text",
       async: false,
       success: this.loadResponse.bind(this),
       error() {
-        $.cookie("wmLastLevel", null);
+        clearCookie("wmLastLevel");
       },
     });
   }
 
   loadResponse(data) {
-    $.cookie("wmLastLevel", this.filePath);
+    setCookie("wmLastLevel", this.filePath);
 
     // extract JSON from a module's JS
-    var jsonMatch = data.match(/\/\*JSON\[\*\/([\s\S]*?)\/\*\]JSON\*\//);
+    const jsonMatch = data.match(/\/\*JSON\[\*\/([\s\S]*?)\/\*\]JSON\*\//);
     data = JSON.parse(jsonMatch ? jsonMatch[1] : data);
     this.levelData = data;
 
@@ -304,14 +301,14 @@ class LevelEditor {
     this.screen = { x: 0, y: 0 };
     this.entities.clear();
 
-    for (var i = 0; i < data.entities.length; i++) {
-      var ent = data.entities[i];
+    for (let i = 0; i < data.entities.length; i++) {
+      const ent = data.entities[i];
       this.entities.spawnEntity(ent.type, ent.x, ent.y, ent.settings);
     }
 
-    for (var i = 0; i < data.layer.length; i++) {
-      var ld = data.layer[i];
-      var newLayer = new wm.EditMap(ld.name, ld.tilesize, ld.tilesetName, !!ld.foreground);
+    for (let i = 0; i < data.layer.length; i++) {
+      const ld = data.layer[i];
+      const newLayer = new EditMap(ld.name, ld.tilesize, ld.tilesetName, !!ld.foreground);
       newLayer.resize(ld.width, ld.height);
       newLayer.linkWithCollision = ld.linkWithCollision;
       newLayer.repeat = ld.repeat;
@@ -322,10 +319,7 @@ class LevelEditor {
       newLayer.toggleVisibility();
       this.layers.push(newLayer);
 
-      if (ld.name == "collision") {
-        this.collisionLayer = newLayer;
-      }
-
+      if (ld.name == "collision") this.collisionLayer = newLayer;
       this.setActiveLayer(ld.name);
     }
 
@@ -339,25 +333,20 @@ class LevelEditor {
     this.draw();
   }
 
-  // -------------------------------------------------------------------------
-  // Saving
+  //#endregion Loading
+
+  //#region Saving
 
   saveQuick() {
-    if (this.fileName == "untitled.js") {
-      this.saveDialog.open();
-    } else {
-      this.save(null, this.filePath);
-    }
+    if (this.fileName === "untitled.js") this.saveDialog.open();
+    else this.save(null, this.filePath);
   }
 
-  save(dialog, path) {
-    if (!path.match(/\.js$/)) {
-      path += ".js";
-    }
-
+  save(_dialog, path) {
+    if (!path.match(/\.js$/)) path += ".js";
     this.filePath = path;
     this.fileName = path.replace(/^.*\//, "");
-    var data = this.levelData;
+    const data = this.levelData;
     data.entities = this.entities.getSaveData();
     data.layer = [];
 
@@ -365,92 +354,35 @@ class LevelEditor {
     for (var i = 0; i < this.layers.length; i++) {
       var layer = this.layers[i];
       data.layer.push(layer.getSaveData());
-      if (layer.name != "collision") {
-        resources.push(layer.tiles.path);
-      }
+      if (layer.name !== "collision") resources.push(layer.tiles.path);
     }
 
-    var dataString = JSON.stringify(data);
-    if (wm.config.project.prettyPrint) {
-      dataString = JSONFormat(dataString);
-    }
+    const dataString = JSON.stringify(data);
+    if (wm.config.project.prettyPrint) dataString = JSONFormat(dataString);
 
-    // Make it an ig.module instead of plain JSON?
-    if (wm.config.project.outputFormat == "module") {
-      var levelModule = path
-        .replace(wm.config.project.modulePath, "")
-        .replace(/\.js$/, "")
-        .replace(/\//g, ".");
-
-      var levelName = levelModule.replace(/(^.*\.|-)(\w)/g, function (m, s, a) {
-        return a.toUpperCase();
-      });
-
-      var resourcesString = "";
-      if (resources.length) {
-        resourcesString =
-          "Level" +
-          levelName +
-          "Resources=[new ig.Image('" +
-          resources.join("'), new ig.Image('") +
-          "')];\n";
-      }
-
-      // Collect all Entity Modules
-      var requires = ["impact.image"];
-      var requiresHash = {};
-      for (var i = 0; i < data.entities.length; i++) {
-        var ec = this.entities.entityClasses[data.entities[i].type];
-        if (!requiresHash[ec]) {
-          requiresHash[ec] = true;
-          requires.push(ec);
-        }
-      }
-
-      // include /*JSON[*/ ... /*]JSON*/ markers, so we can easily load
-      // this level as JSON again
-      dataString =
-        "ig.module( '" +
-        levelModule +
-        "' )\n" +
-        ".requires( '" +
-        requires.join("','") +
-        "' )\n" +
-        ".defines(function(){\n" +
-        "Level" +
-        levelName +
-        "=" +
-        "/*JSON[*/" +
-        dataString +
-        "/*]JSON*/" +
-        ";\n" +
-        resourcesString +
-        "});";
-    }
-
-    var postString = "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
-
-    var req = $.ajax({
-      url: wm.config.api.save,
+    const postString =
+      "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
+    $.ajax({
+      url: this.config.api.save,
       type: "POST",
       dataType: "json",
       async: false,
       data: postString,
-      success: this.saveResponse.bind(this),
+      success: (res) => this.saveResponse(res),
     });
   }
 
   saveResponse(data) {
-    if (data.error) {
-      alert("Error: " + data.msg);
-    } else {
+    if (data.error) alert("Error: " + data.msg);
+    else {
       this.resetModified();
-      $.cookie("wmLastLevel", this.filePath);
+      setCookie("wmLastLevel", this.filePath);
     }
   }
 
-  // -------------------------------------------------------------------------
-  // Layers
+  //#endregion Saving
+
+  //#region Layers
 
   addLayer() {
     var name = "new_layer_" + this.layers.length;
@@ -606,8 +538,9 @@ class LevelEditor {
     ).attr("disabled", isCollision);
   }
 
-  // -------------------------------------------------------------------------
-  // Update
+  //#endregion Layers
+
+  //#region Update
 
   mousemove() {
     if (!this.activeLayer) {
@@ -792,8 +725,9 @@ class LevelEditor {
     this.setModified();
   }
 
-  // -------------------------------------------------------------------------
-  // Drawing
+  //#endregion Update
+
+  //#region Drawing
 
   draw() {
     // The actual drawing loop is scheduled via ig.setAnimation() already.
@@ -856,6 +790,8 @@ class LevelEditor {
       ig.system.context.fillText(ylabel, 0, ty * ig.system.scale);
     }
   }
+
+  //#endregion Drawing
 
   getEntityByName(name) {
     return this.entities.getEntityByName(name);
