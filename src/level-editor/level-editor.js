@@ -28,6 +28,7 @@ class LevelEditor {
   collisionSolid = 1;
 
   loadDialog = null;
+  /** @type {ModalDialogPathSelect} */
   saveDialog = null;
   loseChangesDialog = null;
   deleteLayerDialog = null;
@@ -37,132 +38,121 @@ class LevelEditor {
   needsDraw = true;
 
   undo = null;
+  /** @type {System} */
+  system = null;
+  /** @type {EventedInput} */
+  input = null;
 
-  constructor() {
-    ig.game = ig.editor = this; // TODO
+  constructor({ system, config, input }) {
+    Guard.againstNull({ system });
+    Guard.againstNull({ config });
+    Guard.againstNull({ input });
+    this.system = system;
+    this.config = config;
+    this.input = input;
 
-    ig.system.context.textBaseline = "top";
-    ig.system.context.font = wm.config.labels.font;
-    this.labelsStep = wm.config.labels.step;
+    const { ctx, canvas } = this.system;
+    ctx.textBaseline = "top";
+    ctx.font = config.labels.font;
+    this.labelsStep = config.labels.step;
 
     // Dialogs
     this.loadDialog = new ModalDialogPathSelect("Load Level", "Load", "scripts");
     this.loadDialog.onOk = this.load;
-    this.loadDialog.setPath(wm.config.project.levelPath);
-    $("#levelLoad").bind("click", this.showLoadDialog.bind(this));
-    $("#levelNew").bind("click", this.showNewDialog.bind(this));
+    this.loadDialog.setPath(config.project.levelPath);
+    $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
+    $el("#levelNew").addEventListener("click", () => this.showNewDialog());
 
-    this.saveDialog = new wm.ModalDialogPathSelect("Save Level", "Save", "scripts");
-    this.saveDialog.onOk = this.save.bind(this);
-    this.saveDialog.setPath(wm.config.project.levelPath);
-    $("#levelSaveAs").bind("click", this.saveDialog.open.bind(this.saveDialog));
-    $("#levelSave").bind("click", this.saveQuick.bind(this));
+    this.saveDialog = new ModalDialogPathSelect("Save Level", "Save", "scripts");
+    this.saveDialog.onOk = this.save;
+    this.saveDialog.setPath(config.project.levelPath);
+    $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
+    $el("#levelSave").addEventListener("click", () => this.saveQuick());
 
     this.loseChangesDialog = new ModalDialog("Lose all changes?");
-
     this.deleteLayerDialog = new ModalDialog("Delete Layer? NO UNDO!");
-    this.deleteLayerDialog.onOk = this.removeLayer.bind(this);
-
+    this.deleteLayerDialog.onOk = this.removeLayer;
     this.mode = this.MODE.DEFAULT;
 
-    this.tilesetSelectDialog = new SelectFileDropdown(
-      "#layerTileset",
-      wm.config.api.browse,
-      "images"
-    );
+    this.tilesetSelectDialog = new SelectFileDropdown("#layerTileset", config.api.browse, "images");
     this.entities = new EditEntities($el("#layerEntities"));
 
     $("#layers").sortable({
-      update: this.reorderLayers.bind(this),
+      update: () => this.reorderLayers(),
     });
     $("#layers").disableSelection();
     this.resetModified();
 
     // Events/Input
-    if (wm.config.touchScroll) {
+    if (config.touchScroll) {
       // Setup wheel event
-      ig.system.canvas.addEventListener("wheel", this.touchScroll.bind(this), false);
-
+      canvas.addEventListener("wheel", (e) => this.touchScroll(e), false);
       // Unset MWHEEL_* binds
-      delete wm.config.binds["MWHEEL_UP"];
-      delete wm.config.binds["MWHEEL_DOWN"];
+      delete config.binds["MWHEEL_UP"];
+      delete config.binds["MWHEEL_DOWN"];
     }
 
-    for (var key in wm.config.binds) {
-      ig.input.bind(ig.KEY[key], wm.config.binds[key]);
-    }
-    ig.input.keydownCallback = this.keydown.bind(this);
-    ig.input.keyupCallback = this.keyup.bind(this);
-    ig.input.mousemoveCallback = this.mousemove.bind(this);
+    for (let key in config.binds) input.bind(Input.KEY[key], config.binds[key]);
+    this.input.keydownCallback = (action) => this.keydown(action);
+    this.input.keyupCallback = (action) => this.keyup(action);
+    this.input.mousemoveCallback = () => this.mousemove();
 
-    $(window).resize(this.resize.bind(this));
-    $(window).bind("keydown", this.uikeydown.bind(this));
-    $(window).bind("beforeunload", this.confirmClose.bind(this));
+    window.addEventListener("resize", () => this.resize());
+    window.addEventListener("keydown", (e) => this.uikeydown(e));
+    window.addEventListener("beforeunload", (e) => this.confirmClose(e));
 
-    $("#buttonAddLayer").bind("click", this.addLayer.bind(this));
-    $("#buttonRemoveLayer").bind("click", this.deleteLayerDialog.open.bind(this.deleteLayerDialog));
-    $("#buttonSaveLayerSettings").bind("click", this.saveLayerSettings.bind(this));
-    $("#reloadImages").bind("click", ig.Image.reloadCache);
-    $("#layerIsCollision").bind("change", this.toggleCollisionLayer.bind(this));
+    $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
+    $el("#buttonRemoveLayer").addEventListener("click", this.deleteLayerDialog.open());
+    $el("#buttonSaveLayerSettings").addEventListener("click", () => this.saveLayerSettings());
+    // $el("#reloadImages").addEventListener("click", ig.Image.reloadCache); // TODO
+    $el("#layerIsCollision").addEventListener("change", (e) => this.toggleCollisionLayer(e));
 
-    $("input#toggleSidebar").click(function () {
-      $("div#menu").slideToggle("fast");
-      $("input#toggleSidebar").toggleClass("active");
+    $el("input#toggleSidebar").addEventListener("click", () => {
+      $("div#menu").slideToggle("fast"); // TODO
+      $el("input#toggleSidebar").classList.toggle("active");
     });
 
     // Always unfocus current input field when clicking the canvas
-    $("#canvas").mousedown(function () {
-      $("input:focus").blur();
-    });
+    $el("#canvas").addEventListener("mousedown", () =>
+      document.querySelectorAll("input:focus").forEach((v) => v.blur())
+    );
 
-    this.undo = new wm.Undo(wm.config.undoLevels);
+    this.undo = new Undo(config.undoLevels);
 
-    if (wm.config.loadLastLevel) {
-      var path = $.cookie("wmLastLevel");
-      if (path) {
-        this.load(null, path);
-      }
+    if (config.loadLastLevel) {
+      var path = getCookie("wmLastLevel");
+      if (path) this.load(null, path);
     }
 
-    ig.setAnimation(this.drawIfNeeded.bind(this));
+    requestAnimationFrame(() => this.drawIfNeeded());
   }
 
   uikeydown(event) {
-    if (event.target.type == "text") return;
-
-    var key = String.fromCharCode(event.which);
+    if (event.target.type === "text") return;
+    const key = String.fromCharCode(event.which);
     if (key.match(/^\d$/)) {
-      var index = parseInt(key);
-      var name = $("#layers div.layer:nth-child(" + index + ") span.name").text();
+      const index = parseInt(key);
+      const name = $("#layers div.layer:nth-child(" + index + ") span.name").text();
+      const layer = name === "entities" ? this.entities : this.getLayerWithName(name);
 
-      var layer = name == "entities" ? this.entities : this.getLayerWithName(name);
-
-      if (layer) {
-        if (event.shiftKey) {
-          layer.toggleVisibility();
-        } else {
-          this.setActiveLayer(layer.name);
-        }
-      }
+      if (!layer) return;
+      if (event.shiftKey) layer.toggleVisibility();
+      else this.setActiveLayer(layer.name);
     }
   }
 
   showLoadDialog() {
     if (this.modified) {
-      this.loseChangesDialog.onOk = this.loadDialog.open.bind(this.loadDialog);
+      this.loseChangesDialog.onOk = () => this.loadDialog.open();
       this.loseChangesDialog.open();
-    } else {
-      this.loadDialog.open();
-    }
+    } else this.loadDialog.open();
   }
 
   showNewDialog() {
     if (this.modified) {
-      this.loseChangesDialog.onOk = this.loadNew.bind(this);
+      this.loseChangesDialog.onOk = () => this.loadNew();
       this.loseChangesDialog.open();
-    } else {
-      this.loadNew();
-    }
+    } else this.loadNew();
   }
 
   setModified() {

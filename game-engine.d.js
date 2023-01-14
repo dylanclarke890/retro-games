@@ -1,6 +1,7 @@
 // #region LIB
 /// <reference path="src/lib/polyfills.js"/>
 /// <reference path="src/lib/native-object-extensions.js"/>
+/// <reference path="src/lib/cookie.js"/>
 /// <reference path="src/lib/guard.js"/>
 /// <reference path="src/lib/register.js"/>
 /// <reference path="src/lib/vendor-attributes.js"/>
