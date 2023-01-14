@@ -26,6 +26,21 @@
 /// <reference path="src/core/system.js"/>
 // #endregion CORE
 
+//#region LEVEL-EDITOR
+/// <reference path="src/level-editor/jQuery/jquery-1.7.1.min.js"/>
+/// <reference path="src/level-editor/jQuery/jquery-ui-1.8.1.custom.min.js"/>
+/// <reference path="src/level-editor/config.js"/>
+/// <reference path="src/level-editor/edit-entities.js"/>
+/// <reference path="src/level-editor/edit-map.js"/>
+/// <reference path="src/level-editor/entities.js"/>
+/// <reference path="src/level-editor/evented-input.js"/>
+/// <reference path="src/level-editor/level-editor.js"/>
+/// <reference path="src/level-editor/modal-dialogs.js"/>
+/// <reference path="src/level-editor/select-file-dropdown.js"/>
+/// <reference path="src/level-editor/tile-select.js"/>
+/// <reference path="src/level-editor/undo.js"/>
+//#endregion LEVEL-EDITOR
+
 // #region CUSTOM
 /// <reference path="src/pong-entities.js"/>
 /// <reference path="src/level.js"/>
