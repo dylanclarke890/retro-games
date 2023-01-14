@@ -43,6 +43,14 @@ class LevelEditor {
   /** @type {EventedInput} */
   input = null;
 
+  static getMaxWidth() {
+    return window.innerWidth;
+  }
+
+  static getMaxHeight() {
+    return window.innerHeight - $el("#headerMenu").clientHeight;
+  }
+
   constructor({ system, config, input }) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
@@ -798,14 +806,6 @@ class LevelEditor {
   }
 }
 
-wm.LevelEditor.getMaxWidth = function () {
-  return $(window).width();
-};
-
-wm.LevelEditor.getMaxHeight = function () {
-  return $(window).height() - $("#headerMenu").height();
-};
-
 // Custom ig.Image class for use in LevelEditor. To make the zoom function
 // work, we need some additional scaling behavior:
 // Keep the original image, maintain a cache of scaled versions and use the
@@ -884,8 +884,8 @@ ig.module("LevelEditor.loader")
     ig.system = new ig.System(
       "#canvas",
       1,
-      Math.floor(wm.LevelEditor.getMaxWidth() / wm.config.view.zoom),
-      Math.floor(wm.LevelEditor.getMaxHeight() / wm.config.view.zoom),
+      Math.floor(LevelEditor.getMaxWidth() / wm.config.view.zoom),
+      Math.floor(LevelEditor.getMaxHeight() / wm.config.view.zoom),
       wm.config.view.zoom
     );
 
