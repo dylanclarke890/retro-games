@@ -1,215 +1,209 @@
-ig.module("weltmeister.undo")
-  .requires("weltmeister.config")
-  .defines(function () {
-    "use strict";
+class Undo {
+  static TYPE = {
+    MAP_DRAW: 1,
+    ENTITY_EDIT: 2,
+    ENTITY_CREATE: 3,
+    ENTITY_DELETE: 4,
+  };
 
-    wm.Undo = ig.Class.extend({
-      levels: null,
-      chain: [],
-      rpos: 0,
-      currentAction: null,
+  levels = null;
+  chain = [];
+  rpos = 0;
+  currentAction = null;
 
-      init: function (levels) {
-        this.levels = levels || 10;
-      },
+  constructor(levels) {
+    this.levels = levels || 10;
+  }
 
-      clear: function () {
-        this.chain = [];
-        this.currentAction = null;
-      },
+  clear() {
+    this.chain = [];
+    this.currentAction = null;
+  }
 
-      commit: function (action) {
-        if (this.rpos) {
-          this.chain.splice(this.chain.length - this.rpos, this.rpos);
-          this.rpos = 0;
+  commit(action) {
+    if (this.rpos) {
+      this.chain.splice(this.chain.length - this.rpos, this.rpos);
+      this.rpos = 0;
+    }
+    action.activeLayer = ig.game.activeLayer ? ig.game.activeLayer.name : ""; // TODO
+    this.chain.push(action);
+    if (this.chain.length > this.levels) this.chain.shift();
+  }
+
+  undo() {
+    const action = this.chain[this.chain.length - this.rpos - 1];
+    if (!action) return;
+    this.rpos++;
+    // TODO
+    ig.game.setActiveLayer(action.activeLayer);
+
+    const { MAP_DRAW, ENTITY_EDIT, ENTITY_CREATE, ENTITY_DELETE } = Undo.TYPE;
+    switch (action.type) {
+      case MAP_DRAW:
+        for (let i = 0; i < action.changes.length; i++) {
+          const change = action.changes[i];
+          change.layer.setTile(change.x, change.y, change.old);
         }
-        action.activeLayer = ig.game.activeLayer ? ig.game.activeLayer.name : "";
-        this.chain.push(action);
-        if (this.chain.length > this.levels) {
-          this.chain.shift();
+        break;
+      case ENTITY_EDIT:
+        action.entity.pos.x = action.old.x;
+        action.entity.pos.y = action.old.y;
+        action.entity.size.x = action.old.w;
+        action.entity.size.y = action.old.h;
+        // TODO
+        ig.game.entities.selectEntity(action.entity);
+        ig.game.entities.loadEntitySettings();
+        break;
+      case ENTITY_CREATE:
+        // TODO
+        ig.game.entities.removeEntity(action.entity);
+        ig.game.entities.selectEntity(null);
+        break;
+      case ENTITY_DELETE:
+        // TODO
+        ig.game.entities.entities.push(action.entity);
+        if (action.entity.name) ig.game.entities.namedEntities[action.entity.name] = action.entity;
+        ig.game.entities.selectEntity(action.entity);
+        break;
+      default:
+        throw new Error(`Unexpected undo type: ${action.type}`);
+    }
+
+    // TODO
+    ig.game.setModified();
+  }
+
+  redo() {
+    if (!this.rpos) return;
+
+    const action = this.chain[this.chain.length - this.rpos];
+    if (!action) return;
+    this.rpos--;
+
+    ig.game.setActiveLayer(action.activeLayer); // TODO
+
+    const { MAP_DRAW, ENTITY_EDIT, ENTITY_CREATE, ENTITY_DELETE } = Undo.TYPE;
+    switch (action.type) {
+      case MAP_DRAW:
+        // TODO
+        for (let i = 0; i < action.changes.length; i++) {
+          const change = action.changes[i];
+          change.layer.setTile(change.x, change.y, change.current);
         }
-      },
-
-      undo: function () {
-        var action = this.chain[this.chain.length - this.rpos - 1];
-        if (!action) {
-          return;
+        break;
+      case ENTITY_EDIT:
+        // TODO
+        action.entity.pos.x = action.current.x;
+        action.entity.pos.y = action.current.y;
+        action.entity.size.x = action.current.w;
+        action.entity.size.y = action.current.h;
+        ig.game.entities.selectEntity(action.entity);
+        ig.game.entities.loadEntitySettings();
+        break;
+      case ENTITY_CREATE:
+        // TODO
+        ig.game.entities.entities.push(action.entity);
+        if (action.entity.name) {
+          ig.game.entities.namedEntities[action.entity.name] = action.entity;
         }
-        this.rpos++;
+        break;
+      case ENTITY_DELETE:
+        // TODO
+        ig.game.entities.removeEntity(action.entity);
+        ig.game.entities.selectEntity(null);
+        break;
+      default:
+        throw new Error(`Unexpected redo type: ${action.type}`);
+    }
 
-        ig.game.setActiveLayer(action.activeLayer);
+    // TODO
+    ig.game.setModified();
+  }
 
-        if (action.type == wm.Undo.MAP_DRAW) {
-          for (var i = 0; i < action.changes.length; i++) {
-            var change = action.changes[i];
-            change.layer.setTile(change.x, change.y, change.old);
-          }
-        } else if (action.type == wm.Undo.ENTITY_EDIT) {
-          action.entity.pos.x = action.old.x;
-          action.entity.pos.y = action.old.y;
-          action.entity.size.x = action.old.w;
-          action.entity.size.y = action.old.h;
-          ig.game.entities.selectEntity(action.entity);
-          ig.game.entities.loadEntitySettings();
-        } else if (action.type == wm.Undo.ENTITY_CREATE) {
-          ig.game.entities.removeEntity(action.entity);
-          ig.game.entities.selectEntity(null);
-        } else if (action.type == wm.Undo.ENTITY_DELETE) {
-          ig.game.entities.entities.push(action.entity);
-          if (action.entity.name) {
-            ig.game.entities.namedEntities[action.entity.name] = action.entity;
-          }
-          ig.game.entities.selectEntity(action.entity);
-        }
+  //#region Map changes
 
-        ig.game.setModified();
+  beginMapDraw() {
+    this.currentAction = {
+      type: Undo.TYPE.MAP_DRAW,
+      time: performance.now(),
+      changes: [],
+    };
+  }
+
+  pushMapDraw(layer, x, y, oldTile, currentTile) {
+    if (!this.currentAction) return;
+    this.currentAction.changes.push({ layer, x, y, old: oldTile, current: currentTile });
+  }
+
+  endMapDraw() {
+    if (!this.currentAction || !this.currentAction.changes.length) return;
+    this.commit(this.currentAction);
+    this.currentAction = null;
+  }
+
+  //#endregion Map changes
+
+  //#region Entity changes
+
+  beginEntityEdit(entity) {
+    this.currentAction = {
+      type: Undo.TYPE.ENTITY_EDIT,
+      time: performance.now(),
+      entity,
+      old: {
+        x: entity.pos.x,
+        y: entity.pos.y,
+        w: entity.size.x,
+        h: entity.size.y,
       },
-
-      redo: function () {
-        if (!this.rpos) {
-          return;
-        }
-
-        var action = this.chain[this.chain.length - this.rpos];
-        if (!action) {
-          return;
-        }
-        this.rpos--;
-
-        ig.game.setActiveLayer(action.activeLayer);
-
-        if (action.type == wm.Undo.MAP_DRAW) {
-          for (var i = 0; i < action.changes.length; i++) {
-            var change = action.changes[i];
-            change.layer.setTile(change.x, change.y, change.current);
-          }
-        } else if (action.type == wm.Undo.ENTITY_EDIT) {
-          action.entity.pos.x = action.current.x;
-          action.entity.pos.y = action.current.y;
-          action.entity.size.x = action.current.w;
-          action.entity.size.y = action.current.h;
-          ig.game.entities.selectEntity(action.entity);
-          ig.game.entities.loadEntitySettings();
-        } else if (action.type == wm.Undo.ENTITY_CREATE) {
-          ig.game.entities.entities.push(action.entity);
-          if (action.entity.name) {
-            ig.game.entities.namedEntities[action.entity.name] = action.entity;
-          }
-          ig.game.entities.selectEntity(action.entity);
-        } else if (action.type == wm.Undo.ENTITY_DELETE) {
-          ig.game.entities.removeEntity(action.entity);
-          ig.game.entities.selectEntity(null);
-        }
-
-        ig.game.setModified();
+      current: {
+        x: entity.pos.x,
+        y: entity.pos.y,
+        w: entity.size.x,
+        h: entity.size.y,
       },
+    };
+  }
 
-      // -------------------------------------------------------------------------
-      // Map changes
+  pushEntityEdit(entity) {
+    if (!this.currentAction) return;
+    this.currentAction.current = {
+      x: entity.pos.x,
+      y: entity.pos.y,
+      w: entity.size.x,
+      h: entity.size.y,
+    };
+  }
 
-      beginMapDraw: function () {
-        this.currentAction = {
-          type: wm.Undo.MAP_DRAW,
-          time: Date.now(),
-          changes: [],
-        };
-      },
+  endEntityEdit() {
+    const action = this.currentAction;
+    if (
+      !action ||
+      (action.old.x == action.current.x &&
+        action.old.y == action.current.y &&
+        action.old.w == action.current.w &&
+        action.old.h == action.current.h)
+    )
+      return;
+    this.commit(this.currentAction);
+    this.currentAction = null;
+  }
 
-      pushMapDraw: function (layer, x, y, oldTile, currentTile) {
-        if (!this.currentAction) {
-          return;
-        }
-
-        this.currentAction.changes.push({
-          layer: layer,
-          x: x,
-          y: y,
-          old: oldTile,
-          current: currentTile,
-        });
-      },
-
-      endMapDraw: function () {
-        if (!this.currentAction || !this.currentAction.changes.length) {
-          return;
-        }
-
-        this.commit(this.currentAction);
-        this.currentAction = null;
-      },
-
-      // -------------------------------------------------------------------------
-      // Entity changes
-
-      beginEntityEdit: function (entity) {
-        this.currentAction = {
-          type: wm.Undo.ENTITY_EDIT,
-          time: Date.now(),
-          entity: entity,
-          old: {
-            x: entity.pos.x,
-            y: entity.pos.y,
-            w: entity.size.x,
-            h: entity.size.y,
-          },
-          current: {
-            x: entity.pos.x,
-            y: entity.pos.y,
-            w: entity.size.x,
-            h: entity.size.y,
-          },
-        };
-      },
-
-      pushEntityEdit: function (entity) {
-        if (!this.currentAction) {
-          return;
-        }
-
-        this.currentAction.current = {
-          x: entity.pos.x,
-          y: entity.pos.y,
-          w: entity.size.x,
-          h: entity.size.y,
-        };
-      },
-
-      endEntityEdit: function () {
-        var a = this.currentAction;
-
-        if (
-          !a ||
-          (a.old.x == a.current.x &&
-            a.old.y == a.current.y &&
-            a.old.w == a.current.w &&
-            a.old.h == a.current.h)
-        ) {
-          return;
-        }
-
-        this.commit(this.currentAction);
-        this.currentAction = null;
-      },
-
-      commitEntityCreate: function (entity) {
-        this.commit({
-          type: wm.Undo.ENTITY_CREATE,
-          time: Date.now(),
-          entity: entity,
-        });
-      },
-
-      commitEntityDelete: function (entity) {
-        this.commit({
-          type: wm.Undo.ENTITY_DELETE,
-          time: Date.now(),
-          entity: entity,
-        });
-      },
+  commitEntityCreate(entity) {
+    this.commit({
+      type: Undo.TYPE.ENTITY_CREATE,
+      time: performance.now(),
+      entity,
     });
+  }
 
-    wm.Undo.MAP_DRAW = 1;
-    wm.Undo.ENTITY_EDIT = 2;
-    wm.Undo.ENTITY_CREATE = 3;
-    wm.Undo.ENTITY_DELETE = 4;
-  });
+  commitEntityDelete(entity) {
+    this.commit({
+      type: Undo.TYPE.ENTITY_DELETE,
+      time: performance.now(),
+      entity,
+    });
+  }
+
+  //#endregion Entity changes
+}
