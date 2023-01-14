@@ -4,6 +4,7 @@ class EditMap extends BackgroundMap {
   active = true;
   linkWithCollision = false;
 
+  /** @type {HTMLDivElement} */
   div = null;
   brush = [[0]];
   oldData = null;
@@ -14,24 +15,17 @@ class EditMap extends BackgroundMap {
   isSelecting = false;
   selectionBegin = null;
 
-  constructor(name, tilesize, tileset, foreground) {
-    this.name = name;
-    this.parent(tilesize, [[0]], tileset || "");
-    this.foreground = foreground;
-
-    this.div = $("<div/>", {
-      class: "layer layerActive",
-      id: "layer_" + name,
-      mouseup: this.click.bind(this),
-    });
+  constructor(name, tilesize, tileset, foreground, system) {
+    tileset = tileset || "";
+    super({ tilesize, data: [[0]], tileset, system, name, foreground });
+    this.div = $new("div");
+    this.div.className = "layer layerActive";
+    this.div.id = `layer_${name}`;
+    this.div.addEventListener("click", () => this.click());
     this.setName(name);
-    if (this.foreground) {
-      $("#layers").prepend(this.div);
-    } else {
-      $("#layerEntities").after(this.div);
-    }
-
-    this.tileSelect = new wm.TileSelect(this);
+    if (this.foreground) $el("#layers").prepend(this.div);
+    else $el("#layerEntities").after(this.div);
+    this.tileSelect = new TileSelect(this);
   }
 
   getSaveData() {
@@ -52,50 +46,42 @@ class EditMap extends BackgroundMap {
   }
 
   resize(newWidth, newHeight) {
-    var newData = new Array(newHeight);
-    for (var y = 0; y < newHeight; y++) {
+    const newData = new Array(newHeight);
+    for (let y = 0; y < newHeight; y++) {
       newData[y] = new Array(newWidth);
-      for (var x = 0; x < newWidth; x++) {
+      for (let x = 0; x < newWidth; x++)
         newData[y][x] = x < this.width && y < this.height ? this.data[y][x] : 0;
-      }
     }
+
     this.data = newData;
     this.width = newWidth;
     this.height = newHeight;
-
     this.resetDiv();
   }
 
   beginEditing() {
-    this.oldData = ig.copy(this.data);
+    this.oldData = NativeExtensions.copy(this.data);
   }
 
   getOldTile(x, y) {
-    var tx = Math.floor(x / this.tilesize);
-    var ty = Math.floor(y / this.tilesize);
-    if (tx >= 0 && tx < this.width && ty >= 0 && ty < this.height) {
-      return this.oldData[ty][tx];
-    } else {
-      return 0;
-    }
+    const tx = Math.floor(x / this.tilesize);
+    const ty = Math.floor(y / this.tilesize);
+    return tx >= 0 && tx < this.width && ty >= 0 && ty < this.height ? this.oldData[ty][tx] : 0;
   }
 
   setTileset(tileset) {
-    if (this.name == "collision") {
-      this.setCollisionTileset();
-    } else {
-      this.parent(tileset);
-    }
+    if (this.name === "collision") this.setCollisionTileset();
+    else super().setTileset(tileset);
   }
 
   setCollisionTileset() {
-    var path = wm.config.collisionTiles.path;
-    var scale = this.tilesize / wm.config.collisionTiles.tilesize;
-    this.tiles = new ig.AutoResizedImage(path, scale);
+    // TODO
+    const path = wm.config.collisionTiles.path;
+    const scale = this.tilesize / wm.config.collisionTiles.tilesize;
+    this.tiles = new AutoResizedImage(path, scale);
   }
 
-  // -------------------------------------------------------------------------
-  // UI
+  //#region UI
 
   setHotkey(hotkey) {
     this.hotkey = hotkey;
@@ -108,50 +94,35 @@ class EditMap extends BackgroundMap {
   }
 
   resetDiv() {
-    var visClass = this.visible ? " checkedVis" : "";
-    this.div.html(
-      '<span class="visible' +
-        visClass +
-        '" title="Toggle Visibility (Shift+' +
-        this.hotkey +
-        ')"></span>' +
-        '<span class="name">' +
-        this.name +
-        "</span>" +
-        '<span class="size"> (' +
-        this.width +
-        "x" +
-        this.height +
-        ")</span>"
-    );
-    this.div.attr("title", "Select Layer (" + this.hotkey + ")");
-    this.div.children(".visible").bind("mousedown", this.toggleVisibilityClick.bind(this));
+    const visClass = this.visible ? "checkedVis" : "";
+    this.div.innerHTML = `
+      <span class="visible ${visClass} title="Toggle Visibility (Shift+${this.hotkey})</span>
+      <span class="name">${this.name}</span>
+      <span class="size">${this.width}x${this.height}</span>
+    `;
+    this.div.title = `Select Layer (${this.hotkey})`;
+    this.div
+      .querySelector(".visible")
+      .addEventListener("mousedown", () => this.toggleVisibilityClick());
   }
 
   setActive(active) {
     this.active = active;
-    if (active) {
-      this.div.addClass("layerActive");
-    } else {
-      this.div.removeClass("layerActive");
-    }
+    if (active) this.div.classList.add("layerActive");
+    else this.div.classList.remove("layerActive");
   }
 
   toggleVisibility() {
     this.visible = !this.visible;
     this.resetDiv();
-    if (this.visible) {
-      this.div.children(".visible").addClass("checkedVis");
-    } else {
-      this.div.children(".visible").removeClass("checkedVis");
-    }
-    ig.game.draw();
+    const visibleEl = this.div.querySelector(".visible");
+    if (this.visible) visibleEl.classList.add("checkedVis");
+    else visibleEl.classList.remove("checkedVis");
+    ig.game.draw(); // TODO
   }
 
-  toggleVisibilityClick(_event) {
-    if (!this.active) {
-      this.ignoreLastClick = true;
-    }
+  toggleVisibilityClick() {
+    if (!this.active) this.ignoreLastClick = true;
     this.toggleVisibility();
   }
 
@@ -166,6 +137,8 @@ class EditMap extends BackgroundMap {
   destroy() {
     this.div.remove();
   }
+
+  //#endregion UI
 
   // -------------------------------------------------------------------------
   // Selecting
