@@ -105,7 +105,7 @@ class GameDebugger {
     statsContainer.id = "debug-performance";
     statsContainer.classList.add("debug-subpanel");
     statsContainer.append(this.#newHeading("Performance"));
-    this.stats = new PerformanceStats({ target: statsContainer, height: 100, width: 200 });
+    this.stats = new PerformanceStats({ target: statsContainer, height: 72, width: 144 });
     this.DOMElements.statsContainer = statsContainer;
     return statsContainer;
   }
@@ -133,14 +133,14 @@ class GameDebugger {
     dragElement(statsContainer);
     dragElement(bulkActions);
     dragElement(activeEntityList);
-    selectedEntity.style.left = "51px";
-    selectedEntity.style.top = "344px";
-    statsContainer.style.left = "74px";
+    statsContainer.style.left = "10px";
     statsContainer.style.top = "10px";
-    bulkActions.style.left = "197px";
-    bulkActions.style.top = "182px";
-    activeEntityList.style.left = "12px";
-    activeEntityList.style.top = "182px";
+    bulkActions.style.left = "200px";
+    bulkActions.style.top = "10px";
+    selectedEntity.style.left = "10px";
+    selectedEntity.style.top = "170px";
+    activeEntityList.style.left = "10px";
+    activeEntityList.style.top = "420px";
 
     const forEachEntity = (cb) => {
       for (let i = 0; i < this.game.entities.length; i++) cb(this.game.entities[i]);
