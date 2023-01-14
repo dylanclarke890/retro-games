@@ -84,14 +84,13 @@ class ModalDialogPathSelect extends ModalDialog {
   }
 
   initDialog() {
-    this.parent();
-    this.pathInput = $("<input/>", { type: "text", class: "modalDialogPath" });
+    super().initDialog();
+    this.pathInput = $new("input");
+    this.pathInput.type = "text";
+    this.pathInput.classList.add("modalDialogPath");
     this.buttonDiv.before(this.pathInput);
-    this.pathDropdown = new wm.SelectFileDropdown(
-      this.pathInput,
-      wm.config.api.browse,
-      this.fileType
-    );
+    // TODO
+    this.pathDropdown = new SelectFileDropdown(this.pathInput, wm.config.api.browse, this.fileType);
   }
 
   clickOk() {
