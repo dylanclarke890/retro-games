@@ -1,77 +1,58 @@
-ig.module("weltmeister.evented-input")
-  .requires("impact.input")
-  .defines(function () {
-    "use strict";
+class EventedInput extends Input {
+  mousemoveCallback = null;
+  keyupCallback = null;
+  keydownCallback = null;
 
-    wm.EventedInput = ig.Input.extend({
-      mousemoveCallback: null,
-      keyupCallback: null,
-      keydownCallback: null,
+  delayedKeyup = { push: function () {}, length: 0 };
 
-      delayedKeyup: { push: function () {}, length: 0 },
+  keydown(event) {
+    if (this.targetIsInputOrText(event)) return;
+    const code =
+      event.type == "keydown"
+        ? event.keyCode
+        : event.button == 2
+        ? Input.KEY.MOUSE2
+        : Input.KEY.MOUSE1;
 
-      keydown: function (event) {
-        var tag = event.target.tagName;
-        if (tag == "INPUT" || tag == "TEXTAREA") {
-          return;
-        }
+    const action = this.bindings[code];
+    if (!action) return;
+    if (!this.actions[action]) {
+      this.actions[action] = true;
+      if (this.keydownCallback) this.keydownCallback(action);
+    }
+    event.stopPropagation();
+    event.preventDefault();
+  }
 
-        var code =
-          event.type == "keydown"
-            ? event.keyCode
-            : event.button == 2
-            ? ig.KEY.MOUSE2
-            : ig.KEY.MOUSE1;
-        var action = this.bindings[code];
-        if (action) {
-          if (!this.actions[action]) {
-            this.actions[action] = true;
-            if (this.keydownCallback) {
-              this.keydownCallback(action);
-            }
-          }
-          event.stopPropagation();
-          event.preventDefault();
-        }
-      },
+  keyup(event) {
+    if (this.targetIsInputOrText(event)) return;
+    const code =
+      event.type == "keyup"
+        ? event.keyCode
+        : event.button == 2
+        ? Input.KEY.MOUSE2
+        : Input.KEY.MOUSE1;
 
-      keyup: function (event) {
-        var tag = event.target.tagName;
-        if (tag == "INPUT" || tag == "TEXTAREA") {
-          return;
-        }
+    const action = this.bindings[code];
+    if (!action) return;
+    this.actions[action] = false;
+    if (this.keyupCallback) this.keyupCallback(action);
+    event.stopPropagation();
+    event.preventDefault();
+  }
 
-        var code =
-          event.type == "keyup" ? event.keyCode : event.button == 2 ? ig.KEY.MOUSE2 : ig.KEY.MOUSE1;
-        var action = this.bindings[code];
-        if (action) {
-          this.actions[action] = false;
-          if (this.keyupCallback) {
-            this.keyupCallback(action);
-          }
-          event.stopPropagation();
-          event.preventDefault();
-        }
-      },
+  mousewheel(event) {
+    const delta = event.wheelDelta ? event.wheelDelta : event.detail * -1;
+    const code = delta > 0 ? Input.KEY.MWHEEL_UP : Input.KEY.MWHEEL_DOWN;
+    const action = this.bindings[code];
+    if (!action) return;
+    if (this.keyupCallback) this.keyupCallback(action);
+    event.stopPropagation();
+    event.preventDefault();
+  }
 
-      mousewheel: function (event) {
-        var delta = event.wheelDelta ? event.wheelDelta : event.detail * -1;
-        var code = delta > 0 ? ig.KEY.MWHEEL_UP : ig.KEY.MWHEEL_DOWN;
-        var action = this.bindings[code];
-        if (action) {
-          if (this.keyupCallback) {
-            this.keyupCallback(action);
-          }
-          event.stopPropagation();
-          event.preventDefault();
-        }
-      },
-
-      mousemove: function (event) {
-        this.parent(event);
-        if (this.mousemoveCallback) {
-          this.mousemoveCallback();
-        }
-      },
-    });
-  });
+  mousemove(event) {
+    super().mousemove(event);
+    if (this.mousemoveCallback) this.mousemoveCallback();
+  }
+}
