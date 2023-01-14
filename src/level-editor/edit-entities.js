@@ -169,58 +169,40 @@ class EditEntities {
   //#region Creating, Deleting, Moving
 
   deleteSelectedEntity() {
-    if (!this.selectedEntity) {
-      return false;
-    }
-
-    ig.game.undo.commitEntityDelete(this.selectedEntity);
-
+    if (!this.selectedEntity) return false;
+    ig.game.undo.commitEntityDelete(this.selectedEntity); // TODO
     this.removeEntity(this.selectedEntity);
     this.selectEntity(null);
     return true;
   }
 
   removeEntity(ent) {
-    if (ent.name) {
-      delete this.namedEntities[ent.name];
-    }
+    if (ent.name) delete this.namedEntities[ent.name];
     this.entities.erase(ent);
   }
 
   cloneSelectedEntity() {
-    if (!this.selectedEntity) {
-      return false;
-    }
-
-    var className = this.selectedEntity._wmClassName;
-    var settings = ig.copy(this.selectedEntity._wmSettings);
-    if (settings.name) {
-      settings.name = settings.name + "_clone";
-    }
-    var x = this.selectedEntity.pos.x + this.gridSize;
-    var y = this.selectedEntity.pos.y;
-    var newEntity = this.spawnEntity(className, x, y, settings);
+    if (!this.selectedEntity) return false;
+    const className = this.selectedEntity._wmClassName;
+    const settings = NativeExtensions.copy(this.selectedEntity._wmSettings);
+    if (settings.name) settings.name = settings.name + "_clone";
+    const x = this.selectedEntity.pos.x + this.gridSize;
+    const y = this.selectedEntity.pos.y;
+    const newEntity = this.spawnEntity(className, x, y, settings);
     newEntity._wmSettings = settings;
     this.selectEntity(newEntity);
-
-    ig.game.undo.commitEntityCreate(newEntity);
-
+    ig.game.undo.commitEntityCreate(newEntity); // TODO
     return true;
   }
 
   dragOnSelectedEntity(x, y) {
-    if (!this.selectedEntity) {
-      return false;
-    }
+    if (!this.selectedEntity) return false;
 
-    // scale or move?
-    if (this.selectedEntity._wmScalable && this.wasSelectedOnScaleBorder) {
+    if (this.selectedEntity._wmScalable && this.wasSelectedOnScaleBorder)
       this.scaleSelectedEntity(x, y);
-    } else {
-      this.moveSelectedEntity(x, y);
-    }
+    else this.moveSelectedEntity(x, y);
 
-    ig.game.undo.pushEntityEdit(this.selectedEntity);
+    ig.game.undo.pushEntityEdit(this.selectedEntity); // TODO
     return true;
   }
 
@@ -231,95 +213,84 @@ class EditEntities {
     y =
       Math.round((y - this.selector.offset.y) / this.gridSize) * this.gridSize +
       this.selectedEntity.offset.y;
+    if (this.selectedEntity.pos.x === x && this.selectedEntity.pos.y === y) return;
 
-    // new position?
-    if (this.selectedEntity.pos.x != x || this.selectedEntity.pos.y != y) {
-      $("#entityDefinitionPosX").text(x);
-      $("#entityDefinitionPosY").text(y);
-
-      this.selectedEntity.pos.x = x;
-      this.selectedEntity.pos.y = y;
-    }
+    $el("#entityDefinitionPosX").textContent = x;
+    $el("#entityDefinitionPosY").textContent = x;
+    this.selectedEntity.pos.x = x;
+    this.selectedEntity.pos.y = y;
   }
 
   scaleSelectedEntity(x, y) {
-    var scale = this.wasSelectedOnScaleBorder;
+    const scaleDir = this.wasSelectedOnScaleBorder;
+    let w = Math.round(x / this.gridSize) * this.gridSize - this.selectedEntity.pos.x;
+    let h;
+    if (!this.selectedEntity._wmSettings.size) this.selectedEntity._wmSettings.size = {};
 
-    var w = Math.round(x / this.gridSize) * this.gridSize - this.selectedEntity.pos.x;
-
-    if (!this.selectedEntity._wmSettings.size) {
-      this.selectedEntity._wmSettings.size = {};
+    switch (scaleDir) {
+      case "n":
+        h = this.selectedEntity.pos.y - Math.round(y / this.gridSize) * this.gridSize;
+        if (this.selectedEntity.size.y + h <= this.gridSize)
+          h = (this.selectedEntity.size.y - this.gridSize) * -1;
+        this.selectedEntity.size.y += h;
+        this.selectedEntity.pos.y -= h;
+        break;
+      case "s":
+        h = Math.round(y / this.gridSize) * this.gridSize - this.selectedEntity.pos.y;
+        this.selectedEntity.size.y = Math.max(this.gridSize, h);
+        break;
+      case "e":
+        w = Math.round(x / this.gridSize) * this.gridSize - this.selectedEntity.pos.x;
+        this.selectedEntity.size.x = Math.max(this.gridSize, w);
+        break;
+      case "w":
+        w = this.selectedEntity.pos.x - Math.round(x / this.gridSize) * this.gridSize;
+        if (this.selectedEntity.size.x + w <= this.gridSize)
+          w = (this.selectedEntity.size.x - this.gridSize) * -1;
+        this.selectedEntity.size.x += w;
+        this.selectedEntity.pos.x -= w;
+        break;
+      default:
+        throw new Error(`Unrecognised direction: ${scaleDir}`);
     }
 
-    if (scale == "n") {
-      var h = this.selectedEntity.pos.y - Math.round(y / this.gridSize) * this.gridSize;
-      if (this.selectedEntity.size.y + h <= this.gridSize) {
-        h = (this.selectedEntity.size.y - this.gridSize) * -1;
-      }
-      this.selectedEntity.size.y += h;
-      this.selectedEntity.pos.y -= h;
-    } else if (scale == "s") {
-      var h = Math.round(y / this.gridSize) * this.gridSize - this.selectedEntity.pos.y;
-      this.selectedEntity.size.y = Math.max(this.gridSize, h);
-    } else if (scale == "e") {
-      var w = Math.round(x / this.gridSize) * this.gridSize - this.selectedEntity.pos.x;
-      this.selectedEntity.size.x = Math.max(this.gridSize, w);
-    } else if (scale == "w") {
-      var w = this.selectedEntity.pos.x - Math.round(x / this.gridSize) * this.gridSize;
-      if (this.selectedEntity.size.x + w <= this.gridSize) {
-        w = (this.selectedEntity.size.x - this.gridSize) * -1;
-      }
-      this.selectedEntity.size.x += w;
-      this.selectedEntity.pos.x -= w;
-    }
     this.selectedEntity._wmSettings.size.x = this.selectedEntity.size.x;
     this.selectedEntity._wmSettings.size.y = this.selectedEntity.size.y;
-
     this.loadEntitySettings();
   }
 
   newEntityClick(ev) {
     this.hideMenu();
-    var newEntity = this.spawnEntity(ev.target.id, 0, 0, {});
+    const newEntity = this.spawnEntity(ev.target.id, 0, 0, {});
     this.selectEntity(newEntity);
     this.moveSelectedEntity(this.selector.pos.x, this.selector.pos.y);
-    ig.editor.setModified();
-
+    ig.editor.setModified(); // TODO
     ig.game.undo.commitEntityCreate(newEntity);
   }
 
-  spawnEntity(className, x, y, settings) {
-    settings = settings || {};
-    var entityClass = ig.global[className];
-    if (entityClass) {
-      var newEntity = new entityClass(x, y, settings);
-      newEntity._wmInEditor = true;
-      newEntity._wmClassName = className;
-      newEntity._wmSettings = {};
-      for (var s in settings) {
-        newEntity._wmSettings[s] = settings[s];
-      }
-      this.entities.push(newEntity);
-      if (settings.name) {
-        this.namedEntities[settings.name] = newEntity;
-      }
-      this.sort();
-      return newEntity;
-    }
-    return null;
+  spawnEntity(className, x, y, settings = {}) {
+    const entityClass = Register.getEntityByType(className);
+    if (!entityClass) return null;
+
+    const newEntity = new entityClass(x, y, settings);
+    newEntity._wmInEditor = true;
+    newEntity._wmClassName = className;
+    newEntity._wmSettings = {};
+    for (let s in settings) newEntity._wmSettings[s] = settings[s];
+    this.entities.push(newEntity);
+    if (settings.name) this.namedEntities[settings.name] = newEntity;
+    this.sort();
+    return newEntity;
   }
 
   isOnScaleBorder(entity, selector) {
-    var border = 2;
-    var w = selector.pos.x - entity.pos.x;
-    var h = selector.pos.y - entity.pos.y;
-
+    const border = 2;
+    const w = selector.pos.x - entity.pos.x;
+    const h = selector.pos.y - entity.pos.y;
     if (w < border) return "w";
     if (w > entity.size.x - border) return "e";
-
     if (h < border) return "n";
     if (h > entity.size.y - border) return "s";
-
     return false;
   }
 
@@ -328,41 +299,43 @@ class EditEntities {
   //#region Settings
 
   loadEntitySettings() {
-    if (!this.selectedEntity) {
-      return;
-    }
-    var html =
-      '<div class="entityDefinition"><span class="key">x</span>:<span class="value" id="entityDefinitionPosX">' +
-      this.selectedEntity.pos.x +
-      "</span></div>" +
-      '<div class="entityDefinition"><span class="key">y</span>:<span class="value" id="entityDefinitionPosY">' +
-      this.selectedEntity.pos.y +
-      "</span></div>";
+    if (!this.selectedEntity) return;
+    let html = `
+      <div class="entityDefinition">
+        <span class="key">x</span>:
+        <span class="value" id="entityDefinitionPosX">${this.selectedEntity.pos.x}</span>
+      </div>
+      <div class="entityDefinition">
+        <span class="key">y</span>:
+        <span class="value" id="entityDefinitionPosY">${this.selectedEntity.pos.y}</span>
+    `;
 
     html += this.loadEntitySettingsRecursive(this.selectedEntity._wmSettings);
-    this.entityDefinitions.html(html);
+    this.entityDefinitions.innerHTML = html;
 
-    var className = this.selectedEntity._wmClassName.replace(/^Entity/, "");
-    $("#entityClass").text(className);
+    const className = this.selectedEntity._wmClassName.replace(/^Entity/, "");
+    $el("#entityClass").textContent = className;
 
-    $(".entityDefinition").bind("mouseup", this.selectEntitySetting);
+    const entityDefinitionElements = document.getElementsByClassName("entityDefinition");
+    for (let i = 0; i < entityDefinitionElements.length; i++) {
+      const element = entityDefinitionElements[i];
+      element.addEventListener("mouseup", (e) => this.selectEntitySetting(element));
+    }
   }
 
-  loadEntitySettingsRecursive(settings, path) {
-    path = path || "";
-    var html = "";
-    for (var key in settings) {
-      var value = settings[key];
-      if (typeof value == "object") {
+  loadEntitySettingsRecursive(settings, path = "") {
+    let html = "";
+    for (let key in settings) {
+      const value = settings[key];
+      if (typeof value === "object")
         html += this.loadEntitySettingsRecursive(value, path + key + ".");
-      } else {
-        html +=
-          '<div class="entityDefinition"><span class="key">' +
-          path +
-          key +
-          '</span>:<span class="value">' +
-          value +
-          "</span></div>";
+      else {
+        html += `
+          <div class="entityDefinition">
+            <span class="key">${path}${key}</span>:
+            <span class="value">${value}</span>
+          </div>
+          `;
       }
     }
 
@@ -370,83 +343,68 @@ class EditEntities {
   }
 
   setEntitySetting(ev) {
-    if (ev.which != 13) {
-      return true;
-    }
-    var key = $("#entityKey").val();
-    var value = $("#entityValue").val();
-    var floatVal = parseFloat(value);
-    if (value == floatVal) {
-      value = floatVal;
-    }
+    if (ev.which !== 13) return true;
+    const eKey = $el("#entityKey");
+    const eVal = $el("#entityValue");
+    const key = eKey.value;
+    const value = eVal.value;
+    const floatVal = parseFloat(value);
 
-    if (key == "name") {
-      if (this.selectedEntity.name) {
-        delete this.namedEntities[this.selectedEntity.name];
-      }
+    if (value == floatVal) value = floatVal;
+    if (key === "name") {
+      if (this.selectedEntity.name) delete this.namedEntities[this.selectedEntity.name];
       this.namedEntities[value] = this.selectedEntity;
     }
 
-    if (key == "x") {
-      this.selectedEntity.pos.x = Math.round(value);
-    } else if (key == "y") {
-      this.selectedEntity.pos.y = Math.round(value);
-    } else {
+    if (key === "x") this.selectedEntity.pos.x = Math.round(value);
+    else if (key === "y") this.selectedEntity.pos.y = Math.round(value);
+    else {
       this.writeSettingAtPath(this.selectedEntity._wmSettings, key, value);
-      ig.merge(this.selectedEntity, this.selectedEntity._wmSettings);
+      NativeExtensions.extend(this.selectedEntity, this.selectedEntity._wmSettings);
     }
 
     this.sort();
 
-    ig.game.setModified();
+    ig.game.setModified(); // TODO
     ig.game.draw();
 
-    $("#entityKey").val("");
-    $("#entityValue").val("");
-    $("#entityValue").blur();
+    eKey.value = "";
+    eVal.value = "";
+    eVal.blur();
     this.loadEntitySettings();
-
-    $("#entityKey").focus();
+    eKey.focus();
     return false;
   }
 
   writeSettingAtPath(root, path, value) {
     path = path.split(".");
-    var cur = root;
-    for (var i = 0; i < path.length; i++) {
-      var n = path[i];
-      if (i < path.length - 1 && typeof cur[n] != "object") {
-        cur[n] = {};
-      }
-
-      if (i == path.length - 1) {
-        cur[n] = value;
-      }
-      cur = cur[n];
+    let current = root;
+    for (let i = 0; i < path.length; i++) {
+      const n = path[i];
+      if (i < path.length - 1 && typeof current[n] !== "object") current[n] = {};
+      if (i === path.length - 1) current[n] = value;
+      current = current[n];
     }
 
     this.trimObject(root);
   }
 
   trimObject(obj) {
-    var isEmpty = true;
-    for (var i in obj) {
-      if (obj[i] === "" || (typeof obj[i] == "object" && this.trimObject(obj[i]))) {
-        delete obj[i];
-      }
-
-      if (typeof obj[i] != "undefined") {
-        isEmpty = false;
-      }
+    let isEmpty = true;
+    for (let i in obj) {
+      if (obj[i] === "" || (typeof obj[i] == "object" && this.trimObject(obj[i]))) delete obj[i];
+      if (typeof obj[i] !== "undefined") isEmpty = false;
     }
 
     return isEmpty;
   }
 
-  selectEntitySetting(ev) {
-    $("#entityKey").val($(this).children(".key").text());
-    $("#entityValue").val($(this).children(".value").text());
-    $("#entityValue").select();
+  selectEntitySetting(element) {
+    const entityKey = $el("#entityKey");
+    const entityVal = $el("#entityValue");
+    entityKey.value = element.querySelector(".key").textContent;
+    entityVal.value = element.querySelector(".value").textContent;
+    entityVal.dispatchEvent(new Event("select"));
   }
 
   //#region Settings
