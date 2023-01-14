@@ -131,23 +131,27 @@ class GameDebugger {
     debugPanel.append(this.#newBulkActionsContainer());
     debugPanel.append(this.#newSelectedEntityContainer());
     debugPanel.append(this.#newActiveEntitiesContainer());
-    /*active - left 12 top 20
-    bulk - left 197 top 5
-    performance - left 7 top 185
-    selected - left 67 top 352 */
     document.body.prepend(debugPanel);
   }
 
   #addContainerEvents() {
     const { selectedEntity, statsContainer, bulkActions, activeEntityList } = this.DOMElements;
     selectedEntity.draggable = true;
-    dragElement(selectedEntity);
     statsContainer.draggable = true;
-    dragElement(statsContainer);
     bulkActions.draggable = true;
-    dragElement(bulkActions);
     activeEntityList.draggable = true;
+    dragElement(selectedEntity);
+    dragElement(statsContainer);
+    dragElement(bulkActions);
     dragElement(activeEntityList);
+    selectedEntity.style.left = "67px";
+    selectedEntity.style.top = "368px";
+    statsContainer.style.left = "7px";
+    statsContainer.style.top = "202px";
+    bulkActions.style.left = "197px";
+    bulkActions.style.top = "5px";
+    activeEntityList.style.left = "12px";
+    activeEntityList.style.top = "20px";
 
     const forEachEntity = (cb) => {
       for (let i = 0; i < this.game.entities.length; i++) cb(this.game.entities[i]);
@@ -176,6 +180,18 @@ class GameDebugger {
       forEachEntity((e) => (e._debugShowName = this.bulk.showNames));
       this.#updateBulkActionsDisplay();
     });
+
+    $el("#debug-bulk-map-collision-x").parentElement.addEventListener("click", () => {
+      this.bulk.mapCollisionX = !this.bulk.mapCollisionX;
+      forEachEntity((e) => (e._debugCollisionWithMapOnX = this.bulk.mapCollisionX));
+      this.#updateBulkActionsDisplay();
+    });
+
+    $el("#debug-bulk-map-collision-y").parentElement.addEventListener("click", () => {
+      this.bulk.mapCollisionY = !this.bulk.mapCollisionY;
+      forEachEntity((e) => (e._debugCollisionWithMapOnY = this.bulk.mapCollisionY));
+      this.#updateBulkActionsDisplay();
+    });
   }
 
   //#endregion Containers
@@ -194,7 +210,7 @@ class GameDebugger {
     entityProto._debugShowName = true;
     entityProto._debugCollisionWithEntity = true;
     entityProto._debugCollisionWithMapOnX = true;
-    entityProto._debugCollisionWithMapOnY = false;
+    entityProto._debugCollisionWithMapOnY = true;
 
     // Entity Debug methods
     entityProto._debugDrawLine = function (color, sx, sy, dx, dy) {
@@ -470,10 +486,12 @@ class GameDebugger {
   }
 
   #updateBulkActionsDisplay() {
-    $el("#debug-bulk-collision-on").textContent = boolToOnOff(this.bulk.entityCollision);
     $el("#debug-bulk-show-path").textContent = boolToOnOff(this.bulk.showVelocities);
     $el("#debug-bulk-show-hitbox").textContent = boolToOnOff(this.bulk.showHitboxes);
     $el("#debug-bulk-show-name").textContent = boolToOnOff(this.bulk.showNames);
+    $el("#debug-bulk-collision-on").textContent = boolToOnOff(this.bulk.entityCollision);
+    $el("#debug-bulk-map-collision-x").textContent = boolToOnOff(this.bulk.mapCollisionX);
+    $el("#debug-bulk-map-collision-y").textContent = boolToOnOff(this.bulk.mapCollisionY);
   }
 
   #isMouseWithinEntity(x, y, entity) {
