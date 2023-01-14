@@ -55,44 +55,40 @@ class EditEntities {
 
   //#region Saving/Loading
 
+  // TODO!
   fileNameToClassName(name) {
-    var typeName = "-" + name.replace(/^.*\/|\.js/g, "");
+    const typeName = "-" + name.replace(/^.*\/|\.js/g, "");
     typeName = typeName.replace(/-(\w)/g, function (m, a) {
       return a.toUpperCase();
     });
     return "Entity" + typeName;
   }
 
+  //TODO
   importEntityClass(modules) {
-    var unloadedClasses = [];
-    for (var m in modules) {
-      var className = this.fileNameToClassName(modules[m]);
-      var entityName = className.replace(/^Entity/, "");
+    const unloadedClasses = [];
+    for (let m in modules) {
+      const className = this.fileNameToClassName(modules[m]);
+      const entityName = className.replace(/^Entity/, "");
+      const classDef = Register.getEntityByType(className);
 
-      // ig.global[className] should be the actual class object
-      if (className && ig.global[className]) {
+      if (classDef) {
         // Ignore entities that have the _wmIgnore flag
-        if (!ig.global[className].prototype._wmIgnore) {
-          var a = $("<div/>", {
-            id: className,
-            href: "#",
-            html: entityName,
-            mouseup: this.newEntityClick.bind(this),
-          });
+        if (!classDef.prototype._wmIgnore) {
+          const a = $new("div");
+          a.id = className;
+          a.href = "#";
+          a.textContent = entityName;
+          a.addEventListener("mouseup", (e) => this.newEntityClick(e));
           this.menu.append(a);
           this.entityClasses[className] = m;
         }
-      } else {
-        unloadedClasses.push(modules[m] + " (expected name: " + className + ")");
-      }
+      } else unloadedClasses.push(modules[m] + " (expected name: " + className + ")");
     }
 
     if (unloadedClasses.length > 0) {
-      var warning =
-        "The following entity classes were not loaded due to\n" +
-        "file and class name mismatches: \n\n" +
-        unloadedClasses.join("\n");
-      alert(warning);
+      alert(`"The following entity classes were not loaded due to\nfile and class name mismatches: \n\n
+        ${unloadedClasses.join("\n")}`);
     }
   }
 
@@ -101,23 +97,15 @@ class EditEntities {
   }
 
   getSaveData() {
-    var ents = [];
-    for (var i = 0; i < this.entities.length; i++) {
-      var ent = this.entities[i];
-      var type = ent._wmClassName;
-      var data = { type: type, x: ent.pos.x, y: ent.pos.y };
-
-      var hasSettings = false;
-      for (var p in ent._wmSettings) {
-        hasSettings = true;
-      }
-      if (hasSettings) {
-        data.settings = ent._wmSettings;
-      }
-
-      ents.push(data);
+    const entitiesToSave = [];
+    for (const i = 0; i < this.entities.length; i++) {
+      const ent = this.entities[i];
+      const type = ent._wmClassName;
+      const data = { type: type, x: ent.pos.x, y: ent.pos.y };
+      if (ent._wmSettings) data.settings = ent._wmSettings;
+      entitiesToSave.push(data);
     }
-    return ents;
+    return entitiesToSave;
   }
 
   //#endregion Saving/Loading
@@ -128,38 +116,36 @@ class EditEntities {
     this.selector.pos = { x, y };
 
     // Find all possible selections
-    var possibleSelections = [];
-    for (var i = 0; i < this.entities.length; i++) {
-      if (this.entities[i].touches(this.selector)) {
-        possibleSelections.push(this.entities[i]);
-      }
-    }
+    const possibleSelections = [];
+    for (let i = 0; i < this.entities.length; i++)
+      if (this.entities[i].touches(this.selector)) possibleSelections.push(this.entities[i]);
 
-    // Nothing found? Early out.
     if (!possibleSelections.length) {
       this.selectEntity(null);
-      return false;
+      return;
     }
 
     // Find the 'next' selection
-    var selectedIndex = possibleSelections.indexOf(this.selectedEntity);
-    var nextSelection = (selectedIndex + 1) % possibleSelections.length;
-    var ent = possibleSelections[nextSelection];
+    const selectedIndex = possibleSelections.indexOf(this.selectedEntity);
+    const nextSelection = (selectedIndex + 1) % possibleSelections.length;
+    const entity = possibleSelections[nextSelection];
 
     // Select it!
-    this.selector.offset = {
-      x: x - ent.pos.x + ent.offset.x,
-      y: y - ent.pos.y + ent.offset.y,
-    };
-    this.selectEntity(ent);
-    this.wasSelectedOnScaleBorder = this.isOnScaleBorder(ent, this.selector);
-    return ent;
+    const x = x - entity.pos.x + entity.offset.x;
+    const y = y - entity.pos.y + entity.offset.y;
+    this.selector.offset = { x, y };
+    this.selectEntity(entity);
+    this.wasSelectedOnScaleBorder = this.isOnScaleBorder(entity, this.selector);
+    return entity;
   }
 
   selectEntity(entity) {
-    if (entity && entity != this.selectedEntity) {
+    const entityKey = $el("#entityKey");
+    const entityValue = $el("#entityValue");
+    if (entity && entity !== this.selectedEntity) {
       this.selectedEntity = entity;
-      $("#entitySettings").fadeOut(
+      //TODO
+      $el("#entitySettings").fadeOut(
         100,
         function () {
           this.loadEntitySettings();
@@ -167,14 +153,15 @@ class EditEntities {
         }.bind(this)
       );
     } else if (!entity) {
-      $("#entitySettings").fadeOut(100);
-      $("#entityKey").blur();
-      $("#entityValue").blur();
+      $el("#entitySettings").fadeOut(100);
+      entityKey.blur();
+      entityValue.blur();
     }
 
     this.selectedEntity = entity;
-    $("#entityKey").val("");
-    $("#entityValue").val("");
+    // TODO - check
+    entityKey.value = "";
+    entityValue.value = "";
   }
 
   //#endregion Selecting
