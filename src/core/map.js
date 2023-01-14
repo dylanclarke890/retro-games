@@ -6,8 +6,11 @@ class GameMap {
   pxHeight = 1;
   data = [[]];
   name = null;
+  /** @type {System} */
+  system = null;
 
   constructor({ system, tilesize, data }) {
+    Guard.againstNull({ system });
     this.tilesize = tilesize;
     this.data = data || [[]];
     this.system = system;

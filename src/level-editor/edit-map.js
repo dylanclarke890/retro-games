@@ -15,13 +15,17 @@ class EditMap extends BackgroundMap {
   isSelecting = false;
   selectionBegin = null;
 
-  constructor(name, tilesize, tileset, foreground, system) {
+  constructor({ name, tilesize, tileset, foreground, system, config }) {
     tileset = tileset || "";
     super({ tilesize, data: [[0]], tileset, system, name, foreground });
+    Guard.againstNull({ config });
+    this.config = config;
+
     this.div = $new("div");
     this.div.className = "layer layerActive";
     this.div.id = `layer_${name}`;
     this.div.addEventListener("click", () => this.click());
+
     this.setName(name);
     if (this.foreground) $el("#layers").prepend(this.div);
     else $el("#layerEntities").after(this.div);
@@ -75,10 +79,9 @@ class EditMap extends BackgroundMap {
   }
 
   setCollisionTileset() {
-    // TODO
-    const path = wm.config.collisionTiles.path;
-    const scale = this.tilesize / wm.config.collisionTiles.tilesize;
-    this.tiles = new AutoResizedImage(path, scale);
+    const path = this.config.collisionTiles.path;
+    const internalScale = this.tilesize / this.config.collisionTiles.tilesize;
+    this.tiles = new AutoResizedImage({ path, internalScale, system: this.system, config });
   }
 
   //#region UI
@@ -131,7 +134,7 @@ class EditMap extends BackgroundMap {
       this.ignoreLastClick = false;
       return;
     }
-    ig.editor.setActiveLayer(this.name);
+    ig.editor.setActiveLayer(this.name); // TODO
   }
 
   destroy() {
@@ -185,38 +188,39 @@ class EditMap extends BackgroundMap {
   //#region Drawing
 
   draw() {
+    const { view, colors } = this.config;
     // For performance reasons, repeated background maps are not drawn when zoomed out
-    if (this.visible && !(wm.config.view.zoom < 1 && this.repeat)) this.drawTiled();
+    if (this.visible && !(view.zoom < 1 && this.repeat)) this.drawTiled();
 
-    // Grid TODO
-    if (this.active && wm.config.view.grid) {
-      let x = -ig.system.getDrawPos(this.scroll.x % this.tilesize) - 0.5;
-      let y = -ig.system.getDrawPos(this.scroll.y % this.tilesize) - 0.5;
-      const step = this.tilesize * ig.system.scale;
+    const { drawPosition, scale, ctx, realHeight, realWidth } = this.system;
+    if (this.active && view.grid) {
+      let x = -drawPosition(this.scroll.x % this.tilesize) - 0.5;
+      let y = -drawPosition(this.scroll.y % this.tilesize) - 0.5;
+      const step = this.tilesize * scale;
 
-      ig.system.context.beginPath();
-      for (x; x < ig.system.realWidth; x += step) {
-        ig.system.context.moveTo(x, 0);
-        ig.system.context.lineTo(x, ig.system.realHeight);
+      ctx.beginPath();
+      for (x; x < realWidth; x += step) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, realHeight);
       }
-      for (y; y < ig.system.realHeight; y += step) {
-        ig.system.context.moveTo(0, y);
-        ig.system.context.lineTo(ig.system.realWidth, y);
+      for (y; y < realHeight; y += step) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(realWidth, y);
       }
-      ig.system.context.strokeStyle = wm.config.colors.secondary;
-      ig.system.context.stroke();
-      ig.system.context.closePath();
+      ctx.strokeStyle = colors.secondary;
+      ctx.stroke();
+      ctx.closePath();
     }
 
     // Bounds
     if (this.active) {
-      ig.system.context.lineWidth = 1;
-      ig.system.context.strokeStyle = wm.config.colors.primary;
-      ig.system.context.strokeRect(
-        -ig.system.getDrawPos(this.scroll.x) - 0.5,
-        -ig.system.getDrawPos(this.scroll.y) - 0.5,
-        this.width * this.tilesize * ig.system.scale + 1,
-        this.height * this.tilesize * ig.system.scale + 1
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = colors.primary;
+      ctx.strokeRect(
+        -drawPosition(this.scroll.x) - 0.5,
+        -drawPosition(this.scroll.y) - 0.5,
+        this.width * this.tilesize * scale + 1,
+        this.height * this.tilesize * scale + 1
       );
     }
   }
@@ -231,47 +235,48 @@ class EditMap extends BackgroundMap {
   }
 
   drawCursor(x, y) {
+    const { scale, ctx } = this.system;
     if (this.isSelecting) {
       const r = this.getSelectionRect(x, y);
-
-      ig.system.context.lineWidth = 1;
-      ig.system.context.strokeStyle = wm.config.colors.selection;
-      ig.system.context.strokeRect(
-        (r.x * this.tilesize - this.scroll.x) * ig.system.scale - 0.5,
-        (r.y * this.tilesize - this.scroll.y) * ig.system.scale - 0.5,
-        r.w * this.tilesize * ig.system.scale + 1,
-        r.h * this.tilesize * ig.system.scale + 1
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = this.config.colors.selection;
+      ctx.strokeRect(
+        (r.x * this.tilesize - this.scroll.x) * scale - 0.5,
+        (r.y * this.tilesize - this.scroll.y) * scale - 0.5,
+        r.w * this.tilesize * scale + 1,
+        r.h * this.tilesize * scale + 1
       );
-    } else {
-      const w = this.brush[0].length;
-      const h = this.brush.length;
-      const co = this.getCursorOffset();
-      const cx =
-        Math.floor((x + this.scroll.x) / this.tilesize) * this.tilesize - this.scroll.x - co.x;
-      const cy =
-        Math.floor((y + this.scroll.y) / this.tilesize) * this.tilesize - this.scroll.y - co.y;
-
-      ig.system.context.lineWidth = 1;
-      ig.system.context.strokeStyle = wm.config.colors.primary;
-      ig.system.context.strokeRect(
-        ig.system.getDrawPos(cx) - 0.5,
-        ig.system.getDrawPos(cy) - 0.5,
-        w * this.tilesize * ig.system.scale + 1,
-        h * this.tilesize * ig.system.scale + 1
-      );
-
-      ig.system.context.globalAlpha = 0.5;
-      for (let ty = 0; ty < h; ty++) {
-        for (let tx = 0; tx < w; tx++) {
-          const t = this.brush[ty][tx];
-          if (!t) continue;
-          const px = cx + tx * this.tilesize;
-          const py = cy + ty * this.tilesize;
-          this.tiles.drawTile(px, py, t - 1, this.tilesize);
-        }
-      }
-      ig.system.context.globalAlpha = 1;
+      return;
     }
+
+    const w = this.brush[0].length;
+    const h = this.brush.length;
+    const co = this.getCursorOffset();
+    const cx =
+      Math.floor((x + this.scroll.x) / this.tilesize) * this.tilesize - this.scroll.x - co.x;
+    const cy =
+      Math.floor((y + this.scroll.y) / this.tilesize) * this.tilesize - this.scroll.y - co.y;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.config.colors.primary;
+    ctx.strokeRect(
+      ig.system.getDrawPos(cx) - 0.5,
+      ig.system.getDrawPos(cy) - 0.5,
+      w * this.tilesize * scale + 1,
+      h * this.tilesize * scale + 1
+    );
+
+    ctx.globalAlpha = 0.5;
+    for (let ty = 0; ty < h; ty++) {
+      for (let tx = 0; tx < w; tx++) {
+        const t = this.brush[ty][tx];
+        if (!t) continue;
+        const px = cx + tx * this.tilesize;
+        const py = cy + ty * this.tilesize;
+        this.tiles.drawTile(px, py, t - 1, this.tilesize);
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 
   // #endregion Drawing
@@ -280,7 +285,7 @@ class EditMap extends BackgroundMap {
 class AutoResizedImage extends GameImage {
   internalScale = 1;
 
-  constructor(path, internalScale, system) {
+  constructor({ path, internalScale, system }) {
     super({ system, path });
     this.internalScale = internalScale;
   }
@@ -310,7 +315,7 @@ class AutoResizedImage extends GameImage {
     }
 
     this.loaded = true;
-    if (ig.system.scale !== 1) this.resize(ig.system.scale);
+    if (this.system.scale !== 1) this.resize(this.system.scale);
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 }
