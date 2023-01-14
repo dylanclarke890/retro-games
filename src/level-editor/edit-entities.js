@@ -19,21 +19,29 @@ class EditEntities {
 
   constructor(div) {
     this.div = div;
-    div.bind("mouseup", this.click.bind(this));
-    this.div.children(".visible").bind("mousedown", this.toggleVisibilityClick.bind(this));
+    div.addEventListener("mouseup", () => this.click());
+    div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
 
-    this.menu = $("#entityMenu");
-    this.importEntityClass(wm.entityModules);
-    this.entityDefinitions = $("#entityDefinitions");
+    this.menu = $new("div");
+    this.menu.id = "entityMenu";
+    this.importEntityClass(wm.entityModules); // TODO
+    this.entityDefinitions = $new("div");
+    this.entityDefinitions.id = "entityDefinitions";
 
-    $("#entityKey").bind("keydown", function (ev) {
-      if (ev.which == 13) {
-        $("#entityValue").focus();
+    // TODO
+    const entityKey = $new("div");
+    entityKey.id = "entityKey";
+    entityKey.addEventListener("keydown", (e) => {
+      if (e.which == 13) {
+        // TODO
+        $el("#entityValue").focus();
         return false;
       }
       return true;
     });
-    $("#entityValue").bind("keydown", this.setEntitySetting.bind(this));
+    const entityValue = $new("div");
+    entityValue.id = "entityValue";
+    entityValue.addEventListener("keydown", (e) => this.setEntitySetting(e));
   }
 
   clear() {
@@ -496,10 +504,8 @@ class EditEntities {
     ig.game.draw();
   }
 
-  toggleVisibilityClick(ev) {
-    if (!this.active) {
-      this.ignoreLastClick = true;
-    }
+  toggleVisibilityClick() {
+    if (!this.active) this.ignoreLastClick = true;
     this.toggleVisibility();
   }
 
