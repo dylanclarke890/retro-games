@@ -14,7 +14,8 @@
 // #endregion LIB
 
 // #region CORE
-/// <reference path="assets/js/core/debug.js"/>
+/// <reference path="assets/js/debug/performance.js"/>
+/// <reference path="assets/js/debug/debug.js"/>
 /// <reference path="assets/js/core/entity.js"/>
 /// <reference path="assets/js/core/game.js"/>
 /// <reference path="assets/js/core/input.js"/>
