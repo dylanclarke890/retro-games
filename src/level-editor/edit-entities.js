@@ -29,8 +29,7 @@ class EditEntities {
     this.entityDefinitions.id = "entityDefinitions";
 
     // TODO
-    const entityKey = $new("div");
-    entityKey.id = "entityKey";
+    const entityKey = $el("#entityKey");
     entityKey.addEventListener("keydown", (e) => {
       if (e.which == 13) {
         // TODO
@@ -39,8 +38,7 @@ class EditEntities {
       }
       return true;
     });
-    const entityValue = $new("div");
-    entityValue.id = "entityValue";
+    const entityValue = $el("#entityValue");
     entityValue.addEventListener("keydown", (e) => this.setEntitySetting(e));
   }
 
@@ -413,40 +411,40 @@ class EditEntities {
 
   setHotkey(hotkey) {
     this.hotkey = hotkey;
-    this.div.attr("title", "Select Layer (" + this.hotkey + ")");
+    this.div.title = `Select Layer (${this.hotkey})`;
   }
 
   showMenu(x, y) {
+    const { scale } = this.system; // TODO
+    // TODO
     this.selector.pos = {
       x: Math.round((x + ig.editor.screen.x) / this.gridSize) * this.gridSize,
       y: Math.round((y + ig.editor.screen.y) / this.gridSize) * this.gridSize,
     };
-    this.menu.css({ top: y * ig.system.scale + 2, left: x * ig.system.scale + 2 });
+    this.menu.style.top = `${y * scale + 2}px`;
+    this.menu.style.left = `${x * scale + 2}px`;
+    this.menu.style.display = "block";
     this.menu.show();
   }
 
   hideMenu() {
+    // TODO
     ig.editor.mode = ig.editor.MODE.DEFAULT;
-    this.menu.hide();
+    this.menu.style.display = "none";
   }
 
   setActive(active) {
     this.active = active;
-    if (active) {
-      this.div.addClass("layerActive");
-    } else {
-      this.div.removeClass("layerActive");
-    }
+    if (active) this.div.classList.add("layerActive");
+    else this.div.classList.remove("layerActive");
   }
 
   toggleVisibility() {
     this.visible ^= 1;
-    if (this.visible) {
-      this.div.children(".visible").addClass("checkedVis");
-    } else {
-      this.div.children(".visible").removeClass("checkedVis");
-    }
-    ig.game.draw();
+    const visibleEl = this.div.querySelector(".visible");
+    if (this.visible) visibleEl.classList.add("checkedVis");
+    else visibleEl.classList.remove("checkedVis");
+    ig.game.draw(); // TODO
   }
 
   toggleVisibilityClick() {
@@ -459,26 +457,23 @@ class EditEntities {
       this.ignoreLastClick = false;
       return;
     }
-    ig.editor.setActiveLayer("entities");
+    ig.editor.setActiveLayer("entities"); // TODO
   }
 
   mousemove(x, y) {
     this.selector.pos = { x: x, y: y };
 
-    if (this.selectedEntity) {
-      if (this.selectedEntity._wmScalable && this.selectedEntity.touches(this.selector)) {
-        var scale = this.isOnScaleBorder(this.selectedEntity, this.selector);
-        if (scale == "n" || scale == "s") {
-          $("body").css("cursor", "ns-resize");
-          return;
-        } else if (scale == "e" || scale == "w") {
-          $("body").css("cursor", "ew-resize");
-          return;
-        }
-      }
+    if (
+      !this.selectedEntity ||
+      !(this.selectedEntity._wmScalable && this.selectedEntity.touches(this.selector))
+    ) {
+      document.body.style.cursor = "default";
+      return;
     }
 
-    $("body").css("cursor", "default");
+    const scaleDir = this.isOnScaleBorder(this.selectedEntity, this.selector);
+    if (scaleDir === "n" || scaleDir === "s") document.body.style.cursor = "ns-resize";
+    else if (scaleDir === "e" || scaleDir === "w") document.body.style.cursor = "ew-resize";
   }
 
   //#region UI
@@ -486,91 +481,86 @@ class EditEntities {
   //#region Drawing
 
   draw() {
-    if (this.visible) {
-      for (var i = 0; i < this.entities.length; i++) {
-        this.drawEntity(this.entities[i]);
-      }
-    }
+    if (!this.visible) return;
+    for (let i = 0; i < this.entities.length; i++) this.drawEntity(this.entities[i]);
   }
 
-  drawEntity(ent) {
+  drawEntity(entity) {
     // entity itself
-    ent.draw();
+    entity.draw();
 
+    const { scale, ctx, drawPosition } = this.system;
     // box
-    if (ent._wmDrawBox) {
-      ig.system.context.fillStyle = ent._wmBoxColor || "rgba(128, 128, 128, 0.9)";
-      ig.system.context.fillRect(
-        ig.system.getDrawPos(ent.pos.x - ig.game.screen.x),
-        ig.system.getDrawPos(ent.pos.y - ig.game.screen.y),
-        ent.size.x * ig.system.scale,
-        ent.size.y * ig.system.scale
+    if (entity._wmDrawBox) {
+      ctx.fillStyle = entity._wmBoxColor || "rgba(128, 128, 128, 0.9)";
+      // TODO
+      ctx.fillRect(
+        drawPosition(entity.pos.x - ig.game.screen.x), // TODO
+        drawPosition(entity.pos.y - ig.game.screen.y),
+        entity.size.x * scale,
+        entity.size.y * scale
       );
     }
 
-    if (wm.config.labels.draw) {
+    if (this.config.labels.draw) {
       // description
-      var className = ent._wmClassName.replace(/^Entity/, "");
-      var description = className + (ent.name ? ": " + ent.name : "");
+      const className = entity._wmClassName.replace(/^Entity/, "");
+      const description = className + (entity.name ? ": " + entity.name : "");
 
       // text-shadow
-      ig.system.context.fillStyle = "rgba(0,0,0,0.4)";
-      ig.system.context.fillText(
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.fillText(
         description,
-        ig.system.getDrawPos(ent.pos.x - ig.game.screen.x),
-        ig.system.getDrawPos(ent.pos.y - ig.game.screen.y + 0.5)
+        drawPosition(entity.pos.x - ig.game.screen.x),
+        drawPosition(entity.pos.y - ig.game.screen.y + 0.5) // TODO
       );
 
       // text
-      ig.system.context.fillStyle = wm.config.colors.primary;
-      ig.system.context.fillText(
+      ctx.fillStyle = this.config.colors.primary;
+      ctx.fillText(
         description,
-        ig.system.getDrawPos(ent.pos.x - ig.game.screen.x),
-        ig.system.getDrawPos(ent.pos.y - ig.game.screen.y)
+        drawPosition(entity.pos.x - ig.game.screen.x), // TODO
+        drawPosition(entity.pos.y - ig.game.screen.y)
       );
     }
 
     // line to targets
-    if (typeof ent.target === "object") {
-      for (var t in ent.target) {
-        this.drawLineToTarget(ent, ent.target[t]);
-      }
-    }
+    if (typeof entity.target !== "object") return;
+    for (let t in entity.target) this.drawLineToTarget(entity, entity.target[t]);
   }
 
   drawLineToTarget(ent, target) {
-    target = ig.game.getEntityByName(target);
-    if (!target) {
-      return;
-    }
+    target = ig.game.getEntityByName(target); // TODO
+    if (!target) return;
 
-    ig.system.context.strokeStyle = "#fff";
-    ig.system.context.lineWidth = 1;
+    const { ctx, drawPosition } = this.system;
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1;
 
-    ig.system.context.beginPath();
-    ig.system.context.moveTo(
-      ig.system.getDrawPos(ent.pos.x + ent.size.x / 2 - ig.game.screen.x),
-      ig.system.getDrawPos(ent.pos.y + ent.size.y / 2 - ig.game.screen.y)
+    ctx.beginPath();
+    ctx.moveTo(
+      drawPosition(ent.pos.x + ent.size.x / 2 - ig.game.screen.x), // TODO
+      drawPosition(ent.pos.y + ent.size.y / 2 - ig.game.screen.y)
     );
-    ig.system.context.lineTo(
-      ig.system.getDrawPos(target.pos.x + target.size.x / 2 - ig.game.screen.x),
-      ig.system.getDrawPos(target.pos.y + target.size.y / 2 - ig.game.screen.y)
+    ctx.lineTo(
+      drawPosition(target.pos.x + target.size.x / 2 - ig.game.screen.x), // TODO
+      drawPosition(target.pos.y + target.size.y / 2 - ig.game.screen.y)
     );
-    ig.system.context.stroke();
-    ig.system.context.closePath();
+    ctx.stroke();
+    ctx.closePath();
   }
 
-  drawCursor(x, y) {
-    if (this.selectedEntity) {
-      ig.system.context.lineWidth = 1;
-      ig.system.context.strokeStyle = wm.config.colors.highlight;
-      ig.system.context.strokeRect(
-        ig.system.getDrawPos(this.selectedEntity.pos.x - ig.editor.screen.x) - 0.5,
-        ig.system.getDrawPos(this.selectedEntity.pos.y - ig.editor.screen.y) - 0.5,
-        this.selectedEntity.size.x * ig.system.scale + 1,
-        this.selectedEntity.size.y * ig.system.scale + 1
-      );
-    }
+  drawCursor(_x, _y) {
+    if (!this.selectedEntity) return;
+    const { ctx, drawPosition, scale } = this.system;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.config.colors.highlight;
+    ctx.strokeRect(
+      drawPosition(this.selectedEntity.pos.x - ig.editor.screen.x) - 0.5, // TODO
+      drawPosition(this.selectedEntity.pos.y - ig.editor.screen.y) - 0.5,
+      this.selectedEntity.size.x * scale + 1,
+      this.selectedEntity.size.y * scale + 1
+    );
   }
 
   //#endregion Drawing
