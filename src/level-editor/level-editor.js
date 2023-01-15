@@ -614,75 +614,71 @@ class LevelEditor {
   }
 
   keyup(action) {
-    if (!this.activeLayer) {
-      return;
-    }
+    if (!this.activeLayer) return;
 
-    if (action == "delete") {
-      this.entities.deleteSelectedEntity();
-      this.setModified();
-    } else if (action == "clone") {
-      this.entities.cloneSelectedEntity();
-      this.setModified();
-    } else if (action == "grid") {
-      wm.config.view.grid = !wm.config.view.grid;
-    } else if (action == "menu") {
-      if (this.mode != this.MODE.TILESELECT && this.mode != this.MODE.ENTITYSELECT) {
-        if (this.activeLayer == this.entities) {
-          this.mode = this.MODE.ENTITYSELECT;
-          this.entities.showMenu(ig.input.mouse.x, ig.input.mouse.y);
+    switch (action) {
+      case "delete":
+        this.entities.deleteSelectedEntity();
+        this.setModified();
+        break;
+      case "clone":
+        this.entities.cloneSelectedEntity();
+        this.setModified();
+        break;
+      case "grid":
+        this.config.view.grid = !this.config.view.grid;
+        break;
+      case "menu":
+        if (this.mode !== this.MODE.TILESELECT && this.mode !== this.MODE.ENTITYSELECT) {
+          if (this.activeLayer === this.entities) {
+            this.mode = this.MODE.ENTITYSELECT;
+            this.entities.showMenu(this.input.mouse.x, this.input.mouse.y);
+          } else {
+            this.mode = this.MODE.TILESELECT;
+            this.activeLayer.tileSelect.setPosition(this.input.mouse.x, this.input.mouse.y);
+          }
         } else {
-          this.mode = this.MODE.TILESELECT;
-          this.activeLayer.tileSelect.setPosition(ig.input.mouse.x, ig.input.mouse.y);
+          this.mode = this.MODE.DEFAULT;
+          this.entities.hideMenu();
         }
-      } else {
-        this.mode = this.MODE.DEFAULT;
-        this.entities.hideMenu();
-      }
-    } else if (action == "zoomin") {
-      this.zoom(1);
-    } else if (action == "zoomout") {
-      this.zoom(-1);
-    }
-
-    if (action == "draw") {
-      // select tile
-      if (this.mode == this.MODE.TILESELECT) {
-        this.activeLayer.brush = this.activeLayer.tileSelect.endSelecting(
-          ig.input.mouse.x,
-          ig.input.mouse.y
-        );
-        this.mode = this.MODE.DEFAULT;
-      } else if (this.activeLayer == this.entities) {
-        this.undo.endEntityEdit();
-      } else {
-        if (this.activeLayer.isSelecting) {
-          this.activeLayer.brush = this.activeLayer.endSelecting(
-            ig.input.mouse.x,
-            ig.input.mouse.y
+        break;
+      case "zoomin":
+        this.zoom(1);
+        break;
+      case "zoomout":
+        this.zoom(-1);
+        break;
+      case "draw":
+        // select tile
+        if (this.mode === this.MODE.TILESELECT) {
+          this.activeLayer.brush = this.activeLayer.tileSelect.endSelecting(
+            this.input.mouse.x,
+            this.input.mouse.y
           );
-        } else {
-          this.undo.endMapDraw();
-        }
-      }
+          this.mode = this.MODE.DEFAULT;
+        } else if (this.activeLayer === this.entities) this.undo.endEntityEdit();
+        else if (this.activeLayer.isSelecting) {
+          this.activeLayer.brush = this.activeLayer.endSelecting(
+            this.input.mouse.x,
+            this.input.mouse.y
+          );
+        } else this.undo.endMapDraw();
+        break;
+      case "undo":
+        this.undo.undo();
+        break;
+      case "redo":
+        this.undo.redo();
+        break;
+      default:
+        throw new Error(`Unknown action: ${action}.`);
     }
-
-    if (action == "undo") {
-      this.undo.undo();
-    }
-
-    if (action == "redo") {
-      this.undo.redo();
-    }
-
     this.draw();
-    this.mouseLast = { x: ig.input.mouse.x, y: ig.input.mouse.y };
+    this.mouseLast = { ...this.input.mouse };
   }
 
   setTileOnCurrentLayer() {
-    if (!this.activeLayer || !this.activeLayer.scroll) {
-      return;
-    }
+    if (!this.activeLayer || !this.activeLayer.scroll) return;
 
     var co = this.activeLayer.getCursorOffset();
     var x = ig.input.mouse.x + this.activeLayer.scroll.x - co.x;
