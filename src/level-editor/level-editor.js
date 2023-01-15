@@ -30,7 +30,7 @@ class LevelEditor {
   loseChangesDialog = null;
   deleteLayerDialog = null;
   fileName = "untitled.js";
-  filePath = wm.config.project.levelPath + "untitled.js";
+  filePath = "";
   modified = false;
   needsDraw = true;
 
@@ -48,13 +48,15 @@ class LevelEditor {
     return window.innerHeight - $el("#headerMenu").clientHeight;
   }
 
-  constructor({ system, config, input }) {
+  constructor({ system, config, input } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
     Guard.againstNull({ input });
     this.system = system;
     this.config = config;
     this.input = input;
+
+    this.filePath = config.project.levelPath + this.fileName;
 
     const { ctx, canvas } = this.system;
     ctx.textBaseline = "top";
@@ -789,6 +791,7 @@ class LevelEditorRunner {
   ready = false;
   config = null;
   loader = null;
+  game = null;
 
   constructor() {
     this.config = levelEditorConfig;
@@ -812,6 +815,10 @@ class LevelEditorRunner {
       runner: this,
     });
     this.loader.load();
+  }
+
+  setGame(gameClass) {
+    this.game = new gameClass({ system: this.system, config: this.config, input: this.input });
   }
 
   /** Image overrides for the LevelEditor. To make the zoom function work, we need to
