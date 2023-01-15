@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="assets/css/level-editor.css" />
+    <title>Level Editor</title>
+  </head>
+  <body>
+    <div id="headerMenu">
+      <span class="headerTitle"></span>
+      <span class="unsavedTitle"></span>
+      <span class="headerFloat">
+        <input type="button" id="levelSave" value="Save" class="button" />
+        <input type="button" id="levelSaveAs" value="Save As" class="button" />
+        <input type="button" id="levelNew" value="New" class="button" />
+        <input type="button" id="levelLoad" value="Load" class="button" />
+        <input
+          type="button"
+          id="reloadImages"
+          value="Reload Images"
+          title="Reload Images"
+          class="button" />
+        <input
+          type="button"
+          id="toggleSidebar"
+          value="Toggle Sidebar"
+          title="Toggle Sidebar"
+          class="button" />
+      </span>
+    </div>
+
+    <div id="editor">
+      <div id="entityMenu"></div>
+
+      <canvas id="canvas"></canvas>
+
+      <div id="menu">
+        <div id="layerContainer">
+          <h2>Layers</h2>
+          <div id="layerButtons">
+            <div class="button" id="buttonAddLayer" title="Add Layer">+</div>
+          </div>
+          <div id="layers">
+            <div id="layerEntities" class="layer">
+              <span
+                class="visible specialVis checkedVis"
+                title="Toggle Visibility (Shift+0)"></span>
+              <span class="name">entities</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="layerSettings">
+          <h2>Layer Settings</h2>
+          <dl>
+            <dt>Name:</dt>
+            <dd><input type="text" class="text" id="layerName" /></dd>
+            <dt>Tileset:</dt>
+            <dd><input type="text" class="text" id="layerTileset" /></dd>
+            <dt>Tilesize:</dt>
+            <dd><input type="text" class="number" id="layerTilesize" /></dd>
+            <dt>Dimensions:</dt>
+            <dd>
+              <input type="text" class="number" id="layerWidth" /> &times;
+              <input type="text" class="number" id="layerHeight" />
+            </dd>
+            <dt>Distance:</dt>
+            <dd><input type="text" class="number" id="layerDistance" /></dd>
+            <dd>
+              <input type="checkbox" id="layerIsCollision" />
+              <label for="layerIsCollision">Is Collision Layer</label>
+            </dd>
+            <dd>
+              <input type="checkbox" id="layerPreRender" />
+              <label for="layerPreRender">Pre-Render in Game</label>
+            </dd>
+            <dd>
+              <input type="checkbox" id="layerRepeat" />
+              <label for="layerRepeat">Repeat</label>
+            </dd>
+            <dd>
+              <input type="checkbox" id="layerLinkWithCollision" />
+              <label for="layerLinkWithCollision">Link with Collision</label>
+            </dd>
+            <dd>
+              <input
+                type="button"
+                id="buttonSaveLayerSettings"
+                value="Apply Changes"
+                class="button" />
+              <input type="button" id="buttonRemoveLayer" value="Delete" class="button" />
+            </dd>
+          </dl>
+        </div>
+
+        <div id="entitySettings">
+          <h2>Entity Settings</h2>
+          <h3 id="entityClass">EntityClassName</h3>
+          <div id="entityDefinitions">
+            <div class="entityDefinition">
+              <span class="key">x</span>:<span class="value">188</span>
+            </div>
+            <div class="entityDefinition">
+              <span class="key">y</span>:<span class="value">269</span>
+            </div>
+          </div>
+          <dl id="entityDefinitionInput">
+            <dt>Key:</dt>
+            <dd><input type="text" class="text" id="entityKey" /></dd>
+            <dt>Value:</dt>
+            <dd><input type="text" class="text" id="entityValue" /></dd>
+          </dl>
+        </div>
+      </div>
+
+      <div id="zoomIndicator">1x</div>
+    </div>
+    <!-- #region LIB -->
+    <script src="src/lib/polyfills.js"></script>
+    <script src="src/lib/native-object-extensions.js"></script>
+    <script src="src/lib/cookie.js"></script>
+    <script src="src/lib/guard.js"></script>
+    <script src="src/lib/register.js"></script>
+    <script src="src/lib/vendor-attributes.js"></script>
+    <script src="src/lib/user-agent.js"></script>
+    <script src="src/lib/timer.js"></script>
+    <script src="src/lib/image.js"></script>
+    <script src="src/lib/font.js"></script>
+    <script src="src/lib/animation.js"></script>
+    <script src="src/lib/sound.js"></script>
+    <script src="src/lib/media-factory.js"></script>
+    <!-- #endregion LIB -->
+
+    <!-- #region CORE -->
+    <script src="src/debug/performance-stats.js"></script>
+    <script src="src/debug/debug.js"></script>
+    <script src="src/core/input.js"></script>
+    <script src="src/core/map.js"></script>
+    <script src="src/core/loop.js"></script>
+    <script src="src/core/entity.js"></script>
+    <script src="src/core/system.js"></script>
+    <script src="src/core/game.js"></script>
+    <script src="src/core/runner.js"></script>
+    <script src="src/core/loader.js"></script>
+    <!-- #endregion CORE -->
+
+    <script src="src/level-editor/jQuery/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script
+      src="src/level-editor/jQuery/jquery-ui-1.8.1.custom.min.js"
+      type="text/javascript"></script>
+
+    <script src="src/level-editor/config.js" type="text/javascript"></script>
+    <script src="src/level-editor/undo.js" type="text/javascript"></script>
+    <script src="src/level-editor/edit-entities.js" type="text/javascript"></script>
+    <script src="src/level-editor/edit-map.js" type="text/javascript"></script>
+    <script src="src/level-editor/entities.js" type="text/javascript"></script>
+    <script src="src/level-editor/evented-input.js" type="text/javascript"></script>
+    <script src="src/level-editor/modal-dialogs.js" type="text/javascript"></script>
+    <script src="src/level-editor/select-file-dropdown.js" type="text/javascript"></script>
+    <script src="src/level-editor/tile-select.js" type="text/javascript"></script>
+    <script src="src/level-editor/level-editor.js" type="text/javascript"></script>
+  </body>
+</html>
