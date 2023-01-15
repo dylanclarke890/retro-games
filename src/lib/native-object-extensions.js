@@ -35,6 +35,7 @@ Number.prototype.toDeg = function () {
  * @returns {HTMLElement}
  */
 function $el(selector) {
+  if (selector instanceof HTMLElement) return selector;
   return document.querySelector(selector);
 }
 

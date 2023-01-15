@@ -13,7 +13,7 @@ class ModalDialog {
   /** @type {HTMLDivElement} */
   buttonDiv = null;
 
-  constructor(text, okText, cancelText) {
+  constructor({ text, okText, cancelText, autoInit = true } = {}) {
     this.text = text;
     this.okText = okText || "OK";
     this.cancelText = cancelText || "Cancel";
@@ -23,7 +23,7 @@ class ModalDialog {
     this.dialogBox.classList.add("modalDialogBox");
     this.background.append(this.dialogBox);
     document.body.append(this.background);
-    this.initDialog();
+    if (autoInit) this.initDialog();
   }
 
   initDialog() {
@@ -72,14 +72,17 @@ class ModalDialogPathSelect extends ModalDialog {
   pathInput = null;
   fileType = "";
 
-  constructor(text, okText, type) {
-    this.fileType = type || "";
-    this.parent(text, okText || "Select");
+  constructor({ text, okText = "Select", type = "", config } = {}) {
+    super({ text, okText, autoInit: false });
+    Guard.againstNull({ config });
+    this.config = config;
+    this.fileType = type;
+    this.initDialog();
   }
 
   setPath(path) {
     const dir = path.replace(/\/[^\/]*$/, "");
-    this.pathInput.val(path);
+    this.pathInput.value = path;
     this.pathDropdown.loadDir(dir);
   }
 
@@ -90,7 +93,11 @@ class ModalDialogPathSelect extends ModalDialog {
     this.pathInput.classList.add("modalDialogPath");
     this.buttonDiv.before(this.pathInput);
     // TODO
-    this.pathDropdown = new SelectFileDropdown(this.pathInput, wm.config.api.browse, this.fileType);
+    this.pathDropdown = new SelectFileDropdown(
+      this.pathInput,
+      this.config.api.browse,
+      this.fileType
+    );
   }
 
   clickOk() {

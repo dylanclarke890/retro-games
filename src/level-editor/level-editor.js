@@ -64,13 +64,23 @@ class LevelEditor {
     this.labelsStep = config.labels.step;
 
     // Dialogs
-    this.loadDialog = new ModalDialogPathSelect("Load Level", "Load", "scripts");
+    this.loadDialog = new ModalDialogPathSelect({
+      text: "Load Level",
+      okText: "Load",
+      type: "scripts",
+      config: this.config,
+    });
     this.loadDialog.onOk = this.load;
     this.loadDialog.setPath(config.project.levelPath);
     $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
     $el("#levelNew").addEventListener("click", () => this.showNewDialog());
 
-    this.saveDialog = new ModalDialogPathSelect("Save Level", "Save", "scripts");
+    this.saveDialog = new ModalDialogPathSelect({
+      text: "Save Level",
+      okText: "Save",
+      type: "scripts",
+      config: this.config,
+    });
     this.saveDialog.onOk = this.save;
     this.saveDialog.setPath(config.project.levelPath);
     $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
