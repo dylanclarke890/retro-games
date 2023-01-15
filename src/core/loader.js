@@ -12,7 +12,7 @@ class GameLoader {
 
   constructor({ runner, gameClass, debugMode }) {
     Guard.againstNull({ runner });
-    Guard.againstNull({ gameClass }).isInstanceOf(Game);
+    Guard.againstNull({ gameClass });
 
     this.runner = runner;
     this.gameClass = gameClass;

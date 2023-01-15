@@ -796,9 +796,9 @@ class LevelEditorRunner {
       runner: this,
       canvasId: "canvas",
       fps: 1,
-      width: Math.floor(LevelEditor.getMaxWidth() / config.view.zoom),
-      height: Math.floor(LevelEditor.getMaxHeight() / config.view.zoom),
-      scale: config.view.zoom,
+      width: Math.floor(LevelEditor.getMaxWidth() / this.config.view.zoom),
+      height: Math.floor(LevelEditor.getMaxHeight() / this.config.view.zoom),
+      scale: this.config.view.zoom,
     });
 
     this.input = new EventedInput({ system: this.system });
@@ -811,7 +811,6 @@ class LevelEditorRunner {
       gameClass: LevelEditor,
       runner: this,
     });
-    this.loadedEntities = loadEntities(this.config);
     this.loader.load();
   }
 
@@ -857,3 +856,5 @@ class LevelEditorRunner {
     };
   }
 }
+
+const runner = new LevelEditorRunner();

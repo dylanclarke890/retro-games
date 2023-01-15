@@ -1,6 +1,6 @@
 function loadEntities(config) {
   // Load the list of entity files via AJAX PHP glob
-  const path = config.api.glob + "?",
+  let path = config.api.glob + "?",
     globs =
       typeof config.project.entityFiles == "string"
         ? [config.project.entityFiles]
@@ -10,7 +10,7 @@ function loadEntities(config) {
 
   path += "nocache=" + Math.random();
   // TODO
-  var req = $.ajax({
+  $.ajax({
     url: path,
     method: "get",
     dataType: "json",
@@ -26,7 +26,7 @@ function loadEntities(config) {
         modules[name] = files[i];
       }
     },
-    error: function (xhr, status, error) {
+    error: function (xhr, _status, error) {
       throw "Failed to load entity list via glob.php: " + error + "\n" + xhr.responseText;
     },
   });
