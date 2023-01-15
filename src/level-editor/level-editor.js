@@ -656,20 +656,19 @@ class LevelEditor {
 
   setTileOnCurrentLayer() {
     if (!this.activeLayer || !this.activeLayer.scroll) return;
-
     const co = this.activeLayer.getCursorOffset();
-    var x = ig.input.mouse.x + this.activeLayer.scroll.x - co.x;
-    var y = ig.input.mouse.y + this.activeLayer.scroll.y - co.y;
+    const x = this.input.mouse.x + this.activeLayer.scroll.x - co.x;
+    const y = this.input.mouse.y + this.activeLayer.scroll.y - co.y;
 
-    var brush = this.activeLayer.brush;
-    for (var by = 0; by < brush.length; by++) {
-      var brushRow = brush[by];
-      for (var bx = 0; bx < brushRow.length; bx++) {
-        var mapx = x + bx * this.activeLayer.tilesize;
-        var mapy = y + by * this.activeLayer.tilesize;
+    const brush = this.activeLayer.brush;
+    for (let by = 0; by < brush.length; by++) {
+      const brushRow = brush[by];
+      for (let bx = 0; bx < brushRow.length; bx++) {
+        const mapx = x + bx * this.activeLayer.tilesize;
+        const mapy = y + by * this.activeLayer.tilesize;
 
-        var newTile = brushRow[bx];
-        var oldTile = this.activeLayer.getOldTile(mapx, mapy);
+        const newTile = brushRow[bx];
+        const oldTile = this.activeLayer.getOldTile(mapx, mapy);
 
         this.activeLayer.setTile(mapx, mapy, newTile);
         this.undo.pushMapDraw(this.activeLayer, mapx, mapy, oldTile, newTile);
@@ -677,11 +676,11 @@ class LevelEditor {
         if (
           this.activeLayer.linkWithCollision &&
           this.collisionLayer &&
-          this.collisionLayer != this.activeLayer
+          this.collisionLayer !== this.activeLayer
         ) {
-          var collisionLayerTile = newTile > 0 ? this.collisionSolid : 0;
+          const collisionLayerTile = newTile > 0 ? this.collisionSolid : 0;
+          const oldCollisionTile = this.collisionLayer.getOldTile(mapx, mapy);
 
-          var oldCollisionTile = this.collisionLayer.getOldTile(mapx, mapy);
           this.collisionLayer.setTile(mapx, mapy, collisionLayerTile);
           this.undo.pushMapDraw(
             this.collisionLayer,
