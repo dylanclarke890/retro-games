@@ -759,50 +759,6 @@ class LevelEditor {
   }
 }
 
-// Custom ig.Image class for use in LevelEditor. To make the zoom function
-// work, we need some additional scaling behavior:
-// Keep the original image, maintain a cache of scaled versions and use the
-// default Canvas scaling (~bicubic) instead of nearest neighbor when
-// zooming out.
-ig.Image.inject({
-  resize(scale) {
-    if (!this.loaded) return;
-    if (!this.scaleCache) this.scaleCache = {};
-    if (this.scaleCache["x" + scale]) {
-      this.data = this.scaleCache["x" + scale];
-      return;
-    }
-
-    // Retain the original image when scaling
-    this.origData = this.data = this.origData || this.data;
-
-    if (scale > 1) {
-      // Nearest neighbor when zooming in
-      this.parent(scale);
-    } else {
-      // Otherwise blur
-      var scaled = ig.$new("canvas");
-      scaled.width = Math.ceil(this.width * scale);
-      scaled.height = Math.ceil(this.height * scale);
-      var scaledCtx = scaled.getContext("2d");
-      scaledCtx.drawImage(
-        this.data,
-        0,
-        0,
-        this.width,
-        this.height,
-        0,
-        0,
-        scaled.width,
-        scaled.height
-      );
-      this.data = scaled;
-    }
-
-    this.scaleCache["x" + scale] = this.data;
-  },
-});
-
 /** Custom loader, used to skip sound files and the run loop creation. */
 class LevelEditorLoader extends GameLoader {
   constructor({ config, ...opts }) {
@@ -834,7 +790,8 @@ class LevelEditorRunner {
   config = null;
   loader = null;
 
-  constructor(config) {
+  constructor() {
+    this.config = levelEditorConfig;
     this.system = new System({
       runner: this,
       canvasId: "canvas",
@@ -849,11 +806,54 @@ class LevelEditorRunner {
     this.ready = true;
 
     this.loader = new LevelEditorLoader({
-      config,
+      config: this.config,
       debugMode: false,
-      gameClass: wm.LevelEditor,
+      gameClass: LevelEditor,
       runner: this,
     });
+    this.loadedEntities = loadEntities(this.config);
     this.loader.load();
+  }
+
+  /** Image overrides for the LevelEditor. To make the zoom function work, we need to
+   *  keep the original image, maintain a cache of scaled versions and use the default
+   *  Canvas scaling (~bicubic) instead of nearest neighbor when zooming out. */
+  injectImageOverrides() {
+    GameImage.prototype.baseResize = GameImage.prototype.resize;
+    GameImage.prototype.resize = function (scale) {
+      if (!this.loaded) return;
+      if (!this.scaleCache) this.scaleCache = {};
+      if (this.scaleCache["x" + scale]) {
+        this.data = this.scaleCache["x" + scale];
+        return;
+      }
+
+      // Retain the original image when scaling
+      this.origData = this.data = this.origData || this.data;
+
+      // Nearest neighbor when zooming in
+      if (scale > 1) this.baseResize(scale);
+      // Otherwise blur
+      else {
+        const scaled = $new("canvas");
+        scaled.width = Math.ceil(this.width * scale);
+        scaled.height = Math.ceil(this.height * scale);
+        const scaledCtx = scaled.getContext("2d");
+        scaledCtx.drawImage(
+          this.data,
+          0,
+          0,
+          this.width,
+          this.height,
+          0,
+          0,
+          scaled.width,
+          scaled.height
+        );
+        this.data = scaled;
+      }
+
+      this.scaleCache["x" + scale] = this.data;
+    };
   }
 }
