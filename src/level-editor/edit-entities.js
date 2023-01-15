@@ -129,8 +129,8 @@ class EditEntities {
     const entity = possibleSelections[nextSelection];
 
     // Select it!
-    const x = x - entity.pos.x + entity.offset.x;
-    const y = y - entity.pos.y + entity.offset.y;
+    x = x - entity.pos.x + entity.offset.x;
+    y = y - entity.pos.y + entity.offset.y;
     this.selector.offset = { x, y };
     this.selectEntity(entity);
     this.wasSelectedOnScaleBorder = this.isOnScaleBorder(entity, this.selector);
