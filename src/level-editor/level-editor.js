@@ -398,7 +398,7 @@ class LevelEditor {
     this.setActiveLayer(name);
     this.updateLayerSettings();
     this.reorderLayers();
-    $("#layers").sortable("refresh");
+    $("#layers").sortable("refresh"); // TODO
   }
 
   removeLayer() {
@@ -409,7 +409,7 @@ class LevelEditor {
       if (this.layers[i].name !== name) continue;
       this.layers.splice(i, 1);
       this.reorderLayers();
-      $("#layers").sortable("refresh");
+      $("#layers").sortable("refresh"); // TODO
       this.setActiveLayer("entities");
       return true;
     }
@@ -425,55 +425,46 @@ class LevelEditor {
   }
 
   reorderLayers() {
-    var newLayers = [];
-    var isForegroundLayer = true;
-    $("#layers div.layer span.name").each(
-      function (newIndex, span) {
-        var name = $(span).text();
-
-        var layer = name == "entities" ? this.entities : this.getLayerWithName(name);
-
-        if (layer) {
-          layer.setHotkey(newIndex + 1);
-          if (layer.name == "entities") {
-            // All layers after the entity layer are not foreground
-            // layers
-            isForegroundLayer = false;
-          } else {
-            layer.foreground = isForegroundLayer;
-            newLayers.unshift(layer);
-          }
-        }
-      }.bind(this)
-    );
+    const newLayers = [];
+    let isForegroundLayer = true;
+    document.querySelectorAll("#layers div.layer span.name").forEach((el, i) => {
+      const name = el.textContent;
+      const layer = name === "entities" ? this.entities : this.getLayerWithName(name);
+      if (!layer) return;
+      layer.setHotkey(i + 1);
+      // All layers after the entity layer are not foreground layers
+      if (layer.name === "entities") isForegroundLayer = false;
+      else {
+        layer.foreground = isForegroundLayer;
+        newLayers.unshift(layer);
+      }
+    });
     this.layers = newLayers;
     this.setModified();
     this.draw();
   }
 
   updateLayerSettings() {
-    $("#layerName").val(this.activeLayer.name);
-    $("#layerTileset").val(this.activeLayer.tilesetName);
-    $("#layerTilesize").val(this.activeLayer.tilesize);
-    $("#layerWidth").val(this.activeLayer.width);
-    $("#layerHeight").val(this.activeLayer.height);
-    $("#layerPreRender").prop("checked", this.activeLayer.preRender);
-    $("#layerRepeat").prop("checked", this.activeLayer.repeat);
-    $("#layerLinkWithCollision").prop("checked", this.activeLayer.linkWithCollision);
-    $("#layerDistance").val(this.activeLayer.distance);
+    $el("#layerName").value = this.activeLayer.name;
+    $el("#layerTileset").value = this.activeLayer.tilesetName;
+    $el("#layerTilesize").value = this.activeLayer.tilesize;
+    $el("#layerWidth").value = this.activeLayer.width;
+    $el("#layerHeight").value = this.activeLayer.height;
+    $el("#layerDistance").value = this.activeLayer.distance;
+    $el("#layerPreRender").checked = this.activeLayer.preRender;
+    $el("#layerRepeat").checked = this.activeLayer.repeat;
+    $el("#layerLinkWithCollision").checked = this.activeLayer.linkWithCollision;
   }
 
   saveLayerSettings() {
-    var isCollision = $("#layerIsCollision").prop("checked");
+    const isCollision = $el("#layerIsCollision").checked;
+    const newName = $el("#layerName").value;
+    const newWidth = Math.floor($el("#layerWidth").value);
+    const newHeight = Math.floor($el("#layerHeight").value);
 
-    var newName = $("#layerName").val();
-    var newWidth = Math.floor($("#layerWidth").val());
-    var newHeight = Math.floor($("#layerHeight").val());
-
-    if (newWidth != this.activeLayer.width || newHeight != this.activeLayer.height) {
+    if (newWidth !== this.activeLayer.width || newHeight !== this.activeLayer.height)
       this.activeLayer.resize(newWidth, newHeight);
-    }
-    this.activeLayer.tilesize = Math.floor($("#layerTilesize").val());
+    this.activeLayer.tilesize = Math.floor($el("#layerTilesize").value);
 
     if (isCollision) {
       newName = "collision";
@@ -482,23 +473,19 @@ class LevelEditor {
       this.activeLayer.repeat = false;
       this.activeLayer.setCollisionTileset();
     } else {
-      var newTilesetName = $("#layerTileset").val();
-      if (newTilesetName != this.activeLayer.tilesetName) {
+      const newTilesetName = $el("#layerTileset").value;
+      if (newTilesetName !== this.activeLayer.tilesetName)
         this.activeLayer.setTileset(newTilesetName);
-      }
-      this.activeLayer.linkWithCollision = $("#layerLinkWithCollision").prop("checked");
-      this.activeLayer.distance = parseFloat($("#layerDistance").val());
-      this.activeLayer.repeat = $("#layerRepeat").prop("checked");
-      this.activeLayer.preRender = $("#layerPreRender").prop("checked");
+      this.activeLayer.linkWithCollision = $el("#layerLinkWithCollision").checked;
+      this.activeLayer.distance = parseFloat($el("#layerDistance").value);
+      this.activeLayer.repeat = $el("#layerRepeat").checked;
+      this.activeLayer.preRender = $el("#layerPreRender").checked;
     }
 
-    if (newName == "collision") {
-      // is collision layer
-      this.collisionLayer = this.activeLayer;
-    } else if (this.activeLayer.name == "collision") {
-      // was collision layer, but is no more
-      this.collisionLayer = null;
-    }
+    // Is a collision layer
+    if (newName === "collision") this.collisionLayer = this.activeLayer;
+    // Was a collision layer, but is no more
+    else if (this.activeLayer.name == "collision") this.collisionLayer = null;
 
     this.activeLayer.setName(newName);
     this.setModified();
@@ -506,35 +493,35 @@ class LevelEditor {
   }
 
   setActiveLayer(name) {
-    var previousLayer = this.activeLayer;
-    this.activeLayer = name == "entities" ? this.entities : this.getLayerWithName(name);
-    if (previousLayer == this.activeLayer) {
-      return; // nothing to do here
-    }
+    const previousLayer = this.activeLayer;
+    this.activeLayer = name === "entities" ? this.entities : this.getLayerWithName(name);
+    if (previousLayer === this.activeLayer) return; // nothing to do here
+    if (previousLayer) previousLayer.setActive(false);
 
-    if (previousLayer) {
-      previousLayer.setActive(false);
-    }
     this.activeLayer.setActive(true);
     this.mode = this.MODE.DEFAULT;
+    $el("#layerIsCollision").checked = name === "collision";
 
-    $("#layerIsCollision").prop("checked", name == "collision");
-
-    if (name == "entities") {
-      $("#layerSettings").fadeOut(100);
-    } else {
+    if (name === "entities") $("#layerSettings").fadeOut(100); // TODO
+    else {
       this.entities.selectEntity(null);
       this.toggleCollisionLayer();
-      $("#layerSettings").fadeOut(100, this.updateLayerSettings.bind(this)).fadeIn(100);
+      $("#layerSettings").fadeOut(100, this.updateLayerSettings.bind(this)).fadeIn(100); // TODO
     }
     this.draw();
   }
 
-  toggleCollisionLayer(ev) {
-    var isCollision = $("#layerIsCollision").prop("checked");
-    $(
-      "#layerLinkWithCollision,#layerDistance,#layerPreRender,#layerRepeat,#layerName,#layerTileset"
-    ).attr("disabled", isCollision);
+  toggleCollisionLayer() {
+    const isCollision = $el("#layerIsCollision").checked;
+    const elementsToUpdate = [
+      "#layerLinkWithCollision",
+      "#layerDistance",
+      "#layerPreRender",
+      "#layerRepeat",
+      "#layerName",
+      "#layerTileset",
+    ];
+    elementsToUpdate.forEach((v) => ($el(v).disabled = isCollision));
   }
 
   //#endregion Layers
@@ -542,72 +529,62 @@ class LevelEditor {
   //#region Update
 
   mousemove() {
-    if (!this.activeLayer) {
-      return;
-    }
+    if (!this.activeLayer) return;
 
-    if (this.mode == this.MODE.DEFAULT) {
+    if (this.mode === this.MODE.DEFAULT) {
       // scroll map
-      if (ig.input.state("drag")) {
-        this.drag();
-      } else if (ig.input.state("draw")) {
+      if (this.input.state("drag")) this.drag();
+      else if (this.input.state("draw")) {
         // move/scale entity
-        if (this.activeLayer == this.entities) {
-          var x = ig.input.mouse.x + this.screen.x;
-          var y = ig.input.mouse.y + this.screen.y;
+        if (this.activeLayer === this.entities) {
+          const x = this.input.mouse.x + this.screen.x;
+          const y = this.input.mouse.y + this.screen.y;
           this.entities.dragOnSelectedEntity(x, y);
           this.setModified();
         }
 
         // draw on map
-        else if (!this.activeLayer.isSelecting) {
-          this.setTileOnCurrentLayer();
-        }
-      } else if (this.activeLayer == this.entities) {
-        var x = ig.input.mouse.x + this.screen.x;
-        var y = ig.input.mouse.y + this.screen.y;
+        else if (!this.activeLayer.isSelecting) this.setTileOnCurrentLayer();
+      } else if (this.activeLayer === this.entities) {
+        const x = this.input.mouse.x + this.screen.x;
+        const y = this.input.mouse.y + this.screen.y;
         this.entities.mousemove(x, y);
       }
     }
 
-    this.mouseLast = { x: ig.input.mouse.x, y: ig.input.mouse.y };
+    this.mouseLast = { ...this.input.mouse };
     this.draw();
   }
 
   keydown(action) {
-    if (!this.activeLayer) {
-      return;
-    }
+    if (!this.activeLayer) return;
 
-    if (action == "draw") {
-      if (this.mode == this.MODE.DEFAULT) {
+    if (action === "draw") {
+      if (this.mode === this.MODE.DEFAULT) {
         // select entity
-        if (this.activeLayer == this.entities) {
-          var x = ig.input.mouse.x + this.screen.x;
-          var y = ig.input.mouse.y + this.screen.y;
-          var entity = this.entities.selectEntityAt(x, y);
-          if (entity) {
-            this.undo.beginEntityEdit(entity);
-          }
+        if (this.activeLayer === this.entities) {
+          const x = this.input.mouse.x + this.screen.x;
+          const y = this.input.mouse.y + this.screen.y;
+          const entity = this.entities.selectEntityAt(x, y);
+          if (entity) this.undo.beginEntityEdit(entity);
         } else {
-          if (ig.input.state("select")) {
-            this.activeLayer.beginSelecting(ig.input.mouse.x, ig.input.mouse.y);
-          } else {
+          if (this.input.state("select"))
+            this.activeLayer.beginSelecting(this.input.mouse.x, this.input.mouse.y);
+          else {
             this.undo.beginMapDraw();
             this.activeLayer.beginEditing();
             if (
               this.activeLayer.linkWithCollision &&
               this.collisionLayer &&
               this.collisionLayer != this.activeLayer
-            ) {
+            )
               this.collisionLayer.beginEditing();
-            }
+
             this.setTileOnCurrentLayer();
           }
         }
-      } else if (this.mode == this.MODE.TILESELECT && ig.input.state("select")) {
-        this.activeLayer.tileSelect.beginSelecting(ig.input.mouse.x, ig.input.mouse.y);
-      }
+      } else if (this.mode === this.MODE.TILESELECT && this.input.state("select"))
+        this.activeLayer.tileSelect.beginSelecting(this.input.mouse.x, this.input.mouse.y);
     }
 
     this.draw();
@@ -680,7 +657,7 @@ class LevelEditor {
   setTileOnCurrentLayer() {
     if (!this.activeLayer || !this.activeLayer.scroll) return;
 
-    var co = this.activeLayer.getCursorOffset();
+    const co = this.activeLayer.getCursorOffset();
     var x = ig.input.mouse.x + this.activeLayer.scroll.x - co.x;
     var y = ig.input.mouse.y + this.activeLayer.scroll.y - co.y;
 
@@ -724,26 +701,22 @@ class LevelEditor {
 
   //#region Drawing
 
+  /** The actual drawing loop is already scheduled, this just sets a flag
+   *  to indicate that a redraw is needed. */
   draw() {
-    // The actual drawing loop is scheduled via ig.setAnimation() already.
-    // We just set a flag to indicate that a redraw is needed.
     this.needsDraw = true;
   }
 
   drawIfNeeded() {
     // Only draw if flag is set
-    if (!this.needsDraw) {
-      return;
-    }
+    if (!this.needsDraw) return;
     this.needsDraw = false;
+    this.system.clear(this.config.colors.clear);
 
-    ig.system.clear(wm.config.colors.clear);
-
-    var entitiesDrawn = false;
-    for (var i = 0; i < this.layers.length; i++) {
-      var layer = this.layers[i];
-
-      // This layer is a foreground layer? -> Draw entities first!
+    let entitiesDrawn = false;
+    for (let i = 0; i < this.layers.length; i++) {
+      const layer = this.layers[i];
+      // If layer is a foreground layer, draw entities first.
       if (!entitiesDrawn && layer.foreground) {
         entitiesDrawn = true;
         this.entities.draw();
@@ -751,38 +724,32 @@ class LevelEditor {
       layer.draw();
     }
 
-    if (!entitiesDrawn) {
-      this.entities.draw();
-    }
+    if (!entitiesDrawn) this.entities.draw();
 
     if (this.activeLayer) {
-      if (this.mode == this.MODE.TILESELECT) {
+      if (this.mode === this.MODE.TILESELECT) {
         this.activeLayer.tileSelect.draw();
-        this.activeLayer.tileSelect.drawCursor(ig.input.mouse.x, ig.input.mouse.y);
-      }
-
-      if (this.mode == this.MODE.DEFAULT) {
-        this.activeLayer.drawCursor(ig.input.mouse.x, ig.input.mouse.y);
-      }
+        this.activeLayer.tileSelect.drawCursor(this.input.mouse.x, this.input.mouse.y);
+      } else if (this.mode === this.MODE.DEFAULT)
+        this.activeLayer.drawCursor(this.input.mouse.x, this.input.mouse.y);
     }
 
-    if (wm.config.labels.draw) {
-      this.drawLabels(wm.config.labels.step);
-    }
+    if (this.config.labels.draw) this.drawLabels(this.config.labels.step);
   }
 
   drawLabels(step) {
-    ig.system.context.fillStyle = wm.config.colors.primary;
-    var xlabel = this.screen.x - (this.screen.x % step) - step;
-    for (var tx = Math.floor(-this.screen.x % step); tx < ig.system.width; tx += step) {
+    const { ctx, height, width, scale } = this.system;
+    ctx.fillStyle = wm.config.colors.primary;
+    let xlabel = this.screen.x - (this.screen.x % step) - step;
+    for (let tx = Math.floor(-this.screen.x % step); tx < width; tx += step) {
       xlabel += step;
-      ig.system.context.fillText(xlabel, tx * ig.system.scale, 0);
+      ctx.fillText(xlabel, tx * scale, 0);
     }
 
-    var ylabel = this.screen.y - (this.screen.y % step) - step;
-    for (var ty = Math.floor(-this.screen.y % step); ty < ig.system.height; ty += step) {
+    let ylabel = this.screen.y - (this.screen.y % step) - step;
+    for (let ty = Math.floor(-this.screen.y % step); ty < height; ty += step) {
       ylabel += step;
-      ig.system.context.fillText(ylabel, 0, ty * ig.system.scale);
+      ctx.fillText(ylabel, 0, ty * scale);
     }
   }
 
