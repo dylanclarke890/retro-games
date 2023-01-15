@@ -84,7 +84,7 @@ class ModalDialogPathSelect extends ModalDialog {
   }
 
   initDialog() {
-    super().initDialog();
+    super.initDialog();
     this.pathInput = $new("input");
     this.pathInput.type = "text";
     this.pathInput.classList.add("modalDialogPath");

@@ -75,7 +75,7 @@ class EditMap extends BackgroundMap {
 
   setTileset(tileset) {
     if (this.name === "collision") this.setCollisionTileset();
-    else super().setTileset(tileset);
+    else super.setTileset(tileset);
   }
 
   setCollisionTileset() {

@@ -822,7 +822,7 @@ class LevelEditorLoader extends GameLoader {
   loadResource(res) {
     if (res instanceof Sound) this._unloaded.erase(res.path);
     // TODO
-    else super().loadResource(res);
+    else super.loadResource(res);
   }
 }
 

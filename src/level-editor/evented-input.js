@@ -52,7 +52,7 @@ class EventedInput extends Input {
   }
 
   mousemove(event) {
-    super().mousemove(event);
+    super.mousemove(event);
     if (this.mousemoveCallback) this.mousemoveCallback();
   }
 }
