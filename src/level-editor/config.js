@@ -3,11 +3,10 @@ const levelEditorConfig = {
     // The prefix path of your game's source code.
     modulePath: "lib/",
 
-    // This "glob" tells Weltmeister where to load the entity files
-    // from. If you want to load entities from several directories,
-    // you can specify an array here. E.g.:
-    // 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/*.js']
-    entityFiles: "lib/game/entities/*.js",
+    /** Takes an array of glob regexes which specify where to load entities from.
+     *  Can be individual files or entire directories.
+     *  @example 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/laser.js'] */
+    entityFiles: ["src/entities/*.js"],
 
     // The default path for the level file selection box
     levelPath: "assets/levels/",
