@@ -43,7 +43,7 @@
 //#endregion LEVEL-EDITOR
 
 // #region CUSTOM
-/// <reference path="src/pong-entities.js"/>
-/// <reference path="src/level.js"/>
+/// <reference path="src/entities/pong-entities.js"/>
+/// <reference path="src/levels/level.js"/>
 /// <reference path="src/my-game.js"/>
 // #endregion CUSTOM
