@@ -14,13 +14,20 @@ class EditEntities {
   menu = null;
   selector = { size: { x: 2, y: 2 }, pos: { x: 0, y: 0 }, offset: { x: 0, y: 0 } };
   wasSelectedOnScaleBorder = false;
-  gridSize = wm.config.entityGrid; // TODO
+  gridSize = 0;
   entityDefinitions = null;
+  undo = null;
 
-  constructor(div) {
+  constructor({ div, config, undo } = {}) {
+    Guard.againstNull({ div });
+    Guard.againstNull({ config });
+    Guard.againstNull({ undo });
+
     this.div = div;
+    this.undo = undo;
     div.addEventListener("mouseup", () => this.click());
     div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
+    this.gridSize = config.entityGrid; // TODO
 
     this.menu = $new("div");
     this.menu.id = "entityMenu";
@@ -168,7 +175,7 @@ class EditEntities {
 
   deleteSelectedEntity() {
     if (!this.selectedEntity) return false;
-    ig.game.undo.commitEntityDelete(this.selectedEntity); // TODO
+    this.undo.commitEntityDelete(this.selectedEntity);
     this.removeEntity(this.selectedEntity);
     this.selectEntity(null);
     return true;
@@ -189,7 +196,7 @@ class EditEntities {
     const newEntity = this.spawnEntity(className, x, y, settings);
     newEntity._wmSettings = settings;
     this.selectEntity(newEntity);
-    ig.game.undo.commitEntityCreate(newEntity); // TODO
+    this.undo.commitEntityCreate(newEntity);
     return true;
   }
 
@@ -200,7 +207,7 @@ class EditEntities {
       this.scaleSelectedEntity(x, y);
     else this.moveSelectedEntity(x, y);
 
-    ig.game.undo.pushEntityEdit(this.selectedEntity); // TODO
+    this.undo.pushEntityEdit(this.selectedEntity);
     return true;
   }
 
@@ -263,7 +270,7 @@ class EditEntities {
     this.selectEntity(newEntity);
     this.moveSelectedEntity(this.selector.pos.x, this.selector.pos.y);
     ig.editor.setModified(); // TODO
-    ig.game.undo.commitEntityCreate(newEntity);
+    this.undo.commitEntityCreate(newEntity);
   }
 
   spawnEntity(className, x, y, settings = {}) {
