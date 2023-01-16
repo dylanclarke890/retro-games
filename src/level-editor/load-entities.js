@@ -10,11 +10,11 @@ function loadScript({ src, cb = (_e, _path) => {} } = {}) {
   script.src = src;
 }
 
-function loadEntityScripts(entityObj) {
+function loadEntityScripts(entitiesObj) {
   const cb = (_e, filepath) => {
-    console.log(`Loaded:${filepath}`);
+    console.log(`Loaded: ${filepath}`);
   };
-  Object.keys(entityObj).forEach((filepath) => loadScript({ src: filepath, cb }));
+  Object.keys(entitiesObj).forEach((filepath) => loadScript({ src: filepath, cb }));
 }
 
-loadEntities(levelEditorConfig).then((val) => loadEntityScripts(val));
+loadEntities(levelEditorConfig).then((entitiesObj) => loadEntityScripts(entitiesObj));
