@@ -17,7 +17,7 @@ class HttpClient {
 
     if (!res.ok) throw new Error(res.statusText);
     if (opts.parseResponse !== false && res.status !== 204) return res.json();
-    return undefined;
+    return res.text();
   }
 
   setHeader(key, value) {
@@ -82,15 +82,21 @@ class HttpClient {
 
 class LevelEditorApiClient extends HttpClient {
   constructor(returnFormat = "application/json") {
-    super({ baseUrl: "https://replacethis.com/api", headers: { Accept: returnFormat } });
+    super({
+      baseUrl: `${window.location.origin}/server/level-editor/`,
+      headers: { Accept: returnFormat },
+    });
   }
 
   get client() {
-    const base = "/";
     return {
-      browse: () => this.get(`${base}browse.php`),
-      glob: () => this.get(`${base}glob.php`),
-      save: (data) => this.post(`${base}save.php`, data),
+      browse: () => this.get(`browse.php`),
+      glob: (filepaths) => {
+        return this.get(
+          `glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`
+        );
+      },
+      save: (data) => this.post(`save.php`, data),
     };
   }
 }

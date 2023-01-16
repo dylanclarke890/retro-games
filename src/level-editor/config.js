@@ -6,7 +6,7 @@ const levelEditorConfig = {
     /** Takes an array of glob regexes which specify where to load entities from.
      *  Can be individual files or entire directories.
      *  @example 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/laser.js'] */
-    entityFiles: ["src/entities/*.js"],
+    entityFiles: ["src/entities/fix-entities.js", "src/entities/pong-entities.js"],
 
     // The default path for the level file selection box
     levelPath: "assets/levels/",
