@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 define("ENTITY_REGEX", '/(?<=Register.entityType\()[^)]+|(?<=Register.entityTypes\()[^)]+/');
+$file_root = dirname(__FILE__, 3);
 
 function get_entities_from_glob(string $glob): array
 {
   if (!$glob) die("Invalid glob provided: " . $glob);
-  $filepaths = glob(dirname(__FILE__, 3) . $glob);
+  global $file_root;
+  $filepaths = glob($file_root . $glob);
   if ($filepaths === false) die("Invalid glob provided: " . $glob);
 
   $entityList = array();
@@ -26,12 +28,13 @@ function get_entities_from_glob(string $glob): array
     fclose($file);
   }
 
-  echo json_encode($entityList);
   return $entityList;
 }
 
-$entity_file_globs = array("/src/entities/*.js");
+$entity_file_globs = array("/src/entities/pong-entities.js", "/src/entities/fix-entities.js");
 
-foreach ($entity_file_globs as $glob) {
-  get_entities_from_glob($glob);
-}
+$all_entities_found = array();
+foreach ($entity_file_globs as $glob)
+  $all_entities_found = array_merge($all_entities_found, get_entities_from_glob($glob));
+
+echo json_encode($all_entities_found);
