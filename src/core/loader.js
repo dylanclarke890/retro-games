@@ -25,7 +25,7 @@ class GameLoader {
   load() {
     this.runner.system.clear("#000");
     if (!this.#assetsToPreload.length) {
-      this.#end();
+      this.end();
       return;
     }
     for (let i = 0; i < this.#assetsToPreload.length; i++)
@@ -33,7 +33,7 @@ class GameLoader {
     this.intervalId = setInterval(() => this.#drawLoadingScreen(), 16);
   }
 
-  #end() {
+  end() {
     if (this.#done) return;
     this.#done = true;
     clearInterval(this.intervalId);
@@ -66,6 +66,6 @@ class GameLoader {
     if (!wasSuccessful) throw new Error(`Failed to load resource: ${path}`);
     this.#unloaded.erase(path);
     this.#status = 1 - this.#unloaded.length / this.#assetsToPreload.length;
-    if (this.#unloaded.length === 0) setTimeout(() => this.#end(), 250);
+    if (this.#unloaded.length === 0) setTimeout(() => this.end(), 250);
   }
 }

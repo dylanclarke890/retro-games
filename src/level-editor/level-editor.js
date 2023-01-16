@@ -773,9 +773,14 @@ class LevelEditor {
 
 /** Custom loader, used to skip sound files and the run loop creation. */
 class LevelEditorLoader extends GameLoader {
-  constructor({ config, ...opts }) {
+  apiClient = null;
+  config = null;
+
+  constructor({ config, apiClient, ...opts }) {
     super(opts);
+    Guard.againstNull({ apiClient });
     Guard.againstNull({ config });
+    this.apiClient = apiClient;
     this.config = config;
   }
 
@@ -785,12 +790,6 @@ class LevelEditorLoader extends GameLoader {
     this.done = true;
     this.runner.system.clear(this.config.colors.clear);
     this.runner.setGame(this.gameClass);
-  }
-
-  loadResource(res) {
-    if (res instanceof Sound) this._unloaded.erase(res.path);
-    // TODO
-    else super.loadResource(res);
   }
 }
 
@@ -813,9 +812,9 @@ class LevelEditorRunner {
       height: Math.floor(LevelEditor.getMaxHeight() / this.config.view.zoom),
       scale: this.config.view.zoom,
     });
-
     this.input = new EventedInput({ system: this.system });
     this.soundManager = new SoundManager({ runner: this });
+    this.injectImageOverrides();
     this.ready = true;
 
     this.loader = new LevelEditorLoader({

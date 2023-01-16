@@ -90,12 +90,9 @@ class LevelEditorApiClient extends HttpClient {
 
   get client() {
     return {
-      browse: () => this.get(`browse.php`),
-      glob: (filepaths) => {
-        return this.get(
-          `glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`
-        );
-      },
+      browse: (dir, type) => this.get(`browse.php?dir=${encodeURIComponent(dir)}&type=${type}`),
+      glob: (filepaths) =>
+        this.get(`glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`),
       save: (data) => this.post(`save.php`, data),
     };
   }
