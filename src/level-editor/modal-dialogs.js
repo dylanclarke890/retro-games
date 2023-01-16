@@ -58,12 +58,12 @@ class ModalDialog {
 
   open() {
     // TODO
-    this.background.fadeIn(100);
+    $(this.background).fadeIn(100);
   }
 
   close() {
     // TODO
-    this.background.fadeOut(100);
+    $(this.background).fadeOut(100);
   }
 }
 
