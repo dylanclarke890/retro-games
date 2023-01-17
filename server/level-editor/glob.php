@@ -19,17 +19,14 @@ function get_entities_from_glob(string $glob): array
   foreach ($filepaths as $current_path) {
     $file = fopen($current_path, "r") or die("Error opening file: " . $current_path);
     $res = preg_match_all(constant("ENTITY_REGEX"), fread($file, filesize($current_path)), $matches_found);
-    if ($res === 0 || $res === false) {
-      fclose(($file));
-      continue;
-    }
+    fclose(($file));
 
+    if ($res === 0 || $res === false) continue;
     $entities_for_file = array();
     $flattened_matches = array_merge(...$matches_found);
     foreach ($flattened_matches as $match)
       $entities_for_file = array_merge($entities_for_file, preg_split("/[\s,]+/", $match));
     $entities_found[substr($current_path, $file_root_len)] = $entities_for_file;
-    fclose($file);
   }
 
   return $entities_found;
