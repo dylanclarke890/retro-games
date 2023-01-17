@@ -7,7 +7,7 @@ $file_root_len = strlen($file_root);
 
 function get_entities_from_glob(string $glob): array
 {
-  if (!isset($glob)) die("Invalid glob provided: " . $glob);
+  if (empty($glob)) die("Invalid glob provided: " . $glob);
   if ($glob[0] !== "/") $glob = "/" . $glob;
 
   global $file_root;
@@ -33,7 +33,7 @@ function get_entities_from_glob(string $glob): array
 }
 
 $entity_file_globs = $_GET["entity_filepaths"];
-if (!isset($entity_file_globs)) die("Entity filepaths are required.");
+if (empty($entity_file_globs)) die("Entity filepaths are required.");
 $entity_file_globs = json_decode($entity_file_globs);
 
 $all_entities_found = array();
