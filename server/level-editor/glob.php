@@ -1,19 +1,18 @@
 <?php
 
 declare(strict_types=1);
+require_once("config.php");
 define("ENTITY_REGEX", '/(?<=Register.entityType\()[^)]+|(?<=Register.entityTypes\()[^)]+/');
-$file_root = dirname(__FILE__, 3);
-$file_root_len = strlen($file_root);
 
 function get_entities_from_glob(string $glob): array
 {
-  if (empty($glob)) die("Invalid glob provided: " . $glob);
+  if (empty($glob)) exit_with_err(1, "Invalid glob provided: " . $glob);
   if ($glob[0] !== "/") $glob = "/" . $glob;
 
   global $file_root;
   global $file_root_len;
   $filepaths = glob($file_root . $glob);
-  if ($filepaths === false) die("Invalid glob provided: " . $glob);
+  if ($filepaths === false) exit_with_err(3, "Invalid glob provided: " . $glob);
 
   $entities_found = array();
   foreach ($filepaths as $current_path) {
@@ -33,7 +32,7 @@ function get_entities_from_glob(string $glob): array
 }
 
 $entity_file_globs = $_GET["entity_filepaths"];
-if (empty($entity_file_globs)) die("Entity filepaths are required.");
+if (empty($entity_file_globs)) exit_with_err(2, "Entity filepaths are required.");
 $entity_file_globs = json_decode($entity_file_globs);
 
 $all_entities_found = array();

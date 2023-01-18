@@ -1,9 +1,7 @@
 <?php
 
 declare(strict_types=1);
-
-$file_root = dirname(__FILE__, 3);
-$file_root_len = strlen($file_root);
+require_once("config.php");
 
 $dir_val = $_GET["dir"];
 $dir = $file_root . str_replace('..', '', $dir_val);
