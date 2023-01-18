@@ -1,5 +1,5 @@
 async function loadEntities(config) {
-  const apiClient = new LevelEditorApiClient();
+  const apiClient = new LevelEditorApi();
   return await apiClient.client.glob(config.project.entityFiles);
 }
 

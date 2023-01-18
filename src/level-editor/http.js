@@ -80,7 +80,7 @@ class HttpClient {
   }
 }
 
-class LevelEditorApiClient extends HttpClient {
+class LevelEditorApi extends HttpClient {
   constructor(returnFormat = "application/json") {
     super({
       baseUrl: `${window.location.origin}/server/level-editor/`,
