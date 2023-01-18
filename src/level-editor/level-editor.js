@@ -39,6 +39,7 @@ class LevelEditor {
   system = null;
   /** @type {EventedInput} */
   input = null;
+  apiClient = null;
 
   static getMaxWidth() {
     return window.innerWidth;
@@ -55,6 +56,7 @@ class LevelEditor {
     this.system = system;
     this.config = config;
     this.input = input;
+    this.apiClient = new LevelEditorApi();
 
     this.filePath = config.project.levelPath + this.fileName;
 
@@ -137,7 +139,7 @@ class LevelEditor {
     this.undo = new Undo(config.undoLevels);
 
     if (config.loadLastLevel) {
-      var path = getCookie("wmLastLevel");
+      const path = getCookie("levelEditorLastLevel");
       if (path) this.load(null, path);
     }
 
@@ -272,7 +274,7 @@ class LevelEditor {
   //#region Loading
 
   loadNew() {
-    setCookie("wmLastLevel", null);
+    setCookie("levelEditorLastLevel", null);
     while (this.layers.length) {
       this.layers[0].destroy();
       this.layers.splice(0, 1);
@@ -292,19 +294,17 @@ class LevelEditor {
     this.saveDialog.setPath(path);
     this.fileName = path.replace(/^.*\//, "");
 
-    $.ajax({
-      url: path + "?nocache=" + Math.random(),
-      dataType: "text",
-      async: false,
-      success: this.loadResponse.bind(this),
-      error() {
-        clearCookie("wmLastLevel");
-      },
-    });
+    let levelData = null;
+    try {
+      levelData = this.apiClient.file(path, { parseResponse: false });
+    } catch {
+      clearCookie("levelEditorLastLevel");
+    }
+    if (levelData) this.loadResponse(levelData);
   }
 
   loadResponse(data) {
-    setCookie("wmLastLevel", this.filePath);
+    setCookie("levelEditorLastLevel", this.filePath);
 
     // extract JSON from a module's JS
     const jsonMatch = data.match(/\/\*JSON\[\*\/([\s\S]*?)\/\*\]JSON\*\//);
@@ -393,7 +393,7 @@ class LevelEditor {
     if (data.error) alert("Error: " + data.msg);
     else {
       this.resetModified();
-      setCookie("wmLastLevel", this.filePath);
+      setCookie("levelEditorLastLevel", this.filePath);
     }
   }
 
