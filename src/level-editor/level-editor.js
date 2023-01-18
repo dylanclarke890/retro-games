@@ -49,14 +49,15 @@ class LevelEditor {
     return window.innerHeight - $el("#headerMenu").clientHeight;
   }
 
-  constructor({ system, config, input } = {}) {
+  constructor({ system, config, input, apiClient } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
     Guard.againstNull({ input });
+    Guard.againstNull({ apiClient });
     this.system = system;
     this.config = config;
     this.input = input;
-    this.apiClient = new LevelEditorApi();
+    this.apiClient = apiClient;
 
     this.filePath = config.project.levelPath + this.fileName;
 
@@ -794,15 +795,17 @@ class LevelEditorLoader extends GameLoader {
 }
 
 class LevelEditorRunner {
-  system = null;
-  input = null;
-  soundManager = null;
-  ready = false;
+  apiClient = null;
   config = null;
-  loader = null;
   game = null;
+  input = null;
+  loader = null;
+  ready = false;
+  soundManager = null;
+  system = null;
 
   constructor() {
+    this.apiClient = new LevelEditorApi();
     this.config = levelEditorConfig;
     this.system = new System({
       runner: this,
@@ -818,6 +821,7 @@ class LevelEditorRunner {
     this.ready = true;
 
     this.loader = new LevelEditorLoader({
+      apiClient: this.apiClient,
       config: this.config,
       debugMode: false,
       gameClass: LevelEditor,
@@ -827,7 +831,12 @@ class LevelEditorRunner {
   }
 
   setGame(gameClass) {
-    this.game = new gameClass({ system: this.system, config: this.config, input: this.input });
+    this.game = new gameClass({
+      apiClient: this.apiClient,
+      config: this.config,
+      input: this.input,
+      system: this.system,
+    });
   }
 
   /** Image overrides for the LevelEditor. To make the zoom function work, we need to
