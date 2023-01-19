@@ -18,16 +18,18 @@ class EditEntities {
   entityDefinitions = null;
   undo = null;
 
-  constructor({ div, config, undo } = {}) {
+  constructor({ div, config, undo, editor } = {}) {
     Guard.againstNull({ div });
     Guard.againstNull({ config });
     Guard.againstNull({ undo });
+    Guard.againstNull({ editor });
 
     this.div = div;
     this.undo = undo;
+    this.editor = editor;
     div.addEventListener("mouseup", () => this.click());
     div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
-    this.gridSize = config.entityGrid; // TODO
+    this.gridSize = config.entityGrid;
 
     this.menu = $new("div");
     this.menu.id = "entityMenu";
@@ -60,7 +62,7 @@ class EditEntities {
 
   //#region Saving/Loading
 
-  // TODO!
+  // TODO! - this should be handled by the glob api - we get back an array of objects -> filename => list of entity names
   fileNameToClassName(name) {
     const typeName = "-" + name.replace(/^.*\/|\.js/g, "");
     typeName = typeName.replace(/-(\w)/g, function (m, a) {
@@ -269,7 +271,7 @@ class EditEntities {
     const newEntity = this.spawnEntity(ev.target.id, 0, 0, {});
     this.selectEntity(newEntity);
     this.moveSelectedEntity(this.selector.pos.x, this.selector.pos.y);
-    ig.editor.setModified(); // TODO
+    this.editor.setModified();
     this.undo.commitEntityCreate(newEntity);
   }
 
@@ -370,8 +372,8 @@ class EditEntities {
 
     this.sort();
 
-    ig.game.setModified(); // TODO
-    ig.game.draw();
+    this.editor.setModified();
+    this.editor.draw();
 
     eKey.value = "";
     eVal.value = "";
@@ -422,11 +424,10 @@ class EditEntities {
   }
 
   showMenu(x, y) {
-    const { scale } = this.system; // TODO
-    // TODO
+    const { scale } = this.system;
     this.selector.pos = {
-      x: Math.round((x + ig.editor.screen.x) / this.gridSize) * this.gridSize,
-      y: Math.round((y + ig.editor.screen.y) / this.gridSize) * this.gridSize,
+      x: Math.round((x + this.editor.screen.x) / this.gridSize) * this.gridSize,
+      y: Math.round((y + this.editor.screen.y) / this.gridSize) * this.gridSize,
     };
     this.menu.style.top = `${y * scale + 2}px`;
     this.menu.style.left = `${x * scale + 2}px`;
@@ -435,8 +436,7 @@ class EditEntities {
   }
 
   hideMenu() {
-    // TODO
-    ig.editor.mode = ig.editor.MODE.DEFAULT;
+    this.editor.mode = this.editor.MODE.DEFAULT;
     this.menu.style.display = "none";
   }
 
@@ -451,7 +451,7 @@ class EditEntities {
     const visibleEl = this.div.querySelector(".visible");
     if (this.visible) visibleEl.classList.add("checkedVis");
     else visibleEl.classList.remove("checkedVis");
-    ig.game.draw(); // TODO
+    this.editor.draw();
   }
 
   toggleVisibilityClick() {
@@ -464,7 +464,7 @@ class EditEntities {
       this.ignoreLastClick = false;
       return;
     }
-    ig.editor.setActiveLayer("entities"); // TODO
+    this.editor.setActiveLayer("entities");
   }
 
   mousemove(x, y) {
@@ -502,8 +502,8 @@ class EditEntities {
       ctx.fillStyle = entity._wmBoxColor || "rgba(128, 128, 128, 0.9)";
       // TODO
       ctx.fillRect(
-        drawPosition(entity.pos.x - ig.game.screen.x), // TODO
-        drawPosition(entity.pos.y - ig.game.screen.y),
+        drawPosition(entity.pos.x - this.editor.screen.x),
+        drawPosition(entity.pos.y - this.editor.screen.y),
         entity.size.x * scale,
         entity.size.y * scale
       );
@@ -518,16 +518,16 @@ class EditEntities {
       ctx.fillStyle = "rgba(0,0,0,0.4)";
       ctx.fillText(
         description,
-        drawPosition(entity.pos.x - ig.game.screen.x),
-        drawPosition(entity.pos.y - ig.game.screen.y + 0.5) // TODO
+        drawPosition(entity.pos.x - this.editor.screen.x),
+        drawPosition(entity.pos.y - this.editor.screen.y + 0.5)
       );
 
       // text
       ctx.fillStyle = this.config.colors.primary;
       ctx.fillText(
         description,
-        drawPosition(entity.pos.x - ig.game.screen.x), // TODO
-        drawPosition(entity.pos.y - ig.game.screen.y)
+        drawPosition(entity.pos.x - this.editor.screen.x),
+        drawPosition(entity.pos.y - this.editor.screen.y)
       );
     }
 
@@ -537,7 +537,7 @@ class EditEntities {
   }
 
   drawLineToTarget(ent, target) {
-    target = ig.game.getEntityByName(target); // TODO
+    target = this.editor.getEntityByName(target);
     if (!target) return;
 
     const { ctx, drawPosition } = this.system;
@@ -546,12 +546,12 @@ class EditEntities {
 
     ctx.beginPath();
     ctx.moveTo(
-      drawPosition(ent.pos.x + ent.size.x / 2 - ig.game.screen.x), // TODO
-      drawPosition(ent.pos.y + ent.size.y / 2 - ig.game.screen.y)
+      drawPosition(ent.pos.x + ent.size.x / 2 - this.editor.screen.x),
+      drawPosition(ent.pos.y + ent.size.y / 2 - this.editor.screen.y)
     );
     ctx.lineTo(
-      drawPosition(target.pos.x + target.size.x / 2 - ig.game.screen.x), // TODO
-      drawPosition(target.pos.y + target.size.y / 2 - ig.game.screen.y)
+      drawPosition(target.pos.x + target.size.x / 2 - this.editor.screen.x),
+      drawPosition(target.pos.y + target.size.y / 2 - this.editor.screen.y)
     );
     ctx.stroke();
     ctx.closePath();
@@ -563,8 +563,8 @@ class EditEntities {
     ctx.lineWidth = 1;
     ctx.strokeStyle = this.config.colors.highlight;
     ctx.strokeRect(
-      drawPosition(this.selectedEntity.pos.x - ig.editor.screen.x) - 0.5, // TODO
-      drawPosition(this.selectedEntity.pos.y - ig.editor.screen.y) - 0.5,
+      drawPosition(this.selectedEntity.pos.x - this.editor.screen.x) - 0.5,
+      drawPosition(this.selectedEntity.pos.y - this.editor.screen.y) - 0.5,
       this.selectedEntity.size.x * scale + 1,
       this.selectedEntity.size.y * scale + 1
     );

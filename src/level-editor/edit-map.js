@@ -121,7 +121,7 @@ class EditMap extends BackgroundMap {
     const visibleEl = this.div.querySelector(".visible");
     if (this.visible) visibleEl.classList.add("checkedVis");
     else visibleEl.classList.remove("checkedVis");
-    ig.game.draw(); // TODO
+    this.editor.draw();
   }
 
   toggleVisibilityClick() {
@@ -134,7 +134,7 @@ class EditMap extends BackgroundMap {
       this.ignoreLastClick = false;
       return;
     }
-    ig.editor.setActiveLayer(this.name); // TODO
+    this.editor.setActiveLayer(this.name);
   }
 
   destroy() {

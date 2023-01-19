@@ -137,7 +137,7 @@ class LevelEditor {
       document.querySelectorAll("input:focus").forEach((v) => v.blur())
     );
 
-    this.undo = new Undo(config.undoLevels);
+    this.undo = new Undo({ levels: config.undoLevels, editor: this });
 
     if (config.loadLastLevel) {
       const path = getCookie("levelEditorLastLevel");
@@ -816,7 +816,7 @@ class LevelEditorRunner {
       scale: this.config.view.zoom,
     });
     this.input = new EventedInput({ system: this.system });
-    this.soundManager = new SoundManager({ runner: this });
+    this.soundManager = new SoundManager(this);
     this.injectImageOverrides();
     this.ready = true;
 
