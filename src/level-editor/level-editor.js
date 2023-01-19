@@ -1,45 +1,39 @@
 class LevelEditor {
+  activeLayer = null;
+  apiClient = null;
+  collisionLayer = null;
+  collisionSolid = 1;
+  deleteLayerDialog = null;
+  entities = null;
+  /** @type {EventedInput} */
+  input = null;
+  fileName = "untitled.js";
+  filePath = "";
+  labelsStep = 32;
+  layers = [];
+  levelData = {};
+  levelSavePathDialog = null;
+  loadDialog = null;
+  loseChangesDialog = null;
   mode = null;
   MODE = {
     DRAW: 1,
     TILESELECT: 2,
     ENTITYSELECT: 4,
   };
-
-  levelData = {};
-  layers = [];
-  entities = null;
-  activeLayer = null;
-  collisionLayer = null;
-  selectedEntity = null;
-
-  screen = { x: 0, y: 0 };
-  _rscreen = { x: 0, y: 0 };
+  modified = false;
   mouseLast = { x: -1, y: -1 };
-  waitForModeChange = false;
-
-  tilesetSelectDialog = null;
-  levelSavePathDialog = null;
-  labelsStep = 32;
-
-  collisionSolid = 1;
-
-  loadDialog = null;
+  needsDraw = true;
+  _rscreen = { x: 0, y: 0 };
   /** @type {ModalDialogPathSelect} */
   saveDialog = null;
-  loseChangesDialog = null;
-  deleteLayerDialog = null;
-  fileName = "untitled.js";
-  filePath = "";
-  modified = false;
-  needsDraw = true;
-
   undo = null;
+  screen = { x: 0, y: 0 };
+  selectedEntity = null;
   /** @type {System} */
   system = null;
-  /** @type {EventedInput} */
-  input = null;
-  apiClient = null;
+  tilesetSelectDialog = null;
+  waitForModeChange = false;
 
   static getMaxWidth() {
     return window.innerWidth;
@@ -54,6 +48,7 @@ class LevelEditor {
     Guard.againstNull({ config });
     Guard.againstNull({ input });
     Guard.againstNull({ apiClient });
+
     this.system = system;
     this.config = config;
     this.input = input;
@@ -105,10 +100,8 @@ class LevelEditor {
 
     // Events/Input
     if (config.touchScroll) {
-      // Setup wheel event
-      canvas.addEventListener("wheel", (e) => this.touchScroll(e), false);
-      // Unset MWHEEL_* binds
-      delete config.binds["MWHEEL_UP"];
+      canvas.addEventListener("wheel", (e) => this.touchScroll(e), false); // Setup wheel event
+      delete config.binds["MWHEEL_UP"]; // Unset MWHEEL_* binds
       delete config.binds["MWHEEL_DOWN"];
     }
 

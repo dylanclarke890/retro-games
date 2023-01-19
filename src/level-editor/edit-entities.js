@@ -1,22 +1,20 @@
 class EditEntities {
-  visible = true;
   active = true;
-
   div = null;
+  entities = [];
+  entityClasses = {};
+  entityDefinitions = null;
+  gridSize = 0;
   hotkey = -1;
   ignoreLastClick = false;
+  menu = null;
   name = "entities";
-
-  entities = [];
   namedEntities = {};
   selectedEntity = null;
-  entityClasses = {};
-  menu = null;
   selector = { size: { x: 2, y: 2 }, pos: { x: 0, y: 0 }, offset: { x: 0, y: 0 } };
-  wasSelectedOnScaleBorder = false;
-  gridSize = 0;
-  entityDefinitions = null;
   undo = null;
+  visible = true;
+  wasSelectedOnScaleBorder = false;
 
   constructor({ div, config, undo, editor } = {}) {
     Guard.againstNull({ div });
@@ -500,7 +498,6 @@ class EditEntities {
     // box
     if (entity._wmDrawBox) {
       ctx.fillStyle = entity._wmBoxColor || "rgba(128, 128, 128, 0.9)";
-      // TODO
       ctx.fillRect(
         drawPosition(entity.pos.x - this.editor.screen.x),
         drawPosition(entity.pos.y - this.editor.screen.y),

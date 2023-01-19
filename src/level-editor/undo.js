@@ -80,7 +80,7 @@ class Undo {
     if (!action) return;
 
     this.rpos--;
-    this.editor.setActiveLayer(action.activeLayer); // TODO
+    this.editor.setActiveLayer(action.activeLayer);
 
     const { MAP_DRAW, ENTITY_EDIT, ENTITY_CREATE, ENTITY_DELETE } = Undo.TYPE;
     switch (action.type) {

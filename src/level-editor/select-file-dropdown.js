@@ -7,6 +7,7 @@ class SelectFileDropdown {
   filelistPHP = "";
   filetype = "";
 
+  // TODO
   constructor(elementId, filelistPHP, filetype) {
     this.filetype = filetype || "";
     this.filelistPHP = filelistPHP;
