@@ -1,6 +1,6 @@
 class LevelEditor {
   activeLayer = null;
-  api = null;
+  httpClient = null;
   collisionLayer = null;
   collisionSolid = 1;
   deleteLayerDialog = null;
@@ -43,16 +43,16 @@ class LevelEditor {
     return window.innerHeight - $el("#headerMenu").clientHeight;
   }
 
-  constructor({ system, config, input, api } = {}) {
+  constructor({ system, config, input, httpClient } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
     Guard.againstNull({ input });
-    Guard.againstNull({ api });
+    Guard.againstNull({ httpClient });
 
     this.system = system;
     this.config = config;
     this.input = input;
-    this.api = api;
+    this.httpClient = httpClient;
     this.undo = new Undo({ levels: config.undoLevels, editor: this });
     this.filePath = config.project.levelPath + this.fileName;
 
@@ -69,7 +69,7 @@ class LevelEditor {
 
     this.tilesetSelectDialog = new SelectFileDropdown({
       elementId: "#layerTileset",
-      api: this.api,
+      httpClient: this.httpClient,
       filetype: "images",
     });
     this.entities = new EditEntities($el("#layerEntities"));
@@ -125,7 +125,7 @@ class LevelEditor {
       text: "Load Level",
       okText: "Load",
       type: "scripts",
-      api: this.api,
+      httpClient: this.httpClient,
     });
     this.loadDialog.onOk = this.load;
     this.loadDialog.setPath(this.config.project.levelPath);
@@ -136,7 +136,7 @@ class LevelEditor {
       text: "Save Level",
       okText: "Save",
       type: "scripts",
-      api: this.api,
+      httpClient: this.httpClient,
     });
     this.saveDialog.onOk = this.save;
     this.saveDialog.setPath(this.config.project.levelPath);
@@ -294,7 +294,7 @@ class LevelEditor {
 
     let levelData = null;
     try {
-      levelData = this.api.file(path, { parseResponse: false });
+      levelData = this.httpClient.api.file(path, { parseResponse: false });
     } catch {
       clearCookie("levelEditorLastLevel");
     }
@@ -375,6 +375,7 @@ class LevelEditor {
     const dataString = JSON.stringify(data);
     if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
 
+    this.httpClient.api.save(); // TODO
     const postString =
       "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
     $.ajax({
@@ -792,7 +793,7 @@ class LevelEditorLoader extends GameLoader {
 }
 
 class LevelEditorRunner {
-  api = null;
+  httpClient = null;
   config = null;
   game = null;
   input = null;
@@ -802,7 +803,7 @@ class LevelEditorRunner {
   system = null;
 
   constructor() {
-    this.api = new LevelEditorApi();
+    this.httpClient = new LevelEditorHttpClient();
     this.config = levelEditorConfig;
     this.system = new System({
       runner: this,
@@ -818,7 +819,7 @@ class LevelEditorRunner {
     this.ready = true;
 
     this.loader = new LevelEditorLoader({
-      api: this.api,
+      httpClient: this.httpClient,
       config: this.config,
       debugMode: false,
       gameClass: LevelEditor,
@@ -829,7 +830,7 @@ class LevelEditorRunner {
 
   setGame(gameClass) {
     this.game = new gameClass({
-      api: this.api,
+      httpClient: this.httpClient,
       config: this.config,
       input: this.input,
       system: this.system,

@@ -9,9 +9,9 @@ class SelectFileDropdown {
 
   // TODO!
   // constructor(elementId, filelistPHP, filetype) {
-  constructor({ elementId, api, filetype } = {}) {
-    Guard.againstNull({ api });
-    this.api = api;
+  constructor({ elementId, httpClient, filetype } = {}) {
+    Guard.againstNull({ httpClient });
+    this.httpClient = httpClient;
     this.filetype = filetype || "";
     this.input = $el(elementId);
     this.input.addEventListener("focus", (e) => this.show(e));
@@ -24,7 +24,7 @@ class SelectFileDropdown {
   }
 
   loadDir(dir) {
-    this.api.client
+    this.httpClient.api
       .browse(dir, this.filetype)
       .then((data) => this.showFiles(data))
       .catch((err) => console.log(err));

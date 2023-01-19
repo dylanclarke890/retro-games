@@ -80,7 +80,7 @@ class HttpClient {
   }
 }
 
-class LevelEditorApi extends HttpClient {
+class LevelEditorHttpClient extends HttpClient {
   constructor(returnFormat = "application/json") {
     super({
       baseUrl: `${window.location.origin}/server/level-editor/`,
@@ -88,12 +88,12 @@ class LevelEditorApi extends HttpClient {
     });
   }
 
-  get client() {
+  get api() {
     return {
       browse: (dir, type) => this.get(`browse.php?dir=${encodeURIComponent(dir)}&type=${type}`),
       glob: (filepaths) =>
         this.get(`glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`),
-      save: (data) => this.post(`save.php`, data),
+      save: (path, data) => this.post(`save.php?path=${encodeURIComponent(path)}`, data),
       file: (path) => this.get(`../../${path}`),
     };
   }
