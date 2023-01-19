@@ -7,10 +7,12 @@ class SelectFileDropdown {
   filelistPHP = "";
   filetype = "";
 
-  // TODO
-  constructor(elementId, filelistPHP, filetype) {
+  // TODO!
+  // constructor(elementId, filelistPHP, filetype) {
+  constructor({ elementId, api, filetype } = {}) {
+    Guard.againstNull({ api });
+    this.api = api;
     this.filetype = filetype || "";
-    this.filelistPHP = filelistPHP;
     this.input = $el(elementId);
     this.input.addEventListener("focus", (e) => this.show(e));
     this.div = $new("div");
@@ -22,15 +24,10 @@ class SelectFileDropdown {
   }
 
   loadDir(dir) {
-    const path =
-      this.filelistPHP + "?dir=" + encodeURIComponent(dir || "") + "&type=" + this.filetype;
-    // TODO
-    $.ajax({
-      url: path,
-      dataType: "json",
-      async: false,
-      success: this.showFiles.bind(this),
-    });
+    this.api.client
+      .browse(dir, this.filetype)
+      .then((data) => this.showFiles(data))
+      .catch((err) => console.log(err));
   }
 
   selectDir(event) {
@@ -53,7 +50,7 @@ class SelectFileDropdown {
       parent.href = data.parent;
       parent.innerHTML = "&hellip;parent directory";
       parent.addEventListener("click", (e) => this.selectDir(e));
-      this.div.append(parentDir);
+      this.div.append(parent);
     }
     for (let i = 0; i < data.dirs.length; i++) {
       const name = data.dirs[i].match(/[^\/]*$/)[0] + "/";

@@ -87,7 +87,8 @@ class Undo {
       case MAP_DRAW:
         for (let i = 0; i < action.changes.length; i++) {
           const change = action.changes[i];
-          change.layer.setTile(change.x, change.y, change.current);
+          const { x, y, current } = change;
+          change.layer.setTile(x, y, current);
         }
         break;
       case ENTITY_EDIT:

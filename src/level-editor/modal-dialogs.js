@@ -72,10 +72,10 @@ class ModalDialogPathSelect extends ModalDialog {
   pathInput = null;
   fileType = "";
 
-  constructor({ text, okText = "Select", type = "", config } = {}) {
+  constructor({ text, okText = "Select", type = "", api } = {}) {
     super({ text, okText, autoInit: false });
-    Guard.againstNull({ config });
-    this.config = config;
+    Guard.againstNull({ api });
+    this.api = api;
     this.fileType = type;
     this.initDialog();
   }
@@ -92,12 +92,11 @@ class ModalDialogPathSelect extends ModalDialog {
     this.pathInput.type = "text";
     this.pathInput.classList.add("modalDialogPath");
     this.buttonDiv.before(this.pathInput);
-    // TODO
-    this.pathDropdown = new SelectFileDropdown(
-      this.pathInput,
-      this.config.api.browse,
-      this.fileType
-    );
+    this.pathDropdown = new SelectFileDropdown({
+      elementId: this.pathInput,
+      filetype: this.fileType,
+      api: this.api,
+    });
   }
 
   clickOk() {

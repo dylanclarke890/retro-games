@@ -1,6 +1,6 @@
 class LevelEditor {
   activeLayer = null;
-  apiClient = null;
+  api = null;
   collisionLayer = null;
   collisionSolid = 1;
   deleteLayerDialog = null;
@@ -43,17 +43,17 @@ class LevelEditor {
     return window.innerHeight - $el("#headerMenu").clientHeight;
   }
 
-  constructor({ system, config, input, apiClient } = {}) {
+  constructor({ system, config, input, api } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
     Guard.againstNull({ input });
-    Guard.againstNull({ apiClient });
+    Guard.againstNull({ api });
 
     this.system = system;
     this.config = config;
     this.input = input;
-    this.apiClient = apiClient;
-
+    this.api = api;
+    this.undo = new Undo({ levels: config.undoLevels, editor: this });
     this.filePath = config.project.levelPath + this.fileName;
 
     const { ctx, canvas } = this.system;
@@ -61,35 +61,17 @@ class LevelEditor {
     ctx.font = config.labels.font;
     this.labelsStep = config.labels.step;
 
-    // Dialogs
-    this.loadDialog = new ModalDialogPathSelect({
-      text: "Load Level",
-      okText: "Load",
-      type: "scripts",
-      config: this.config,
-    });
-    this.loadDialog.onOk = this.load;
-    this.loadDialog.setPath(config.project.levelPath);
-    $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
-    $el("#levelNew").addEventListener("click", () => this.showNewDialog());
-
-    this.saveDialog = new ModalDialogPathSelect({
-      text: "Save Level",
-      okText: "Save",
-      type: "scripts",
-      config: this.config,
-    });
-    this.saveDialog.onOk = this.save;
-    this.saveDialog.setPath(config.project.levelPath);
-    $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
-    $el("#levelSave").addEventListener("click", () => this.saveQuick());
-
+    this.initDialogs();
     this.loseChangesDialog = new ModalDialog("Lose all changes?");
     this.deleteLayerDialog = new ModalDialog("Delete Layer? NO UNDO!");
     this.deleteLayerDialog.onOk = this.removeLayer;
     this.mode = this.MODE.DEFAULT;
 
-    this.tilesetSelectDialog = new SelectFileDropdown("#layerTileset", config.api.browse, "images");
+    this.tilesetSelectDialog = new SelectFileDropdown({
+      elementId: "#layerTileset",
+      api: this.api,
+      filetype: "images",
+    });
     this.entities = new EditEntities($el("#layerEntities"));
 
     $("#layers").sortable({
@@ -130,14 +112,36 @@ class LevelEditor {
       document.querySelectorAll("input:focus").forEach((v) => v.blur())
     );
 
-    this.undo = new Undo({ levels: config.undoLevels, editor: this });
-
     if (config.loadLastLevel) {
       const path = getCookie("levelEditorLastLevel");
       if (path) this.load(null, path);
     }
 
     requestAnimationFrame(() => this.drawIfNeeded());
+  }
+
+  initDialogs() {
+    this.loadDialog = new ModalDialogPathSelect({
+      text: "Load Level",
+      okText: "Load",
+      type: "scripts",
+      api: this.api,
+    });
+    this.loadDialog.onOk = this.load;
+    this.loadDialog.setPath(this.config.project.levelPath);
+    $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
+    $el("#levelNew").addEventListener("click", () => this.showNewDialog());
+
+    this.saveDialog = new ModalDialogPathSelect({
+      text: "Save Level",
+      okText: "Save",
+      type: "scripts",
+      api: this.api,
+    });
+    this.saveDialog.onOk = this.save;
+    this.saveDialog.setPath(this.config.project.levelPath);
+    $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
+    $el("#levelSave").addEventListener("click", () => this.saveQuick());
   }
 
   uikeydown(event) {
@@ -290,7 +294,7 @@ class LevelEditor {
 
     let levelData = null;
     try {
-      levelData = this.apiClient.file(path, { parseResponse: false });
+      levelData = this.api.file(path, { parseResponse: false });
     } catch {
       clearCookie("levelEditorLastLevel");
     }
@@ -788,7 +792,7 @@ class LevelEditorLoader extends GameLoader {
 }
 
 class LevelEditorRunner {
-  apiClient = null;
+  api = null;
   config = null;
   game = null;
   input = null;
@@ -798,7 +802,7 @@ class LevelEditorRunner {
   system = null;
 
   constructor() {
-    this.apiClient = new LevelEditorApi();
+    this.api = new LevelEditorApi();
     this.config = levelEditorConfig;
     this.system = new System({
       runner: this,
@@ -814,7 +818,7 @@ class LevelEditorRunner {
     this.ready = true;
 
     this.loader = new LevelEditorLoader({
-      apiClient: this.apiClient,
+      api: this.api,
       config: this.config,
       debugMode: false,
       gameClass: LevelEditor,
@@ -825,7 +829,7 @@ class LevelEditorRunner {
 
   setGame(gameClass) {
     this.game = new gameClass({
-      apiClient: this.apiClient,
+      api: this.api,
       config: this.config,
       input: this.input,
       system: this.system,
