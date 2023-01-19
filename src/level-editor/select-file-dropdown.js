@@ -1,11 +1,12 @@
 class SelectFileDropdown {
+  boundShow = null;
   /** @type {HTMLElement} */
   div = null;
+  filetype = "";
+  /** @type {LevelEditorHttpClient} */
+  httpClient = null;
   /** @type {HTMLElement} */
   input = null;
-  boundShow = null;
-  filelistPHP = "";
-  filetype = "";
 
   constructor({ elementId, httpClient, filetype } = {}) {
     Guard.againstNull({ httpClient });
