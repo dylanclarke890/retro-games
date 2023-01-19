@@ -7,8 +7,6 @@ class SelectFileDropdown {
   filelistPHP = "";
   filetype = "";
 
-  // TODO!
-  // constructor(elementId, filelistPHP, filetype) {
   constructor({ elementId, httpClient, filetype } = {}) {
     Guard.againstNull({ httpClient });
     this.httpClient = httpClient;
@@ -18,7 +16,6 @@ class SelectFileDropdown {
     this.div = $new("div");
     this.div.classList.add("selectFileDialog");
     this.div.addEventListener("mousedown", (e) => this.noHide(e));
-
     this.input.after(this.div);
     this.loadDir("");
   }
