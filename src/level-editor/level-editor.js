@@ -62,8 +62,8 @@ class LevelEditor {
     this.labelsStep = config.labels.step;
 
     this.initDialogs();
-    this.loseChangesDialog = new ModalDialog("Lose all changes?");
-    this.deleteLayerDialog = new ModalDialog("Delete Layer? NO UNDO!");
+    this.loseChangesDialog = new ModalDialog({ text: "Lose all changes?", autoInit: true });
+    this.deleteLayerDialog = new ModalDialog({ text: "Delete Layer? NO UNDO!", autoInit: true });
     this.deleteLayerDialog.onOk = this.removeLayer;
     this.mode = this.MODE.DEFAULT;
 
@@ -100,7 +100,7 @@ class LevelEditor {
 
     window.addEventListener("resize", () => this.resize());
     window.addEventListener("keydown", (e) => this.uikeydown(e));
-    window.addEventListener("beforeunload", (e) => this.confirmClose(e));
+    if (config.askBeforeClose) window.addEventListener("beforeunload", (e) => this.confirmClose(e));
 
     $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
     $el("#buttonRemoveLayer").addEventListener("click", this.deleteLayerDialog.open());
@@ -257,7 +257,7 @@ class LevelEditor {
     config.labels.step = Math.round(this.labelsStep / config.view.zoom);
     // TODO
     $("#zoomIndicator")
-      .text(wm.config.view.zoom + "x")
+      .text(config.view.zoom + "x")
       .stop(true, true)
       .show()
       .delay(300)
@@ -269,7 +269,7 @@ class LevelEditor {
     this.drag();
 
     // for (let i in ig.Image.cache) {
-    //   ig.Image.cache[i].resize(wm.config.view.zoom);
+    //   ig.Image.cache[i].resize(config.view.zoom);
     // } // TODO
 
     this.resize();
@@ -755,7 +755,7 @@ class LevelEditor {
 
   drawLabels(step) {
     const { ctx, height, width, scale } = this.system;
-    ctx.fillStyle = wm.config.colors.primary;
+    ctx.fillStyle = this.config.colors.primary;
     let xlabel = this.screen.x - (this.screen.x % step) - step;
     for (let tx = Math.floor(-this.screen.x % step); tx < width; tx += step) {
       xlabel += step;

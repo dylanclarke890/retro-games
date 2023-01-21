@@ -10,10 +10,8 @@ class ModalDialog {
   background = null;
   /** @type {HTMLDivElement} */
   dialogBox = null;
-  /** @type {HTMLDivElement} */
-  buttonDiv = null;
 
-  constructor({ text, okText, cancelText, autoInit = true } = {}) {
+  constructor({ text, okText, cancelText, autoInit } = {}) {
     this.text = text;
     this.okText = okText || "OK";
     this.cancelText = cancelText || "Cancel";
@@ -22,28 +20,28 @@ class ModalDialog {
     this.dialogBox = $new("div");
     this.dialogBox.classList.add("modalDialogBox");
     this.background.append(this.dialogBox);
-    document.body.append(this.background);
+    document.body.prepend(this.background);
     if (autoInit) this.initDialog();
   }
 
   initDialog() {
-    this.buttonDiv = $new("div");
-    this.buttonDiv.classList.add("modalDialogButtons");
-
     const okButton = $new("button");
     okButton.classList.add("button");
     okButton.textContent = this.okText;
+    okButton.addEventListener("click", () => this.clickOk());
+
     const cancelButton = $new("button");
     cancelButton.classList.add("button");
     cancelButton.textContent = this.cancelText;
-
-    okButton.addEventListener("click", () => this.clickOk());
-    this.buttonDiv.append(okButton);
     cancelButton.addEventListener("click", () => this.clickCancel());
-    this.buttonDiv.append(cancelButton);
 
-    this.dialogBox.innerHTML = '<div class="modalDialogText">' + this.text + "</div>";
-    this.dialogBox.append(this.buttonDiv);
+    const buttonDiv = $new("div");
+    buttonDiv.classList.add("modalDialogButtons");
+    buttonDiv.append(okButton);
+    buttonDiv.append(cancelButton);
+
+    this.dialogBox.innerHTML = `<div class="modalDialogText">${this.text}</div>`;
+    this.dialogBox.append(buttonDiv);
   }
 
   clickOk() {
@@ -75,6 +73,7 @@ class ModalDialogPathSelect extends ModalDialog {
   constructor({ text, okText = "Select", type = "", httpClient } = {}) {
     super({ text, okText, autoInit: false });
     Guard.againstNull({ httpClient });
+    Guard.againstNull({ type });
     this.httpClient = httpClient;
     this.fileType = type;
     this.initDialog();
@@ -91,7 +90,8 @@ class ModalDialogPathSelect extends ModalDialog {
     this.pathInput = $new("input");
     this.pathInput.type = "text";
     this.pathInput.classList.add("modalDialogPath");
-    this.buttonDiv.before(this.pathInput);
+    // Insert dropdown before dialog buttons but after title.
+    this.dialogBox.insertBefore(this.pathInput, this.dialogBox.children[1]);
     this.pathDropdown = new SelectFileDropdown({
       elementId: this.pathInput,
       filetype: this.fileType,
@@ -100,7 +100,7 @@ class ModalDialogPathSelect extends ModalDialog {
   }
 
   clickOk() {
-    if (this.onOk) this.onOk(this, this.pathInput.val());
+    if (this.onOk) this.onOk(this, this.pathInput.value);
     this.close();
   }
 }

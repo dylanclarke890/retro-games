@@ -4,11 +4,6 @@ class EventedInput extends Input {
   keyupCallback = null;
   mousemoveCallback = null;
 
-  constructor(settings) {
-    console.log(settings);
-    super(settings);
-  }
-
   keydown(event) {
     if (this.targetIsInputOrText(event)) return;
     const code =

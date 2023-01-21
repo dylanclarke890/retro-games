@@ -16,7 +16,7 @@ const levelEditorConfig = {
     tilesize: 8,
   },
   /** Whether to ask before closing level editor when there are unsaved changes. */
-  askBeforeClose: true,
+  askBeforeClose: false,
   /** Whether to attempt to load the last opened level on startup. */
   loadLastLevel: true,
   /** Size of the "snap" grid when moving entities. */

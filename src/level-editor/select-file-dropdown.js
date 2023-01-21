@@ -12,12 +12,15 @@ class SelectFileDropdown {
     Guard.againstNull({ httpClient });
     this.httpClient = httpClient;
     this.filetype = filetype || "";
-    this.input = $el(elementId);
-    this.input.addEventListener("focus", (e) => this.show(e));
+    
     this.div = $new("div");
     this.div.classList.add("selectFileDialog");
     this.div.addEventListener("mousedown", (e) => this.noHide(e));
-    this.input.after(this.div);
+
+    this.input = $el(elementId);
+    this.input.addEventListener("focus", (e) => this.show(e));
+    this.input.append(this.div);
+
     this.loadDir("");
   }
 
@@ -25,19 +28,17 @@ class SelectFileDropdown {
     this.httpClient.api
       .browse(dir, this.filetype)
       .then((data) => this.showFiles(data))
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }
 
   selectDir(event) {
     this.loadDir(event.target.href);
-    return false;
   }
 
   selectFile(event) {
     this.input.value = event.target.href;
     this.input.blur();
     this.hide();
-    return false;
   }
 
   showFiles(data) {

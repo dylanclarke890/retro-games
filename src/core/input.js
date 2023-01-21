@@ -94,8 +94,6 @@ class Input {
     PERIOD: 190,
   };
 
-  #actions = {};
-  #bindings = {};
   #delayedKeyup = {};
   #isUsingAccelerometer = false;
   #isUsingKeyboard = false;
@@ -103,8 +101,10 @@ class Input {
   #locks = {};
   #userAgent = null;
   #presses = {};
-
+  
   accel = { x: 0, y: 0, z: 0 };
+  actions = {};
+  bindings = {};
   mouse = { x: 0, y: 0 };
   system = null;
 
@@ -160,10 +160,10 @@ class Input {
 
   mousewheel(event) {
     const code = event.deltaY < 0 ? Input.KEY.MWHEEL_UP : Input.KEY.MWHEEL_DOWN;
-    const action = this.#bindings[code];
+    const action = this.bindings[code];
     if (!action) return;
 
-    this.#actions[action] = true;
+    this.actions[action] = true;
     this.#presses[action] = true;
     this.#delayedKeyup[action] = true;
     event.stopPropagation();
@@ -183,7 +183,7 @@ class Input {
   }
 
   contextmenu(event) {
-    if (!this.#bindings[Input.KEY.MOUSE2]) return;
+    if (!this.bindings[Input.KEY.MOUSE2]) return;
     event.stopPropagation();
     event.preventDefault();
   }
@@ -202,9 +202,9 @@ class Input {
     if (code < 0 && !this.#userAgent.device.mobile) window.focus();
     if (event.type == "touchstart" || event.type == "mousedown") this.mousemove(event);
 
-    const action = this.#bindings[code];
+    const action = this.bindings[code];
     if (!action) return;
-    this.#actions[action] = true;
+    this.actions[action] = true;
     if (!this.#locks[action]) {
       this.#presses[action] = true;
       this.#locks[action] = true;
@@ -221,7 +221,7 @@ class Input {
         ? Input.KEY.MOUSE2
         : Input.KEY.MOUSE1;
 
-    const action = this.#bindings[code];
+    const action = this.bindings[code];
     if (!action) return;
     this.#delayedKeyup[action] = true;
     event.preventDefault();
@@ -234,7 +234,7 @@ class Input {
   bind(key, action) {
     if (key < 0) this.initMouse();
     else if (key > 0) this.initKeyboard();
-    this.#bindings[key] = action;
+    this.bindings[key] = action;
   }
 
   bindTouch(selector, action) {
@@ -246,21 +246,21 @@ class Input {
   }
 
   unbind(key) {
-    const action = this.#bindings[key];
+    const action = this.bindings[key];
     this.#delayedKeyup[action] = true;
-    this.#bindings[key] = null;
+    this.bindings[key] = null;
   }
 
   unbindAll() {
-    this.#bindings = {};
-    this.#actions = {};
+    this.bindings = {};
+    this.actions = {};
     this.#presses = {};
     this.#locks = {};
     this.#delayedKeyup = {};
   }
 
   state(action) {
-    return this.#actions[action];
+    return this.actions[action];
   }
 
   pressed(action) {
@@ -273,7 +273,7 @@ class Input {
 
   clearPressed() {
     for (let action in this.#delayedKeyup) {
-      this.#actions[action] = false;
+      this.actions[action] = false;
       this.#locks[action] = false;
     }
     this.#delayedKeyup = {};
@@ -281,7 +281,7 @@ class Input {
   }
 
   touchStart(event, action) {
-    this.#actions[action] = true;
+    this.actions[action] = true;
     this.#presses[action] = true;
     event.stopPropagation();
     event.preventDefault();

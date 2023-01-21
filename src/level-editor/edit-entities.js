@@ -70,8 +70,7 @@ class EditEntities {
 
   loadEntityScripts(entitiesData) {
     let totalScriptsToLoad = Object.keys(entitiesData).length;
-    const scriptLoadCb = (_e, filepath) => {
-      console.log(`Loaded: ${filepath}, Left: ${totalScriptsToLoad}`);
+    const scriptLoadCb = () => {
       if (--totalScriptsToLoad <= 0) this.importEntities(entitiesData);
     };
     for (let filepath in entitiesData) loadScript({ src: filepath, cb: scriptLoadCb });
@@ -153,20 +152,11 @@ class EditEntities {
   selectEntity(entity) {
     const entityKey = $el("#entityKey");
     const entityValue = $el("#entityValue");
-    if (entity && entity !== this.selectedEntity) {
-      //TODO
-      $el("#entitySettings").fadeOut(
-        100,
-        function () {
-          this.loadEntitySettings();
-          $("#entitySettings").fadeIn(100);
-        }.bind(this)
-      );
-    } else if (!entity) {
-      $el("#entitySettings").fadeOut(100);
+    if (!entity) {
+      $el("#entitySettings").display = "none";
       entityKey.blur();
       entityValue.blur();
-    }
+    } else if (entity !== this.selectedEntity) this.loadEntitySettings();
 
     this.selectedEntity = entity;
     entityKey.value = "";
