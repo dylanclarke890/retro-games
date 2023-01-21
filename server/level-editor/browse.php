@@ -15,6 +15,8 @@ switch ($_GET['type']) {
   case 'scripts':
     $find = '*.js';
     break;
+  default:
+    break;
 }
 $dirs = glob($dir . '*', GLOB_ONLYDIR) ?? array();
 foreach ($dirs as $i => $d) $dirs[$i] = substr($d, $file_root_len);
