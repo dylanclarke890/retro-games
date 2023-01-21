@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-require_once("config.php");
+require_once("../config.php");
 define("ENTITY_REGEX", '/(?<=Register.entityType\()[^)]+|(?<=Register.entityTypes\()[^)]+/');
 
 function get_entities_from_glob(string $glob): array

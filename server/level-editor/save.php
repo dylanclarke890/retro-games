@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once("config.php");
+require_once("../config.php");
 
 if (empty($_POST['path']) || empty($_POST['data']))
   exit_with_err(1, "No Data or Path specified.");

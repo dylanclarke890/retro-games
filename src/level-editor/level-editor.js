@@ -772,14 +772,14 @@ class LevelEditor {
 
 /** Custom loader, used to skip sound files and the run loop creation. */
 class LevelEditorLoader extends GameLoader {
-  apiClient = null;
+  httpClient = null;
   config = null;
 
-  constructor({ config, apiClient, ...opts }) {
+  constructor({ config, httpClient, ...opts }) {
     super(opts);
-    Guard.againstNull({ apiClient });
+    Guard.againstNull({ httpClient });
     Guard.againstNull({ config });
-    this.apiClient = apiClient;
+    this.httpClient = httpClient;
     this.config = config;
   }
 
