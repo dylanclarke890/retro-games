@@ -72,7 +72,12 @@ class LevelEditor {
       httpClient: this.httpClient,
       filetype: "images",
     });
-    this.entities = new EditEntities($el("#layerEntities"));
+    this.entities = new EditEntities({
+      div: $el("#layerEntities"),
+      config: this.config,
+      undo: this.undo,
+      editor: this,
+    });
 
     $("#layers").sortable({
       update: () => this.reorderLayers(),

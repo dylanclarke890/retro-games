@@ -128,4 +128,8 @@ class Register {
   static getCachedAsset(path) {
     return this.#assetCache[path];
   }
+
+  static get classDefinitions() {
+    return this.#preloadCache.classDefinitions;
+  }
 }

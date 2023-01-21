@@ -38,8 +38,7 @@ class EditEntities {
     // TODO
     const entityKey = $el("#entityKey");
     entityKey.addEventListener("keydown", (e) => {
-      if (e.which == 13) {
-        // TODO
+      if (e.key === "Enter") {
         $el("#entityValue").focus();
         return false;
       }

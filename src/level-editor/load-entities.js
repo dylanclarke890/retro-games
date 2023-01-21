@@ -1,6 +1,5 @@
 async function loadEntities(config) {
-  const apiClient = new LevelEditorApi();
-  return await apiClient.client.glob(config.project.entityFiles);
+  return await new LevelEditorHttpClient().api.glob(config.project.entityFiles);
 }
 
 function loadScript({ src, cb = (_e, _path) => {} } = {}) {
@@ -8,6 +7,7 @@ function loadScript({ src, cb = (_e, _path) => {} } = {}) {
   script.type = "text/javascript";
   script.addEventListener("load", (e) => cb(e, src));
   script.src = src;
+  document.body.appendChild(script);
 }
 
 function loadEntityScripts(entitiesObj) {
