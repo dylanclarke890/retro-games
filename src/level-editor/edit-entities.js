@@ -1,11 +1,13 @@
 class EditEntities {
   active = true;
+  config = null;
   div = null;
   entities = [];
   entityClasses = {};
   entityDefinitions = null;
   gridSize = 0;
   hotkey = -1;
+  httpClient = null;
   ignoreLastClick = false;
   menu = null;
   name = "entities";
@@ -16,36 +18,37 @@ class EditEntities {
   visible = true;
   wasSelectedOnScaleBorder = false;
 
-  constructor({ div, config, undo, editor } = {}) {
+  constructor({ div, config, undo, editor, httpClient } = {}) {
     Guard.againstNull({ div });
     Guard.againstNull({ config });
     Guard.againstNull({ undo });
     Guard.againstNull({ editor });
+    Guard.againstNull({ httpClient });
 
+    this.config = config;
     this.div = div;
-    this.undo = undo;
     this.editor = editor;
+    this.httpClient = httpClient;
+    this.undo = undo;
+
     div.addEventListener("mouseup", () => this.click());
     div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
     this.gridSize = config.entityGrid;
 
     this.menu = $new("div");
     this.menu.id = "entityMenu";
-    this.importEntityClass(wm.entityModules); // TODO
     this.entityDefinitions = $new("div");
     this.entityDefinitions.id = "entityDefinitions";
 
-    // TODO
     const entityKey = $el("#entityKey");
     entityKey.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        $el("#entityValue").focus();
-        return false;
-      }
-      return true;
+      // Tab over to the value on enter press.
+      if (e.key === "Enter") $el("#entityValue").focus();
     });
     const entityValue = $el("#entityValue");
     entityValue.addEventListener("keydown", (e) => this.setEntitySetting(e));
+
+    this.loadEntities();
   }
 
   clear() {
@@ -59,41 +62,45 @@ class EditEntities {
 
   //#region Saving/Loading
 
-  // TODO! - this should be handled by the glob api - we get back an array of objects -> filename => list of entity names
-  fileNameToClassName(name) {
-    const typeName = "-" + name.replace(/^.*\/|\.js/g, "");
-    typeName = typeName.replace(/-(\w)/g, function (m, a) {
-      return a.toUpperCase();
+  async loadEntities() {
+    await this.httpClient.api.glob(this.config.project.entityFiles).then((entitiesData) => {
+      this.loadEntityScripts(entitiesData);
     });
-    return "Entity" + typeName;
   }
 
-  //TODO
-  importEntityClass(modules) {
-    const unloadedClasses = [];
-    for (let m in modules) {
-      const className = this.fileNameToClassName(modules[m]);
-      const entityName = className.replace(/^Entity/, "");
-      const classDef = Register.getEntityByType(className);
+  loadEntityScripts(entitiesData) {
+    let totalScriptsToLoad = Object.keys(entitiesData).length;
+    const scriptLoadCb = (_e, filepath) => {
+      console.log(`Loaded: ${filepath}, Left: ${totalScriptsToLoad}`);
+      if (--totalScriptsToLoad <= 0) this.importEntities(entitiesData);
+    };
+    for (let filepath in entitiesData) loadScript({ src: filepath, cb: scriptLoadCb });
+  }
 
-      if (classDef) {
-        // Ignore entities that have the _wmIgnore flag
-        if (!classDef.prototype._wmIgnore) {
-          const a = $new("div");
-          a.id = className;
-          a.href = "#";
-          a.textContent = entityName;
-          a.addEventListener("mouseup", (e) => this.newEntityClick(e));
-          this.menu.append(a);
-          this.entityClasses[className] = m;
+  importEntities(entitiesData) {
+    const invalidClasses = [];
+    for (let filepath in entitiesData) {
+      for (let i = 0; i < entitiesData[filepath].length; i++) {
+        const className = entitiesData[filepath][i];
+        const entityName = className.replace(/^Entity/, "");
+        const classDef = Register.getEntityByType(className);
+        if (!classDef) {
+          invalidClasses.push(className); // should never happen.
+          continue;
         }
-      } else unloadedClasses.push(modules[m] + " (expected name: " + className + ")");
+
+        if (classDef.prototype._wmIgnore) continue;
+        const entityDiv = $new("div");
+        entityDiv.id = className;
+        entityDiv.textContent = entityName;
+        entityDiv.addEventListener("mouseup", (e) => this.newEntityClick(e));
+        this.menu.append(entityDiv);
+        this.entityClasses[className] = filepath;
+      }
     }
 
-    if (unloadedClasses.length > 0) {
-      alert(`"The following entity classes were not loaded due to\nfile and class name mismatches: \n\n
-        ${unloadedClasses.join("\n")}`);
-    }
+    if (invalidClasses.length > 0)
+      console.warn(`Entity class definitions could not be fetched: ${invalidClasses.join("\n")}`);
   }
 
   getEntityByName(name) {
@@ -147,7 +154,6 @@ class EditEntities {
     const entityKey = $el("#entityKey");
     const entityValue = $el("#entityValue");
     if (entity && entity !== this.selectedEntity) {
-      this.selectedEntity = entity;
       //TODO
       $el("#entitySettings").fadeOut(
         100,
@@ -163,7 +169,6 @@ class EditEntities {
     }
 
     this.selectedEntity = entity;
-    // TODO - check
     entityKey.value = "";
     entityValue.value = "";
   }

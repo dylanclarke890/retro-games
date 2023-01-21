@@ -157,6 +157,14 @@ function dragElement(el) {
   }
 }
 
+function loadScript({ src, cb = (_e, _path) => {} } = {}) {
+  const script = document.createElement("script");
+  script.type = "text/javascript";
+  script.addEventListener("load", (e) => cb(e, src));
+  script.src = src;
+  document.body.appendChild(script);
+}
+
 Object.defineProperty(Array.prototype, "erase", {
   value: function (item) {
     for (let i = this.length; i--; )

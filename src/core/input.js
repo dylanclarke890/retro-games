@@ -96,19 +96,21 @@ class Input {
 
   #actions = {};
   #bindings = {};
+  #delayedKeyup = {};
   #isUsingAccelerometer = false;
   #isUsingKeyboard = false;
   #isUsingMouse = false;
   #locks = {};
   #userAgent = null;
   #presses = {};
-  #delayedKeyup = {};
 
-  mouse = { x: 0, y: 0 };
   accel = { x: 0, y: 0, z: 0 };
+  mouse = { x: 0, y: 0 };
+  system = null;
 
   constructor({ system } = {}) {
     Guard.againstNull({ system });
+    this.system = system;
     this.#userAgent = UserAgent.info;
   }
 

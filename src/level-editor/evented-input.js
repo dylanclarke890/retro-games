@@ -1,9 +1,13 @@
 class EventedInput extends Input {
-  mousemoveCallback = null;
-  keyupCallback = null;
-  keydownCallback = null;
-
   delayedKeyup = { push: function () {}, length: 0 };
+  keydownCallback = null;
+  keyupCallback = null;
+  mousemoveCallback = null;
+
+  constructor(settings) {
+    console.log(settings);
+    super(settings);
+  }
 
   keydown(event) {
     if (this.targetIsInputOrText(event)) return;

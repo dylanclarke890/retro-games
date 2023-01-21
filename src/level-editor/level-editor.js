@@ -77,6 +77,7 @@ class LevelEditor {
       config: this.config,
       undo: this.undo,
       editor: this,
+      httpClient: this.httpClient,
     });
 
     $("#layers").sortable({

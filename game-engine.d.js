@@ -33,7 +33,6 @@
 /// <reference path="src/level-editor/config.js"/>
 /// <reference path="src/level-editor/edit-entities.js"/>
 /// <reference path="src/level-editor/edit-map.js"/>
-/// <reference path="src/level-editor/load-entities.js"/>
 /// <reference path="src/level-editor/evented-input.js"/>
 /// <reference path="src/level-editor/level-editor.js"/>
 /// <reference path="src/level-editor/modal-dialogs.js"/>
