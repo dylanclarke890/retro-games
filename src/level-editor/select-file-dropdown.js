@@ -41,33 +41,28 @@ class SelectFileDropdown {
     this.hide();
   }
 
+  addDropdownOption(path, textContent, type) {
+    const option = $new("div");
+    option.classList.add(type);
+    option.dataset.path = path;
+    option.textContent = textContent;
+    const cb = type === "dir" ? () => this.selectDir(option) : this.selectFile(option);
+    option.addEventListener("click", () => cb(option));
+    this.div.append(option);
+  }
+
   showFiles(data) {
     this.div.innerHTML = "";
-    if (data.parent !== false) {
-      const parent = $new("div");
-      parent.classList.add("dir");
-      parent.dataset.path = data.parent;
-      parent.innerHTML = "&hellip;parent directory";
-      parent.addEventListener("click", () => this.selectDir(parent));
-      this.div.append(parent);
-    }
+    if (data.parent !== false)
+      this.addDropdownOption(data.parent, "&hellip;parent directory", "dir");
+
     for (let i = 0; i < data.dirs.length; i++) {
       const name = data.dirs[i].match(/[^\/]*$/)[0] + "/";
-      const dir = $new("div");
-      dir.classList.add("dir");
-      dir.innerHTML = name;
-      dir.dataset.path = data.dirs[i];
-      dir.addEventListener("click", () => this.selectDir(dir));
-      this.div.append(dir);
+      this.addDropdownOption(data.dirs[i], name, "dir");
     }
     for (let i = 0; i < data.files.length; i++) {
       const name = data.files[i].match(/[^\/]*$/)[0];
-      const file = $new("div");
-      file.classList.add("file");
-      file.innerHTML = name;
-      file.dataset.path = data.files[i];
-      file.addEventListener("click", () => this.selectFile(file));
-      this.div.append(file);
+      this.addDropdownOption(data.files[i], name, "file");
     }
   }
 
