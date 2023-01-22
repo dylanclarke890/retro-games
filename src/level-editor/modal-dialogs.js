@@ -55,11 +55,11 @@ class ModalDialog {
   }
 
   open() {
-    fadeIn(this.background, "ease-in", 100);
+    fadeIn(this.background, { duration: 100 });
   }
 
   close() {
-    fadeOut(this.background, "ease-in", 100);
+    fadeOut(this.background, { duration: 100 });
   }
 }
 

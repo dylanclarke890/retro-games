@@ -530,13 +530,16 @@ class LevelEditor {
     this.mode = this.MODE.DEFAULT;
     $el("#layerIsCollision").checked = name === "collision";
 
-    if (name === "entities") fadeOut($el("#layerSettings"), "ease-in", 100);
+    if (name === "entities") fadeOut($el("#layerSettings"), { duration: 100 });
     else {
       this.entities.selectEntity(null);
       this.toggleCollisionLayer();
-      fadeOut($el("#layerSettings"), "ease-in", 100, (el) => {
-        this.updateLayerSettings();
-        fadeIn(el, "ease-in", 100);
+      fadeOut($el("#layerSettings"), {
+        duration: 100,
+        cb: (el) => {
+          this.updateLayerSettings();
+          fadeIn(el, { duration: 100 });
+        },
       });
     }
     this.draw();
