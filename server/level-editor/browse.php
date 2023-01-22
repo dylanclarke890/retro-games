@@ -18,12 +18,15 @@ switch ($_GET['type']) {
   default:
     break;
 }
+
 $dirs = glob($dir . '*', GLOB_ONLYDIR) ?? array();
 foreach ($dirs as $i => $d) $dirs[$i] = substr($d, $file_root_len);
 $files = glob($dir . $find, GLOB_BRACE) ?? array();
 foreach ($files as $i => $f) $files[$i] = substr($f, $file_root_len);
 
-$parent = substr($dir_val, 0, strrpos($dir, '/'));
+$last_slash_pos = strrpos($dir_val, '/');
+$parent = $last_slash_pos !== false ? substr($dir_val, 0, $last_slash_pos) : false;
+
 echo json_encode(array(
   'parent' => (empty($dir_val) ? false : $parent),
   'dirs' => $dirs,

@@ -55,6 +55,7 @@ class LevelEditor {
     this.httpClient = httpClient;
     this.undo = new Undo({ levels: config.undoLevels, editor: this });
     this.filePath = config.project.levelPath + this.fileName;
+    this.mode = this.MODE.DEFAULT;
 
     const { ctx, canvas } = this.system;
     ctx.textBaseline = "top";
@@ -62,10 +63,6 @@ class LevelEditor {
     this.labelsStep = config.labels.step;
 
     this.initDialogs();
-    this.loseChangesDialog = new ModalDialog({ text: "Lose all changes?", autoInit: true });
-    this.deleteLayerDialog = new ModalDialog({ text: "Delete Layer? NO UNDO!", autoInit: true });
-    this.deleteLayerDialog.onOk = this.removeLayer;
-    this.mode = this.MODE.DEFAULT;
 
     this.tilesetSelectDialog = new SelectFileDropdown({
       elementId: "#layerTileset",
@@ -103,7 +100,7 @@ class LevelEditor {
     if (config.askBeforeClose) window.addEventListener("beforeunload", (e) => this.confirmClose(e));
 
     $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
-    $el("#buttonRemoveLayer").addEventListener("click", this.deleteLayerDialog.open());
+    $el("#buttonRemoveLayer").addEventListener("click", () => this.deleteLayerDialog.open());
     $el("#buttonSaveLayerSettings").addEventListener("click", () => this.saveLayerSettings());
     // $el("#reloadImages").addEventListener("click", ig.Image.reloadCache); // TODO
     $el("#layerIsCollision").addEventListener("change", (e) => this.toggleCollisionLayer(e));
@@ -133,7 +130,7 @@ class LevelEditor {
       type: "scripts",
       httpClient: this.httpClient,
     });
-    this.loadDialog.onOk = this.load;
+    this.loadDialog.onOk = (dialog, path) => this.load(dialog, path);
     this.loadDialog.setPath(this.config.project.levelPath);
     $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
     $el("#levelNew").addEventListener("click", () => this.showNewDialog());
@@ -148,6 +145,13 @@ class LevelEditor {
     this.saveDialog.setPath(this.config.project.levelPath);
     $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
     $el("#levelSave").addEventListener("click", () => this.saveQuick());
+
+    this.loseChangesDialog = new ModalDialog({ text: "Lose all changes?", autoInit: true });
+    this.deleteLayerDialog = new ModalDialog({
+      text: "Delete Layer? NO UNDO!",
+      autoInit: true,
+    });
+    this.deleteLayerDialog.onOk = this.removeLayer;
   }
 
   uikeydown(event) {
@@ -295,15 +299,16 @@ class LevelEditor {
 
   load(_dialog, path) {
     this.filePath = path;
+    console.log(this.saveDialog);
     this.saveDialog.setPath(path);
     this.fileName = path.replace(/^.*\//, "");
 
     let levelData = null;
-    try {
-      levelData = this.httpClient.api.file(path, { parseResponse: false });
-    } catch {
-      clearCookie("levelEditorLastLevel");
-    }
+    this.httpClient.api
+      .file(path, { parseResponse: false })
+      .then((data) => (levelData = data))
+      .catch(() => clearCookie("levelEditorLastLevel"));
+
     if (levelData) this.loadResponse(levelData);
   }
 
@@ -381,7 +386,11 @@ class LevelEditor {
     const dataString = JSON.stringify(data);
     if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
 
-    this.httpClient.api.save(); // TODO
+    this.httpClient.api
+      .save(path, data)
+      .then((res) => this.saveResponse(res))
+      .catch((err) => console.error(err));
+    // TODO
     const postString =
       "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
     $.ajax({

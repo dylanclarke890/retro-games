@@ -165,6 +165,61 @@ function loadScript({ src, cb = (_e, _path) => {} } = {}) {
   document.body.appendChild(script);
 }
 
+function JSONFormat(json) {
+  const p = [];
+  push = function (m) {
+    return "\\" + p.push(m) + "\\";
+  };
+  pop = function (_m, i) {
+    return p[i - 1];
+  };
+  tabs = function (count) {
+    return Array.from({ length: count + 1 }).join("\t");
+  };
+  let out = "",
+    indent = 0;
+
+  // Extract backslashes and strings
+  json = json
+    .replace(/\\./g, push)
+    .replace(/(".*?"|'.*?')/g, push)
+    .replace(/\s+/, "");
+
+  // Indent and insert newlines
+  for (let i = 0; i < json.length; i++) {
+    const c = json.charAt(i);
+    switch (c) {
+      case "{":
+      case "[":
+        out += c + "\n" + tabs(++indent);
+        break;
+      case "}":
+      case "]":
+        out += "\n" + tabs(--indent) + c;
+        break;
+      case ",":
+        out += ",\n" + tabs(indent);
+        break;
+      case ":":
+        out += ": ";
+        break;
+      default:
+        out += c;
+        break;
+    }
+  }
+
+  // Strip whitespace from numeric arrays and put backslashes
+  // and strings back in
+  out = out
+    .replace(/\[[\d,\s]+?\]/g, function (m) {
+      return m.replace(/\s/g, "");
+    })
+    .replace(/\\(\d+)\\/g, pop);
+
+  return out;
+}
+
 Object.defineProperty(Array.prototype, "erase", {
   value: function (item) {
     for (let i = this.length; i--; )
