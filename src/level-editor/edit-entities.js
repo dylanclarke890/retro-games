@@ -5,6 +5,7 @@ class EditEntities {
   entities = [];
   entityClasses = {};
   entityDefinitions = null;
+  game = null;
   gridSize = 0;
   hotkey = -1;
   httpClient = null;
@@ -18,25 +19,26 @@ class EditEntities {
   visible = true;
   wasSelectedOnScaleBorder = false;
 
-  constructor({ div, config, undo, editor, httpClient } = {}) {
+  constructor({ div, config, undo, editor, httpClient, media } = {}) {
     Guard.againstNull({ div });
     Guard.againstNull({ config });
     Guard.againstNull({ undo });
     Guard.againstNull({ editor });
     Guard.againstNull({ httpClient });
+    Guard.againstNull({ media });
 
     this.config = config;
     this.div = div;
     this.editor = editor;
     this.httpClient = httpClient;
     this.undo = undo;
+    this.media = media;
 
     div.addEventListener("mouseup", () => this.click());
     div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
     this.gridSize = config.entityGrid;
 
-    this.menu = $new("div");
-    this.menu.id = "entityMenu";
+    this.menu = $el("#entityMenu");
     this.entityDefinitions = $new("div");
     this.entityDefinitions.id = "entityDefinitions";
 
@@ -49,6 +51,10 @@ class EditEntities {
     entityValue.addEventListener("keydown", (e) => this.setEntitySetting(e));
 
     this.loadEntities();
+  }
+
+  createAnimationSheet({ path, size }) {
+    return this.media.createAnimationSheet({ path, size });
   }
 
   clear() {
@@ -271,7 +277,7 @@ class EditEntities {
     const entityClass = Register.getEntityByType(className);
     if (!entityClass) return null;
 
-    const newEntity = new entityClass(x, y, settings);
+    const newEntity = new entityClass({ x, y, game: this, settings });
     newEntity._wmInEditor = true;
     newEntity._wmClassName = className;
     newEntity._wmSettings = {};

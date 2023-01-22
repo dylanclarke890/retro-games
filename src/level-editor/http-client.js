@@ -9,15 +9,16 @@ class HttpClient {
     this.#headers = headers;
   }
 
-  async #fetchJSON(endpoint, opts = {}) {
+  async #doRequest(endpoint, opts = {}) {
     const res = await fetch(this.#baseUrl + endpoint, {
       ...opts,
       headers: this.#headers,
     });
-
     if (!res.ok) throw new Error(res.statusText);
-    if (opts.parseResponse !== false && res.status !== 204) return res.json();
-    return res.text();
+    if (res.status === 204) return undefined;
+
+    if (opts.parseResponse === false) return res.text();
+    return res.json();
   }
 
   setHeader(key, value) {
@@ -40,14 +41,14 @@ class HttpClient {
   }
 
   get(endpoint, opts = {}) {
-    return this.#fetchJSON(endpoint, {
+    return this.#doRequest(endpoint, {
       ...opts,
       method: "GET",
     });
   }
 
   post(endpoint, body, opts = {}) {
-    return this.#fetchJSON(endpoint, {
+    return this.#doRequest(endpoint, {
       ...opts,
       body: body ? JSON.stringify(body) : undefined,
       method: "POST",
@@ -55,7 +56,7 @@ class HttpClient {
   }
 
   put(endpoint, body, opts = {}) {
-    return this.#fetchJSON(endpoint, {
+    return this.#doRequest(endpoint, {
       ...opts,
       body: body ? JSON.stringify(body) : undefined,
       method: "PUT",
@@ -63,7 +64,7 @@ class HttpClient {
   }
 
   patch(endpoint, operations, opts = {}) {
-    return this.#fetchJSON(endpoint, {
+    return this.#doRequest(endpoint, {
       parseResponse: false,
       ...opts,
       body: JSON.stringify(operations),
@@ -72,7 +73,7 @@ class HttpClient {
   }
 
   delete(endpoint, opts = {}) {
-    return this.#fetchJSON(endpoint, {
+    return this.#doRequest(endpoint, {
       parseResponse: false,
       ...opts,
       method: "DELETE",
@@ -90,11 +91,16 @@ class LevelEditorHttpClient extends HttpClient {
 
   get api() {
     return {
-      browse: (dir, type) => this.get(`browse.php?dir=${encodeURIComponent(dir)}&type=${type}`),
-      glob: (filepaths) =>
-        this.get(`glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`),
-      save: (path, data) => this.post(`save.php?path=${encodeURIComponent(path)}`, data),
-      file: (path) => this.get(`../../${path}`),
+      browse: (dir, type, opts = {}) =>
+        this.get(`browse.php?dir=${encodeURIComponent(dir)}&type=${type}`, opts),
+      glob: (filepaths, opts = {}) =>
+        this.get(
+          `glob.php?entity_filepaths=${encodeURIComponent(JSON.stringify(filepaths))}`,
+          opts
+        ),
+      save: (path, data, opts = {}) =>
+        this.post(`save.php?path=${encodeURIComponent(path)}`, data, opts),
+      file: (path, opts = {}) => this.get(`../../${path}`, opts),
     };
   }
 }

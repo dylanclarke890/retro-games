@@ -1,14 +1,15 @@
 class LevelEditor {
   activeLayer = null;
-  httpClient = null;
   collisionLayer = null;
   collisionSolid = 1;
+  config = null;
   deleteLayerDialog = null;
   entities = null;
   /** @type {EventedInput} */
   input = null;
   fileName = "untitled.js";
   filePath = "";
+  httpClient = null;
   labelsStep = 32;
   layers = [];
   levelData = {};
@@ -43,21 +44,23 @@ class LevelEditor {
     return window.innerHeight - $el("#headerMenu").clientHeight;
   }
 
-  constructor({ system, config, input, httpClient } = {}) {
+  constructor({ system, config, input, httpClient, media } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ config });
     Guard.againstNull({ input });
     Guard.againstNull({ httpClient });
+    Guard.againstNull({ media });
 
     this.system = system;
     this.config = config;
     this.input = input;
     this.httpClient = httpClient;
+    this.media = media;
     this.undo = new Undo({ levels: config.undoLevels, editor: this });
     this.filePath = config.project.levelPath + this.fileName;
     this.mode = this.MODE.DEFAULT;
 
-    const { ctx, canvas } = this.system;
+    const { ctx } = this.system;
     ctx.textBaseline = "top";
     ctx.font = config.labels.font;
     this.labelsStep = config.labels.step;
@@ -65,11 +68,12 @@ class LevelEditor {
     this.initDialogs();
 
     this.entities = new EditEntities({
-      div: $el("#layerEntities"),
       config: this.config,
-      undo: this.undo,
+      div: $el("#layerEntities"),
       editor: this,
       httpClient: this.httpClient,
+      media: this.media,
+      undo: this.undo,
     });
 
     $("#layers").sortable({
@@ -78,37 +82,7 @@ class LevelEditor {
     $("#layers").disableSelection();
     this.resetModified();
 
-    // Events/Input
-    if (config.touchScroll) {
-      canvas.addEventListener("wheel", (e) => this.touchScroll(e), false); // Setup wheel event
-      delete config.binds["MWHEEL_UP"]; // Unset MWHEEL_* binds
-      delete config.binds["MWHEEL_DOWN"];
-    }
-
-    for (let key in config.binds) input.bind(Input.KEY[key], config.binds[key]);
-    this.input.keydownCallback = (action) => this.keydown(action);
-    this.input.keyupCallback = (action) => this.keyup(action);
-    this.input.mousemoveCallback = () => this.mousemove();
-
-    window.addEventListener("resize", () => this.resize());
-    window.addEventListener("keydown", (e) => this.uikeydown(e));
-    if (config.askBeforeClose) window.addEventListener("beforeunload", (e) => this.confirmClose(e));
-
-    $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
-    $el("#buttonRemoveLayer").addEventListener("click", () => this.deleteLayerDialog.open());
-    $el("#buttonSaveLayerSettings").addEventListener("click", () => this.saveLayerSettings());
-    // $el("#reloadImages").addEventListener("click", ig.Image.reloadCache); // TODO
-    $el("#layerIsCollision").addEventListener("change", (e) => this.toggleCollisionLayer(e));
-
-    $el("input#toggleSidebar").addEventListener("click", () => {
-      $("div#menu").slideToggle("fast"); // TODO
-      $el("input#toggleSidebar").classList.toggle("active");
-    });
-
-    // Always unfocus current input field when clicking the canvas
-    $el("#canvas").addEventListener("mousedown", () =>
-      document.querySelectorAll("input:focus").forEach((v) => v.blur())
-    );
+    this.initEvents();
 
     if (config.loadLastLevel) {
       const path = getCookie("levelEditorLastLevel");
@@ -154,6 +128,40 @@ class LevelEditor {
       httpClient: this.httpClient,
       filetype: "images",
     });
+  }
+
+  initEvents() {
+    const config = this.config;
+    if (config.touchScroll) {
+      this.system.canvas.addEventListener("wheel", (e) => this.touchScroll(e), false); // Setup wheel event
+      delete config.binds["MWHEEL_UP"]; // Unset MWHEEL_* binds
+      delete config.binds["MWHEEL_DOWN"];
+    }
+
+    for (let key in config.binds) this.input.bind(Input.KEY[key], config.binds[key]);
+    this.input.keydownCallback = (action) => this.keydown(action);
+    this.input.keyupCallback = (action) => this.keyup(action);
+    this.input.mousemoveCallback = () => this.mousemove();
+
+    window.addEventListener("resize", () => this.resize());
+    window.addEventListener("keydown", (e) => this.uikeydown(e));
+    if (config.askBeforeClose) window.addEventListener("beforeunload", (e) => this.confirmClose(e));
+
+    $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
+    $el("#buttonRemoveLayer").addEventListener("click", () => this.deleteLayerDialog.open());
+    $el("#buttonSaveLayerSettings").addEventListener("click", () => this.saveLayerSettings());
+    // $el("#reloadImages").addEventListener("click", ig.Image.reloadCache); // TODO
+    $el("#layerIsCollision").addEventListener("change", (e) => this.toggleCollisionLayer(e));
+
+    $el("input#toggleSidebar").addEventListener("click", () => {
+      slideToggle($el("div#menu"));
+      $el("input#toggleSidebar").classList.toggle("active");
+    });
+
+    this.system.canvas.addEventListener("click", () =>
+      // Always unfocus current input field when clicking the canvas
+      document.querySelectorAll("input:focus").forEach((v) => v.blur())
+    );
   }
 
   uikeydown(event) {
@@ -301,25 +309,24 @@ class LevelEditor {
 
   load(_dialog, path) {
     this.filePath = path;
-    console.log(this.saveDialog);
     this.saveDialog.setPath(path);
     this.fileName = path.replace(/^.*\//, "");
 
-    let levelData = null;
     this.httpClient.api
       .file(path, { parseResponse: false })
-      .then((data) => (levelData = data))
-      .catch(() => clearCookie("levelEditorLastLevel"));
-
-    if (levelData) this.loadResponse(levelData);
+      .then((data) => this.loadResponse(data));
   }
 
   loadResponse(data) {
+    if (!data) {
+      console.debug("LevelEditor: loadResponse called but no data provided.");
+      return;
+    }
     setCookie("levelEditorLastLevel", this.filePath);
 
-    // extract JSON from a module's JS
-    const jsonMatch = data.match(/\/\*JSON\[\*\/([\s\S]*?)\/\*\]JSON\*\//);
-    data = JSON.parse(jsonMatch ? jsonMatch[1] : data);
+    // extract JSON from a level's JS.
+    const jsonMatch = data.match(/\/\*JSON-BEGIN\*\/\s?([\s\S]*?);?\s?\/\*JSON-END\*/);
+    data = jsonMatch ? eval(`(${jsonMatch[1]})`) : JSON.parse(data);
     this.levelData = data;
 
     while (this.layers.length) {
@@ -336,7 +343,15 @@ class LevelEditor {
 
     for (let i = 0; i < data.layer.length; i++) {
       const ld = data.layer[i];
-      const newLayer = new EditMap(ld.name, ld.tilesize, ld.tilesetName, !!ld.foreground);
+      const newLayer = new EditMap({
+        name: ld.name,
+        tilesize: ld.tilesize,
+        tileset: ld.tilesetName,
+        foreground: !!ld.foreground,
+        system: this.system,
+        config: this.config,
+        editor: this,
+      });
       newLayer.resize(ld.width, ld.height);
       newLayer.linkWithCollision = ld.linkWithCollision;
       newLayer.repeat = ld.repeat;
@@ -419,7 +434,12 @@ class LevelEditor {
 
   addLayer() {
     const name = "new_layer_" + this.layers.length;
-    const newLayer = new EditMap(name, this.config.layerDefaults.tilesize);
+    const newLayer = new EditMap({
+      name,
+      tilesize: this.config.layerDefaults.tilesize,
+      system: this.system,
+      config: this.config,
+    });
     newLayer.resize(this.config.layerDefaults.width, this.config.layerDefaults.height);
     newLayer.setScreenPos(this.screen.x, this.screen.y);
     this.layers.push(newLayer);
@@ -486,7 +506,7 @@ class LevelEditor {
 
   saveLayerSettings() {
     const isCollision = $el("#layerIsCollision").checked;
-    const newName = $el("#layerName").value;
+    let newName = $el("#layerName").value;
     const newWidth = Math.floor($el("#layerWidth").value);
     const newHeight = Math.floor($el("#layerHeight").value);
 
@@ -610,7 +630,7 @@ class LevelEditor {
             if (
               this.activeLayer.linkWithCollision &&
               this.collisionLayer &&
-              this.collisionLayer != this.activeLayer
+              this.collisionLayer !== this.activeLayer
             )
               this.collisionLayer.beginEditing();
 
@@ -838,6 +858,7 @@ class LevelEditorRunner {
     });
     this.input = new EventedInput({ system: this.system });
     this.soundManager = new SoundManager(this);
+    this.media = new MediaFactory({ system: this.system, soundManager: this.soundManager });
     this.injectImageOverrides();
     this.ready = true;
 
@@ -857,6 +878,7 @@ class LevelEditorRunner {
       config: this.config,
       input: this.input,
       system: this.system,
+      media: this.media,
     });
   }
 

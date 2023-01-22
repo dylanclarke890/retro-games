@@ -101,7 +101,7 @@ class Input {
   #locks = {};
   #userAgent = null;
   #presses = {};
-  
+
   accel = { x: 0, y: 0, z: 0 };
   actions = {};
   bindings = {};
@@ -123,8 +123,7 @@ class Input {
     if (this.#isUsingMouse) return;
     this.#isUsingMouse = true;
     const canvas = this.system.canvas;
-
-    canvas.addEventListener("wheel", (e) => this.mousewheel(e), false);
+    canvas.addEventListener("wheel", (e) => this.mousewheel(e), { passive: false }); // Stops Chrome warning
     canvas.addEventListener("contextmenu", (e) => this.contextmenu(e), false);
     canvas.addEventListener("mousedown", (e) => this.keydown(e), false);
     canvas.addEventListener("mouseup", (e) => this.keyup(e), false);

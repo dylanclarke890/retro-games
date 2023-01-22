@@ -11,7 +11,7 @@ class SelectFileDropdown {
   constructor({ elementId, httpClient, filetype } = {}) {
     Guard.againstNull({ elementId });
     Guard.againstNull({ httpClient });
-    
+
     this.httpClient = httpClient;
     this.filetype = filetype || "";
 
@@ -48,7 +48,7 @@ class SelectFileDropdown {
     option.classList.add(type);
     option.dataset.path = path;
     option.textContent = textContent;
-    const cb = type === "dir" ? () => this.selectDir(option) : this.selectFile(option);
+    const cb = type === "dir" ? () => this.selectDir(option) : () => this.selectFile(option);
     option.addEventListener("click", () => cb(option));
     this.div.append(option);
   }
@@ -56,7 +56,7 @@ class SelectFileDropdown {
   showFiles(data) {
     this.div.innerHTML = "";
     if (data.parent !== false)
-      this.addDropdownOption(data.parent, "&hellip;parent directory", "dir");
+      this.addDropdownOption(data.parent, "...parent directory", "dir");
 
     for (let i = 0; i < data.dirs.length; i++) {
       const name = data.dirs[i].match(/[^\/]*$/)[0] + "/";

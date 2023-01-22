@@ -1,4 +1,4 @@
-const levelOne = {
+const levelOne = /*JSON-BEGIN*/ {
   entities: [
     { type: "EntityPaddleCpu", x: 47, y: 258, settings: {} },
     { type: "EntityPaddleCpu", x: 657, y: 258, settings: {} },
@@ -52,4 +52,4 @@ const levelOne = {
       ],
     },
   ],
-};
+}; /*JSON-END*/

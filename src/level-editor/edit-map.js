@@ -15,11 +15,14 @@ class EditMap extends BackgroundMap {
   isSelecting = false;
   selectionBegin = null;
 
-  constructor({ name, tilesize, tileset, foreground, system, config }) {
+  constructor({ name, tilesize, tileset, foreground, system, config, editor }) {
     tileset = tileset || "";
-    super({ tilesize, data: [[0]], tileset, system, name, foreground });
+    super({ tilesize, data: [[0]], tileset, system, name, foreground, autoset: false });
     Guard.againstNull({ config });
+    Guard.againstNull({ editor });
     this.config = config;
+    this.editor = editor;
+    this.setTileset(this.tileset);
 
     this.div = $new("div");
     this.div.className = "layer layerActive";
@@ -79,6 +82,7 @@ class EditMap extends BackgroundMap {
   }
 
   setCollisionTileset() {
+    console.log(this);
     const path = this.config.collisionTiles.path;
     const internalScale = this.tilesize / this.config.collisionTiles.tilesize;
     this.tiles = new AutoResizedImage({ path, internalScale, system: this.system, config });

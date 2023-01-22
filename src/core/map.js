@@ -63,6 +63,7 @@ class BackgroundMap extends GameMap {
     system,
     tileset,
     tilesize,
+    autoset,
   }) {
     super({ system, tilesize, data });
     this.anims = anims || {};
@@ -71,7 +72,7 @@ class BackgroundMap extends GameMap {
     this.name = name;
     this.preRender = !!preRender;
     this.repeat = repeat;
-    this.setTileset(tileset);
+    if (autoset !== false) this.setTileset(tileset);
   }
 
   setTileset(tileset) {
