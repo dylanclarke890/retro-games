@@ -9,7 +9,9 @@ class SelectFileDropdown {
   input = null;
 
   constructor({ elementId, httpClient, filetype } = {}) {
+    Guard.againstNull({ elementId });
     Guard.againstNull({ httpClient });
+    
     this.httpClient = httpClient;
     this.filetype = filetype || "";
 
