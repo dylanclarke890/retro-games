@@ -45,10 +45,11 @@ function $el(selector) {
 function $new(tagname, opts = null) {
   return document.createElement(tagname, opts);
 }
-
-function slideUp(target, duration = 500) {
+// TODO
+function slideUp(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
   target.style.transitionProperty = "height, margin, padding";
   target.style.transitionDuration = duration + "ms";
+  target.style.transitionTimingFunction = easing;
   target.style.boxSizing = "border-box";
   target.style.height = target.offsetHeight + "px";
   target.offsetHeight;
@@ -68,25 +69,29 @@ function slideUp(target, duration = 500) {
     target.style.removeProperty("overflow");
     target.style.removeProperty("transition-duration");
     target.style.removeProperty("transition-property");
+    if (cb) cb(target);
   }, duration);
 }
-
-function slideDown(target, duration = 500) {
+// TODO
+function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
   target.style.removeProperty("display");
   let display = window.getComputedStyle(target).display;
   if (display === "none") display = "block";
   target.style.display = display;
-  let height = target.offsetHeight;
+
+  const height = target.offsetHeight;
   target.style.overflow = "hidden";
   target.style.height = 0;
   target.style.paddingTop = 0;
   target.style.paddingBottom = 0;
   target.style.marginTop = 0;
   target.style.marginBottom = 0;
-  target.offsetHeight;
+  target.offsetHeight; // Trigger repaint of DOM.
+
   target.style.boxSizing = "border-box";
   target.style.transitionProperty = "height, margin, padding";
   target.style.transitionDuration = duration + "ms";
+  target.style.transitionTimingFunction = easing;
   target.style.height = height + "px";
   target.style.removeProperty("padding-top");
   target.style.removeProperty("padding-bottom");
@@ -97,19 +102,81 @@ function slideDown(target, duration = 500) {
     target.style.removeProperty("overflow");
     target.style.removeProperty("transition-duration");
     target.style.removeProperty("transition-property");
+    target.style.removeProperty("transition-timing-function");
+    if (cb) cb(target);
+  }, duration);
+}
+function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+  if (target.style.display === "block") slideUp(target, easing, duration, cb);
+  else slideDown(target, easing, duration, cb);
+}
+function fadeIn(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+  target.style.removeProperty("display");
+  let display = window.getComputedStyle(target).display;
+  if (display === "none") display = "block";
+  target.style.display = display;
+  target.style.opacity = 0;
+  target.offsetHeight; // Trigger repaint of DOM.
+
+  target.style.boxSizing = "border-box";
+  target.style.transitionProperty = "opacity";
+  target.style.transitionDuration = duration + "ms";
+  target.style.transitionTimingFunction = easing;
+  target.style.opacity = 1;
+  window.setTimeout(() => {
+    target.style.removeProperty("opacity");
+    target.style.removeProperty("transition-duration");
+    target.style.removeProperty("transition-property");
+    target.style.removeProperty("transition-timing-function");
+    target.style.removeProperty("display");
+    let display = window.getComputedStyle(target).display;
+    if (display === "none") display = "block";
+    target.style.display = display;
+    if (cb) cb(target);
   }, duration);
 }
 
-function getInnerHeight(elm) {
-  const computed = getComputedStyle(elm),
-    padding = parseInt(computed.paddingTop) + parseInt(computed.paddingBottom);
-  return elm.clientHeight - padding;
+function fadeOut(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+  target.style.removeProperty("display");
+  let display = window.getComputedStyle(target).display;
+  if (display === "none") display = "block";
+  target.style.display = display;
+  target.style.opacity = 1;
+  target.offsetHeight; // Trigger repaint of DOM.
+
+  target.style.boxSizing = "border-box";
+  target.style.transitionProperty = "opacity";
+  target.style.transitionDuration = duration + "ms";
+  target.style.transitionTimingFunction = easing;
+  target.style.opacity = 0;
+  window.setTimeout(() => {
+    target.style.removeProperty("opacity");
+    target.style.removeProperty("transition-duration");
+    target.style.removeProperty("transition-property");
+    target.style.removeProperty("transition-timing-function");
+    target.style.removeProperty("display");
+    let display = window.getComputedStyle(target).display;
+    if (display !== "none") display = "none";
+    target.style.display = display;
+    if (cb) cb(target);
+  });
 }
 
-function getInnerWidth(elm) {
-  const computed = getComputedStyle(elm),
+function fadeToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+  if (target.style.display === "block") fadeOut(target, easing, duration, cb);
+  else fadeIn(target, easing, duration, cb);
+}
+
+function getInnerHeight(element) {
+  const computed = getComputedStyle(element),
+    padding = parseInt(computed.paddingTop) + parseInt(computed.paddingBottom);
+  return element.clientHeight - padding;
+}
+
+function getInnerWidth(element) {
+  const computed = getComputedStyle(element),
     padding = parseInt(computed.paddingLeft) + parseInt(computed.paddingRight);
-  return elm.clientWidth - padding;
+  return element.clientWidth - padding;
 }
 
 function boolToOnOff(bool) {

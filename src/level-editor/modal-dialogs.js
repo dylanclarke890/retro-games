@@ -55,13 +55,11 @@ class ModalDialog {
   }
 
   open() {
-    // TODO
-    $(this.background).fadeIn(100);
+    fadeIn(this.background, "ease-in", 100);
   }
 
   close() {
-    // TODO
-    $(this.background).fadeOut(100);
+    fadeOut(this.background, "ease-in", 100);
   }
 }
 

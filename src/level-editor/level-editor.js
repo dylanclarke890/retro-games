@@ -64,11 +64,6 @@ class LevelEditor {
 
     this.initDialogs();
 
-    this.tilesetSelectDialog = new SelectFileDropdown({
-      elementId: "#layerTileset",
-      httpClient: this.httpClient,
-      filetype: "images",
-    });
     this.entities = new EditEntities({
       div: $el("#layerEntities"),
       config: this.config,
@@ -147,11 +142,18 @@ class LevelEditor {
     $el("#levelSave").addEventListener("click", () => this.saveQuick());
 
     this.loseChangesDialog = new ModalDialog({ text: "Lose all changes?", autoInit: true });
+
     this.deleteLayerDialog = new ModalDialog({
       text: "Delete Layer? NO UNDO!",
       autoInit: true,
     });
     this.deleteLayerDialog.onOk = this.removeLayer;
+
+    this.tilesetSelectDialog = new SelectFileDropdown({
+      elementId: "#layerTileset",
+      httpClient: this.httpClient,
+      filetype: "images",
+    });
   }
 
   uikeydown(event) {
@@ -528,11 +530,14 @@ class LevelEditor {
     this.mode = this.MODE.DEFAULT;
     $el("#layerIsCollision").checked = name === "collision";
 
-    if (name === "entities") $("#layerSettings").fadeOut(100); // TODO
+    if (name === "entities") fadeOut($el("#layerSettings"), "ease-in", 100);
     else {
       this.entities.selectEntity(null);
       this.toggleCollisionLayer();
-      $("#layerSettings").fadeOut(100, this.updateLayerSettings.bind(this)).fadeIn(100); // TODO
+      fadeOut($el("#layerSettings"), "ease-in", 100, (el) => {
+        this.updateLayerSettings();
+        fadeIn(el, "ease-in", 100);
+      });
     }
     this.draw();
   }
