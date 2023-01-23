@@ -1,14 +1,30 @@
-const levelOne = /*JSON-BEGIN*/ {
+const level = /*JSON-BEGIN*/ {
   entities: [
-    { type: "EntityPaddleCpu", x: 47, y: 258, settings: {} },
-    { type: "EntityPaddleCpu", x: 657, y: 258, settings: {} },
-    { type: "EntityBall", x: 400, y: 200, settings: {} },
+    {
+      type: "EntityPaddleCpu",
+      x: 47,
+      y: 258,
+      settings: {},
+    },
+    {
+      type: "EntityPaddleCpu",
+      x: 657,
+      y: 258,
+      settings: {},
+    },
+    {
+      type: "EntityBall",
+      x: 400,
+      y: 200,
+      settings: {},
+    },
   ],
-
   layer: [
     {
       name: "collision",
+      visible: false,
       repeat: false,
+      preRender: false,
       distance: 1,
       tilesize: 48,
       foreground: false,
@@ -30,8 +46,9 @@ const levelOne = /*JSON-BEGIN*/ {
     },
     {
       name: "background1",
-      tilesetName: "assets/images/block.png",
+      visible: true,
       repeat: false,
+      preRender: false,
       distance: 1,
       tilesize: 48,
       foreground: false,

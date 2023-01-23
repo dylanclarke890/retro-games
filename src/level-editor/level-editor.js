@@ -387,6 +387,7 @@ class LevelEditor {
 
   save(_dialog, path) {
     if (!path.match(/\.js$/)) path += ".js";
+    console.log(path);
     this.filePath = path;
     this.fileName = path.replace(/^.*\//, "");
     const data = this.levelData;
@@ -400,29 +401,21 @@ class LevelEditor {
       if (layer.name !== "collision") resources.push(layer.tiles.path);
     }
 
-    const dataString = JSON.stringify(data);
+    let dataString = JSON.stringify(data);
     if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
+    const levelName = this.fileName.substring(0, this.fileName.lastIndexOf("."));
+    dataString = `const ${levelName} = /*JSON-BEGIN*/ ${dataString}; /*JSON-END*/`;
 
     this.httpClient.api
-      .save(path, data)
+      .save(path, dataString)
       .then((res) => this.saveResponse(res))
       .catch((err) => console.error(err));
-    // TODO
-    const postString =
-      "path=" + encodeURIComponent(path) + "&data=" + encodeURIComponent(dataString);
-    $.ajax({
-      url: this.config.api.save,
-      type: "POST",
-      dataType: "json",
-      async: false,
-      data: postString,
-      success: (res) => this.saveResponse(res),
-    });
   }
 
   saveResponse(data) {
-    if (data.error) alert("Error: " + data.msg);
-    else {
+    if (data.error) {
+      console.error(data.msg);
+    } else {
       this.resetModified();
       setCookie("levelEditorLastLevel", this.filePath);
     }

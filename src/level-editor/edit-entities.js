@@ -114,7 +114,7 @@ class EditEntities {
 
   getSaveData() {
     const entitiesToSave = [];
-    for (const i = 0; i < this.entities.length; i++) {
+    for (let i = 0; i < this.entities.length; i++) {
       const ent = this.entities[i];
       const type = ent._wmClassName;
       const data = { type: type, x: ent.pos.x, y: ent.pos.y };

@@ -48,17 +48,19 @@ class HttpClient {
   }
 
   post(endpoint, body, opts = {}) {
+    if (body && opts.stringify !== false) body = JSON.stringify(body);
     return this.#doRequest(endpoint, {
       ...opts,
-      body: body ? JSON.stringify(body) : undefined,
+      body,
       method: "POST",
     });
   }
 
   put(endpoint, body, opts = {}) {
+    if (body && opts.stringify !== false) body = JSON.stringify(body);
     return this.#doRequest(endpoint, {
       ...opts,
-      body: body ? JSON.stringify(body) : undefined,
+      body,
       method: "PUT",
     });
   }
@@ -99,7 +101,7 @@ class LevelEditorHttpClient extends HttpClient {
           opts
         ),
       save: (path, data, opts = {}) =>
-        this.post(`save.php?path=${encodeURIComponent(path)}`, data, opts),
+        this.post(`save.php?path=${encodeURIComponent(path)}`, data, { ...opts, stringify: false }),
       file: (path, opts = {}) => this.get(`../../${path}`, opts),
     };
   }
