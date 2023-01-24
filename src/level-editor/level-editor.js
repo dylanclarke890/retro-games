@@ -36,6 +36,8 @@ class LevelEditor {
   tilesetSelectDialog = null;
   waitForModeChange = false;
 
+  #rafId = null;
+
   static getMaxWidth() {
     return window.innerWidth;
   }
@@ -90,6 +92,7 @@ class LevelEditor {
       if (path) this.load(null, path);
     }
 
+    this.loadNew();
     requestAnimationFrame(() => this.drawIfNeeded());
   }
 
@@ -766,9 +769,9 @@ class LevelEditor {
     this.needsDraw = true;
   }
 
-  drawIfNeeded() {
-    // Only draw if flag is set
-    if (!this.needsDraw) return;
+  drawIfNeeded(_timestamp) {
+    this.#rafId = raf((t) => this.drawIfNeeded(t));
+    if (!this.needsDraw) return; // Only draw if flag is set
     this.needsDraw = false;
     this.system.clear(this.config.colors.clear);
 
@@ -794,6 +797,11 @@ class LevelEditor {
     }
 
     if (this.config.labels.draw) this.drawLabels(this.config.labels.step);
+  }
+
+  stopDrawing() {
+    caf(this.#rafId);
+    this.needsDraw = false;
   }
 
   drawLabels(step) {
