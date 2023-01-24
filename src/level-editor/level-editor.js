@@ -74,6 +74,7 @@ class LevelEditor {
       httpClient: this.httpClient,
       media: this.media,
       undo: this.undo,
+      system: this.system,
     });
 
     $("#layers").sortable({
@@ -324,9 +325,23 @@ class LevelEditor {
     }
     setCookie("levelEditorLastLevel", this.filePath);
 
-    // extract JSON from a level's JS.
+    // extract JS object from level data.
     const jsonMatch = data.match(/\/\*JSON-BEGIN\*\/\s?([\s\S]*?);?\s?\/\*JSON-END\*/);
-    data = jsonMatch ? eval(`(${jsonMatch[1]})`) : JSON.parse(data);
+    if (jsonMatch) {
+      let json = jsonMatch[1];
+      // Some keys may be stored in modern JS format i.e without quotes. Find and replace them.
+      const matches = json.match(/(\w+):/g);
+      matches.forEach((v) => {
+        // v = match + : - we want it to be "match":
+        const match = v.substring(0, v.length - 1);
+        json = json.replace(v, `\"${match}\":`);
+      });
+      // Remove all trailing commas on arrays and objects.
+      json = json.replace(/\,(?=\s*[}|\]])/gm, "");
+      // Finally, we can parse it:
+      data = JSON.parse(json);
+    }
+
     this.levelData = data;
 
     while (this.layers.length) {

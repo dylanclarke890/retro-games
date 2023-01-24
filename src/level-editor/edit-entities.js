@@ -19,13 +19,14 @@ class EditEntities {
   visible = true;
   wasSelectedOnScaleBorder = false;
 
-  constructor({ div, config, undo, editor, httpClient, media } = {}) {
+  constructor({ div, config, undo, editor, httpClient, media, system } = {}) {
     Guard.againstNull({ div });
     Guard.againstNull({ config });
     Guard.againstNull({ undo });
     Guard.againstNull({ editor });
     Guard.againstNull({ httpClient });
     Guard.againstNull({ media });
+    Guard.againstNull({ system });
 
     this.config = config;
     this.div = div;
@@ -33,6 +34,7 @@ class EditEntities {
     this.httpClient = httpClient;
     this.undo = undo;
     this.media = media;
+    this.system = system;
 
     div.addEventListener("mouseup", () => this.click());
     div.querySelector(".visible").addEventListener("mousedown", () => this.toggleVisibilityClick());
@@ -220,8 +222,8 @@ class EditEntities {
       this.selectedEntity.offset.y;
     if (this.selectedEntity.pos.x === x && this.selectedEntity.pos.y === y) return;
 
-    $el("#entityDefinitionPosX").textContent = x;
-    $el("#entityDefinitionPosY").textContent = x;
+    $el("#entityDefinitionPosX").textContent = x; // TODO - invalid reference.
+    $el("#entityDefinitionPosY").textContent = x; // TODO - invalid reference.
     this.selectedEntity.pos.x = x;
     this.selectedEntity.pos.y = y;
   }
@@ -430,7 +432,6 @@ class EditEntities {
     this.menu.style.top = `${y * scale + 2}px`;
     this.menu.style.left = `${x * scale + 2}px`;
     this.menu.style.display = "block";
-    this.menu.show();
   }
 
   hideMenu() {
