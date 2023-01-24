@@ -270,13 +270,11 @@ class LevelEditor {
 
     config.view.zoom = z.constrain(config.view.zoomMin, config.view.zoomMax);
     config.labels.step = Math.round(this.labelsStep / config.view.zoom);
-    // TODO
-    $("#zoomIndicator")
-      .text(config.view.zoom + "x")
-      .stop(true, true)
-      .show()
-      .delay(300)
-      .fadeOut();
+    const zoomDisplay = $el("#zoomIndicator");
+    zoomDisplay.textContent = `${config.view.zoom}x`;
+    // .stop(true, true) TODO
+    zoomDisplay.style.display = "block";
+    setTimeout(() => fadeOut(zoomDisplay), 300);
 
     // Adjust mouse pos and screen coordinates
     this.input.mouse.x = mx / config.view.zoom;
