@@ -312,7 +312,7 @@ class LevelEditor {
     this.fileName = path.replace(/^.*\//, "");
 
     this.httpClient.api
-      .file(path, { parseResponse: false })
+      .file(path, { parseResponse: false }) // need to preprocess before we can parse as JSON
       .then((data) => this.loadResponse(data));
   }
 
