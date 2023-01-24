@@ -262,7 +262,7 @@ class LevelEditor {
 
   zoom(delta) {
     const config = this.config;
-    const z = config.view.zoom;
+    let z = config.view.zoom;
     const mx = this.input.mouse.x * z,
       my = this.input.mouse.y * z;
 
