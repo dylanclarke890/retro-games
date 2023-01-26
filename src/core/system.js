@@ -16,11 +16,16 @@ class System {
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
-    this.canvas = $el("#" + canvasId) ?? $new("canvas");
+    let insertElement = false;
+    this.canvas = $el("#" + canvasId);
+    if (!this.canvas) {
+      this.canvas = $new("canvas");
+      insertElement = true;
+    }
     this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");
-    document.body.insertBefore(this.canvas, document.body.firstChild);
+    if (insertElement) document.body.insertBefore(this.canvas, document.body.firstChild);
     this.width = width;
     this.height = height;
   }

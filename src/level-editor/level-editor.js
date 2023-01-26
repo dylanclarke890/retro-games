@@ -25,11 +25,13 @@ class LevelEditor {
   modified = false;
   mouseLast = { x: -1, y: -1 };
   needsDraw = true;
-  _rscreen = { x: 0, y: 0 };
   /** @type {ModalDialogPathSelect} */
   saveDialog = null;
   undo = null;
-  screen = { x: 0, y: 0 };
+  screen = {
+    rounded: { x: 0, y: 0 },
+    actual: { x: 0, y: 0 },
+  };
   selectedEntity = null;
   /** @type {System} */
   system = null;
@@ -237,13 +239,12 @@ class LevelEditor {
 
   scroll(x, y) {
     const scale = this.system.scale;
-    this.screen.x -= x;
-    this.screen.y -= y;
-
-    this._rscreen.x = Math.round(this.screen.x * scale) / scale;
-    this._rscreen.y = Math.round(this.screen.y * scale) / scale;
-    for (let i = 0; i < this.layers.length; i++)
-      this.layers[i].setScreenPos(this.screen.x, this.screen.y);
+    const { actual, rounded } = this.screen;
+    actual.x -= x;
+    actual.y -= y;
+    rounded.x = Math.round(actual.x * scale) / scale;
+    rounded.y = Math.round(actual.y * scale) / scale;
+    for (let i = 0; i < this.layers.length; i++) this.layers[i].setScreenPos(actual.x, actual.y);
   }
 
   drag() {
@@ -299,7 +300,7 @@ class LevelEditor {
       this.layers[0].destroy();
       this.layers.splice(0, 1);
     }
-    this.screen = { x: 0, y: 0 };
+    this.screen.actual = { x: 0, y: 0 };
     this.entities.clear();
     this.fileName = "untitled.js";
     this.filePath = this.config.project.levelPath + "untitled.js";
@@ -349,7 +350,7 @@ class LevelEditor {
       this.layers[0].destroy();
       this.layers.splice(0, 1);
     }
-    this.screen = { x: 0, y: 0 };
+    this.screen.actual = { x: 0, y: 0 };
     this.entities.clear();
 
     for (let i = 0; i < data.entities.length; i++) {
@@ -450,7 +451,7 @@ class LevelEditor {
       config: this.config,
     });
     newLayer.resize(this.config.layerDefaults.width, this.config.layerDefaults.height);
-    newLayer.setScreenPos(this.screen.x, this.screen.y);
+    newLayer.setScreenPos(this.screen.actual.x, this.screen.actual.y);
     this.layers.push(newLayer);
     this.setActiveLayer(name);
     this.updateLayerSettings();
@@ -600,8 +601,8 @@ class LevelEditor {
       else if (this.input.state("draw")) {
         // move/scale entity
         if (this.activeLayer === this.entities) {
-          const x = this.input.mouse.x + this.screen.x;
-          const y = this.input.mouse.y + this.screen.y;
+          const x = this.input.mouse.x + this.screen.actual.x;
+          const y = this.input.mouse.y + this.screen.actual.y;
           this.entities.dragOnSelectedEntity(x, y);
           this.setModified();
         }
@@ -609,8 +610,8 @@ class LevelEditor {
         // draw on map
         else if (!this.activeLayer.isSelecting) this.setTileOnCurrentLayer();
       } else if (this.activeLayer === this.entities) {
-        const x = this.input.mouse.x + this.screen.x;
-        const y = this.input.mouse.y + this.screen.y;
+        const x = this.input.mouse.x + this.screen.actual.x;
+        const y = this.input.mouse.y + this.screen.actual.y;
         this.entities.mousemove(x, y);
       }
     }
@@ -626,8 +627,8 @@ class LevelEditor {
       if (this.mode === this.MODE.DEFAULT) {
         // select entity
         if (this.activeLayer === this.entities) {
-          const x = this.input.mouse.x + this.screen.x;
-          const y = this.input.mouse.y + this.screen.y;
+          const x = this.input.mouse.x + this.screen.actual.x;
+          const y = this.input.mouse.y + this.screen.actual.y;
           const entity = this.entities.selectEntityAt(x, y);
           if (entity) this.undo.beginEntityEdit(entity);
         } else {
@@ -807,14 +808,14 @@ class LevelEditor {
   drawLabels(step) {
     const { ctx, height, width, scale } = this.system;
     ctx.fillStyle = this.config.colors.primary;
-    let xlabel = this.screen.x - (this.screen.x % step) - step;
-    for (let tx = Math.floor(-this.screen.x % step); tx < width; tx += step) {
+    let xlabel = this.screen.actual.x - (this.screen.actual.x % step) - step;
+    for (let tx = Math.floor(-this.screen.actual.x % step); tx < width; tx += step) {
       xlabel += step;
       ctx.fillText(xlabel, tx * scale, 0);
     }
 
-    let ylabel = this.screen.y - (this.screen.y % step) - step;
-    for (let ty = Math.floor(-this.screen.y % step); ty < height; ty += step) {
+    let ylabel = this.screen.actual.y - (this.screen.actual.y % step) - step;
+    for (let ty = Math.floor(-this.screen.actual.y % step); ty < height; ty += step) {
       ylabel += step;
       ctx.fillText(ylabel, 0, ty * scale);
     }

@@ -19,6 +19,10 @@ class EditEntities {
   visible = true;
   wasSelectedOnScaleBorder = false;
 
+  get screen() {
+    return this.editor.screen;
+  }
+
   constructor({ div, config, undo, editor, httpClient, media, system } = {}) {
     Guard.againstNull({ div });
     Guard.againstNull({ config });
@@ -107,7 +111,7 @@ class EditEntities {
     }
 
     if (invalidClasses.length > 0)
-      console.warn(`Entity class definitions could not be fetched: ${invalidClasses.join("\n")}`);
+      console.debug(`Entity class definitions could not be fetched: ${invalidClasses.join("\n")}`);
   }
 
   getEntityByName(name) {
@@ -278,7 +282,7 @@ class EditEntities {
   spawnEntity(className, x, y, settings = {}) {
     const entityClass = Register.getEntityByType(className);
     if (!entityClass) return null;
-
+    // TODO: Pass a Game object entities can use (with screen settings actual and rounded or whatever).
     const newEntity = new entityClass({ x, y, game: this, settings });
     newEntity._wmInEditor = true;
     newEntity._wmClassName = className;

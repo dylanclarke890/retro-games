@@ -20,7 +20,8 @@ class ModalDialog {
     this.dialogBox = $new("div");
     this.dialogBox.classList.add("modalDialogBox");
     this.background.append(this.dialogBox);
-    document.body.prepend(this.background);
+    const firstScript = document.body.querySelector("script");
+    firstScript.before(this.background);
     if (autoInit) this.initDialog();
   }
 
