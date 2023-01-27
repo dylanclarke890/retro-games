@@ -51,6 +51,7 @@ const level = /*JSON-BEGIN*/ {
       preRender: false,
       distance: 1,
       tilesize: 48,
+      tileset: "assets/images/block.png",
       foreground: false,
       data: [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],

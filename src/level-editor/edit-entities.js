@@ -224,8 +224,8 @@ class EditEntities {
       this.selectedEntity.offset.y;
     if (this.selectedEntity.pos.x === x && this.selectedEntity.pos.y === y) return;
 
-    $el("#entityDefinitionPosX").textContent = x; // TODO - invalid reference.
-    $el("#entityDefinitionPosY").textContent = x; // TODO - invalid reference.
+    $el("#position-x").textContent = x; // TODO - invalid reference.
+    $el("#position-y").textContent = x; // TODO - invalid reference.
     this.selectedEntity.pos.x = x;
     this.selectedEntity.pos.y = y;
   }
@@ -280,7 +280,6 @@ class EditEntities {
   spawnEntity(className, x, y, settings = {}) {
     const entityClass = Register.getEntityByType(className);
     if (!entityClass) return null;
-    // TODO: Pass a Game object entities can use (with screen settings actual and rounded or whatever).
     const newEntity = new entityClass({ x, y, game: this, settings });
     newEntity._wmInEditor = true;
     newEntity._wmClassName = className;
@@ -442,16 +441,14 @@ class EditEntities {
   }
 
   setActive(active) {
-    this.active = active;
-    if (active) this.div.classList.add("layerActive");
-    else this.div.classList.remove("layerActive");
+    this.active = !!active;
+    this.div.classList.toggle("layerActive", this.active)
   }
 
   toggleVisibility() {
-    this.visible ^= 1;
+    this.visible = !this.visible;
     const visibleEl = this.div.querySelector(".visible");
-    if (this.visible) visibleEl.classList.add("checkedVis");
-    else visibleEl.classList.remove("checkedVis");
+    visibleEl.classList.toggle("checkedVis", this.visible);
     this.editor.draw();
   }
 
@@ -469,7 +466,7 @@ class EditEntities {
   }
 
   mousemove(x, y) {
-    this.selector.pos = { x: x, y: y };
+    this.selector.pos = { x, y };
 
     if (
       !this.selectedEntity ||

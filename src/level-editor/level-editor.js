@@ -4,6 +4,8 @@ class LevelEditor {
   collisionSolid = 1;
   config = null;
   deleteLayerDialog = null;
+  /** @type {NodeListOf<Element>} */
+  editorActionDisplays = null;
   entities = null;
   /** @type {EventedInput} */
   input = null;
@@ -16,12 +18,12 @@ class LevelEditor {
   levelSavePathDialog = null;
   loadDialog = null;
   loseChangesDialog = null;
-  mode = null;
   MODE = {
     DRAW: 1,
     TILESELECT: 2,
     ENTITYSELECT: 4,
   };
+  mode = this.MODE.DRAW;
   modified = false;
   mouseLast = { x: -1, y: -1 };
   needsDraw = true;
@@ -70,6 +72,7 @@ class LevelEditor {
     this.labelsStep = config.labels.step;
 
     this.initDialogs();
+    this.editorActionDisplays = document.querySelectorAll(".editor-action");
 
     this.entities = new EditEntities({
       config: this.config,
@@ -283,7 +286,7 @@ class LevelEditor {
 
     config.view.zoom = z.constrain(config.view.zoomMin, config.view.zoomMax);
     config.labels.step = Math.round(this.labelsStep / config.view.zoom);
-    
+
     const zoomDisplay = $el("#zoomIndicator");
     zoomDisplay.textContent = `${config.view.zoom}x`;
     zoomDisplay.style.display = "block";
@@ -633,6 +636,11 @@ class LevelEditor {
 
     this.mouseLast = { ...this.input.mouse };
     this.draw();
+  }
+
+  displayAction(action) {
+    action = action.toUpperCase();
+    this.editorActionDisplays.forEach((v) => (v.textContent = action));
   }
 
   keydown(action) {
