@@ -428,11 +428,9 @@ class LevelEditor {
     data.entities = this.entities.getSaveData();
     data.layer = [];
 
-    const resources = [];
     for (let i = 0; i < this.layers.length; i++) {
       const layer = this.layers[i];
       data.layer.push(layer.getSaveData());
-      if (layer.name !== "collision") resources.push(layer.tiles.path);
     }
 
     let dataString = JSON.stringify(data);
@@ -474,7 +472,7 @@ class LevelEditor {
     this.setActiveLayer(name);
     this.updateLayerSettings();
     this.reorderLayers();
-    $("#layers").sortable("refresh"); // TODO
+    $("#layers").sortable("refresh");
   }
 
   removeLayer() {
@@ -485,7 +483,7 @@ class LevelEditor {
       if (this.layers[i].name !== name) continue;
       this.layers.splice(i, 1);
       this.reorderLayers();
-      $("#layers").sortable("refresh"); // TODO
+      $("#layers").sortable("refresh");
       this.setActiveLayer("entities");
       return true;
     }
@@ -595,15 +593,14 @@ class LevelEditor {
 
   toggleCollisionLayer() {
     const isCollision = $el("#layerIsCollision").checked;
-    const elementsToUpdate = [
-      "#layerLinkWithCollision",
+    [
+      "#layerName",
+      "#layerRepeat",
+      "#layerTileset",
       "#layerDistance",
       "#layerPreRender",
-      "#layerRepeat",
-      "#layerName",
-      "#layerTileset",
-    ];
-    elementsToUpdate.forEach((v) => ($el(v).disabled = isCollision));
+      "#layerLinkWithCollision",
+    ].forEach((v) => ($el(v).disabled = isCollision));
   }
 
   //#endregion Layers

@@ -62,7 +62,7 @@ function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) =>
 }
 
 function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
-  if (target.style.display === "block") slideUp(target, easing, duration, cb);
+  if (window.getComputedStyle(target).display === "block") slideUp(target, easing, duration, cb);
   else slideDown(target, easing, duration, cb);
 }
 //#endregion slide

@@ -5,18 +5,11 @@ class EntityBall extends Entity {
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
   hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
+
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
-  }
-
-  draw() {
-    super.draw();
-  }
-
-  update() {
-    super.update();
   }
 }
 

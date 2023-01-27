@@ -35,7 +35,7 @@ class EditMap extends BackgroundMap {
   }
 
   getSaveData() {
-    return {
+    const baseData = {
       name: this.name,
       width: this.width,
       height: this.height,
@@ -49,6 +49,7 @@ class EditMap extends BackgroundMap {
       foreground: this.foreground,
       data: this.data,
     };
+    return this.name === "collision" ? baseData : { ...baseData, tileset: this.tiles.path };
   }
 
   resize(newWidth, newHeight) {
@@ -83,7 +84,12 @@ class EditMap extends BackgroundMap {
   setCollisionTileset() {
     const path = this.config.collisionTiles.path;
     const internalScale = this.tilesize / this.config.collisionTiles.tilesize;
-    this.tiles = new AutoResizedImage({ path, internalScale, system: this.system, config });
+    this.tiles = new AutoResizedImage({
+      path,
+      internalScale,
+      system: this.system,
+      config: this.config,
+    });
   }
 
   //#region UI
@@ -288,6 +294,7 @@ class AutoResizedImage extends GameImage {
   internalScale = 1;
 
   constructor({ path, internalScale, system }) {
+    console.log(path);
     super({ system, path });
     this.internalScale = internalScale;
   }
@@ -297,7 +304,7 @@ class AutoResizedImage extends GameImage {
     this.height = Math.ceil(this.data.height * this.internalScale);
 
     if (this.internalScale !== 1) {
-      const scaled = ig.$new("canvas");
+      const scaled = $new("canvas");
       scaled.width = this.width;
       scaled.height = this.height;
       const scaledCtx = scaled.getContext("2d");

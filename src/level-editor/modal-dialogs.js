@@ -88,6 +88,7 @@ class ModalDialogPathSelect extends ModalDialog {
     super.initDialog();
     this.pathInput = $new("input");
     this.pathInput.type = "text";
+    this.pathInput.autocomplete = "off";
     this.pathInput.classList.add("modalDialogPath");
     // Insert dropdown before dialog buttons but after title.
     this.dialogBox.insertBefore(this.pathInput, this.dialogBox.children[1]);
