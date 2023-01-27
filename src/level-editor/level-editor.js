@@ -352,7 +352,7 @@ class LevelEditor {
 
       // Remove all trailing commas on arrays and objects.
       json = json.replace(/\,(?=\s*[}|\]])/gm, "");
-      
+
       // Finally, we can parse it:
       data = JSON.parse(json);
     }
@@ -636,38 +636,57 @@ class LevelEditor {
   keydown(action) {
     if (!this.activeLayer) return;
 
-    if (action === "draw") {
-      if (this.mode === this.MODE.DEFAULT) {
-        // select entity
-        if (this.activeLayer === this.entities) {
-          const x = this.input.mouse.x + this.screen.actual.x;
-          const y = this.input.mouse.y + this.screen.actual.y;
-          const entity = this.entities.selectEntityAt(x, y);
-          if (entity) this.undo.beginEntityEdit(entity);
-        } else {
-          if (this.input.state("select"))
-            this.activeLayer.beginSelecting(this.input.mouse.x, this.input.mouse.y);
-          else {
-            this.undo.beginMapDraw();
-            this.activeLayer.beginEditing();
-            if (
-              this.activeLayer.linkWithCollision &&
-              this.collisionLayer &&
-              this.collisionLayer !== this.activeLayer
-            )
-              this.collisionLayer.beginEditing();
-
-            this.setTileOnCurrentLayer();
-          }
-        }
-      } else if (this.mode === this.MODE.TILESELECT && this.input.state("select"))
-        this.activeLayer.tileSelect.beginSelecting(this.input.mouse.x, this.input.mouse.y);
+    if (action !== "draw") {
+      this.draw();
+      return;
     }
+
+    if (this.mode === this.MODE.TILESELECT && this.input.state("select")) {
+      this.activeLayer.tileSelect.beginSelecting(this.input.mouse.x, this.input.mouse.y);
+      this.draw();
+      return;
+    }
+
+    if (this.mode !== this.MODE.DEFAULT) {
+      this.draw();
+      return;
+    }
+
+    // select entity
+    if (this.activeLayer === this.entities) {
+      const x = this.input.mouse.x + this.screen.actual.x;
+      const y = this.input.mouse.y + this.screen.actual.y;
+      const entity = this.entities.selectEntityAt(x, y);
+      if (entity) this.undo.beginEntityEdit(entity);
+      this.draw();
+      return;
+    }
+
+    // layer select
+    if (this.input.state("select")) {
+      this.activeLayer.beginSelecting(this.input.mouse.x, this.input.mouse.y);
+      this.draw();
+      return;
+    }
+
+    // drawing map
+    this.undo.beginMapDraw();
+    this.activeLayer.beginEditing();
+    // update collision map too if linked.
+    if (
+      this.activeLayer.linkWithCollision &&
+      this.collisionLayer &&
+      this.collisionLayer !== this.activeLayer
+    ) {
+      this.collisionLayer.beginEditing();
+    }
+    this.setTileOnCurrentLayer();
 
     this.draw();
   }
 
   keyup(action) {
+    console.log(action);
     if (!this.activeLayer) return;
 
     switch (action) {
