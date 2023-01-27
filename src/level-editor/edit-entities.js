@@ -56,7 +56,7 @@ class EditEntities {
     const entityValue = $el("#entityValue");
     entityValue.addEventListener("keydown", (e) => this.setEntitySetting(e));
 
-    this.loadEntities();
+    this.loadEntities().then((entitiesData) => this.loadEntityScripts(entitiesData));
   }
 
   createAnimationSheet({ path, size }) {
@@ -75,9 +75,7 @@ class EditEntities {
   //#region Saving/Loading
 
   async loadEntities() {
-    await this.httpClient.api.glob(this.config.project.entityFiles).then((entitiesData) => {
-      this.loadEntityScripts(entitiesData);
-    });
+    return await this.httpClient.api.glob(this.config.project.entityFiles);
   }
 
   loadEntityScripts(entitiesData) {

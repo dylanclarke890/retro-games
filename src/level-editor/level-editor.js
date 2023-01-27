@@ -87,7 +87,7 @@ class LevelEditor {
     $("#layers").disableSelection();
     this.resetModified();
 
-    this.initEvents();
+    this.bindEvents();
 
     if (config.loadLastLevel) {
       const path = getCookie("levelEditorLastLevel");
@@ -98,7 +98,11 @@ class LevelEditor {
     requestAnimationFrame(() => this.drawIfNeeded());
   }
 
+  /**
+   * Init the pop up dialogs. Event listeners are bound in bindEvents().
+   */
   initDialogs() {
+    // Load level dropdown dialog.
     this.loadDialog = new ModalDialogPathSelect({
       text: "Load Level",
       okText: "Load",
@@ -107,28 +111,28 @@ class LevelEditor {
     });
     this.loadDialog.onOk = (dialog, path) => this.load(dialog, path);
     this.loadDialog.setPath(this.config.project.levelPath);
-    $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
-    $el("#levelNew").addEventListener("click", () => this.showNewDialog());
 
+    // Save dialog.
     this.saveDialog = new ModalDialogPathSelect({
       text: "Save Level",
       okText: "Save",
       type: "scripts",
       httpClient: this.httpClient,
     });
-    this.saveDialog.onOk = this.save;
+    this.saveDialog.onOk = (dialog, path) => this.save(dialog, path);
     this.saveDialog.setPath(this.config.project.levelPath);
-    $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
-    $el("#levelSave").addEventListener("click", () => this.saveQuick());
 
+    // Lose changes confirmation.
     this.loseChangesDialog = new ModalDialog({ text: "Lose all changes?", autoInit: true });
 
+    // Delete layer confirmation.
     this.deleteLayerDialog = new ModalDialog({
       text: "Delete Layer? NO UNDO!",
       autoInit: true,
     });
-    this.deleteLayerDialog.onOk = this.removeLayer;
+    this.deleteLayerDialog.onOk = () => this.removeLayer();
 
+    // Select tile
     this.tilesetSelectDialog = new SelectFileDropdown({
       elementId: "#layerTileset",
       httpClient: this.httpClient,
@@ -136,7 +140,12 @@ class LevelEditor {
     });
   }
 
-  initEvents() {
+  bindEvents() {
+    $el("#levelLoad").addEventListener("click", () => this.showLoadDialog());
+    $el("#levelNew").addEventListener("click", () => this.showNewDialog());
+    $el("#levelSaveAs").addEventListener("click", () => this.saveDialog.open());
+    $el("#levelSave").addEventListener("click", () => this.saveQuick());
+
     const config = this.config;
     if (config.touchScroll) {
       this.system.canvas.addEventListener("wheel", (e) => this.touchScroll(e), false); // Setup wheel event
@@ -333,13 +342,17 @@ class LevelEditor {
       let json = jsonMatch[1];
       // Some keys may be stored in modern JS format i.e without quotes. Find and replace them.
       const matches = json.match(/(\w+):/g);
-      matches.forEach((v) => {
-        // v = match + : - we want it to be "match":
-        const match = v.substring(0, v.length - 1);
-        json = json.replace(v, `\"${match}\":`);
-      });
+      if (matches) {
+        matches.forEach((v) => {
+          // v = match + : - we want it to be "match":
+          const match = v.substring(0, v.length - 1);
+          json = json.replace(v, `\"${match}\":`);
+        });
+      }
+
       // Remove all trailing commas on arrays and objects.
       json = json.replace(/\,(?=\s*[}|\]])/gm, "");
+      
       // Finally, we can parse it:
       data = JSON.parse(json);
     }
@@ -404,7 +417,7 @@ class LevelEditor {
 
   save(_dialog, path) {
     if (!path.match(/\.js$/)) path += ".js";
-    console.log(path);
+    console.log(this.entities);
     this.filePath = path;
     this.fileName = path.replace(/^.*\//, "");
     const data = this.levelData;
@@ -658,6 +671,8 @@ class LevelEditor {
     if (!this.activeLayer) return;
 
     switch (action) {
+      case "drag":
+        break; // handled by drag() method.
       case "delete":
         this.entities.deleteSelectedEntity();
         this.setModified();
