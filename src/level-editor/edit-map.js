@@ -16,13 +16,11 @@ class EditMap extends BackgroundMap {
   selectionBegin = null;
 
   constructor({ name, tilesize, tileset, foreground, system, config, editor }) {
-    tileset = tileset || "";
-    super({ tilesize, data: [[0]], tileset, system, name, foreground, autoset: false });
+    super({ tilesize, data: [[0]], system, name, foreground, autoset: false });
     Guard.againstNull({ config });
     Guard.againstNull({ editor });
     this.config = config;
     this.editor = editor;
-    this.setTileset(this.tileset);
 
     this.div = $new("div");
     this.div.className = "layer layerActive";
@@ -30,6 +28,7 @@ class EditMap extends BackgroundMap {
     this.div.addEventListener("click", () => this.click());
 
     this.setName(name);
+    this.setTileset(tileset || "");
     if (this.foreground) $el("#layers").prepend(this.div);
     else $el("#layerEntities").after(this.div);
     this.tileSelect = new TileSelect(this);
@@ -82,7 +81,6 @@ class EditMap extends BackgroundMap {
   }
 
   setCollisionTileset() {
-    console.log(this);
     const path = this.config.collisionTiles.path;
     const internalScale = this.tilesize / this.config.collisionTiles.tilesize;
     this.tiles = new AutoResizedImage({ path, internalScale, system: this.system, config });
@@ -103,7 +101,7 @@ class EditMap extends BackgroundMap {
   resetDiv() {
     const visClass = this.visible ? "checkedVis" : "";
     this.div.innerHTML = `
-      <span class="visible ${visClass} title="Toggle Visibility (Shift+${this.hotkey})</span>
+      <span class="visible ${visClass}" title="Toggle Visibility (Shift+${this.hotkey})"></span>
       <span class="name">${this.name}</span>
       <span class="size">${this.width}x${this.height}</span>
     `;
@@ -239,7 +237,7 @@ class EditMap extends BackgroundMap {
   }
 
   drawCursor(x, y) {
-    const { scale, ctx } = this.system;
+    const { scale, ctx, drawPosition } = this.system;
     if (this.isSelecting) {
       const r = this.getSelectionRect(x, y);
       ctx.lineWidth = 1;
@@ -264,8 +262,8 @@ class EditMap extends BackgroundMap {
     ctx.lineWidth = 1;
     ctx.strokeStyle = this.config.colors.primary;
     ctx.strokeRect(
-      ig.system.getDrawPos(cx) - 0.5,
-      ig.system.getDrawPos(cy) - 0.5,
+      drawPosition(cx) - 0.5,
+      drawPosition(cy) - 0.5,
       w * this.tilesize * scale + 1,
       h * this.tilesize * scale + 1
     );

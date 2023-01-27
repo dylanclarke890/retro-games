@@ -11,9 +11,9 @@ const levelEditorConfig = {
   },
   /** Default settings when creating new layers in level editor. */
   layerDefaults: {
-    width: 30,
-    height: 20,
-    tilesize: 8,
+    width: 10,
+    height: 10,
+    tilesize: 32,
   },
   /** Whether to ask before closing level editor when there are unsaved changes. */
   askBeforeClose: false,

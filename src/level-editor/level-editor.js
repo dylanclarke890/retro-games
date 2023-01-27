@@ -283,9 +283,9 @@ class LevelEditor {
 
     config.view.zoom = z.constrain(config.view.zoomMin, config.view.zoomMax);
     config.labels.step = Math.round(this.labelsStep / config.view.zoom);
+    
     const zoomDisplay = $el("#zoomIndicator");
     zoomDisplay.textContent = `${config.view.zoom}x`;
-    // .stop(true, true) TODO
     zoomDisplay.style.display = "block";
     setTimeout(() => fadeOut(zoomDisplay), 300);
 
@@ -417,9 +417,10 @@ class LevelEditor {
 
   save(_dialog, path) {
     if (!path.match(/\.js$/)) path += ".js";
-    console.log(this.entities);
+
     this.filePath = path;
     this.fileName = path.replace(/^.*\//, "");
+
     const data = this.levelData;
     data.entities = this.entities.getSaveData();
     data.layer = [];
@@ -462,6 +463,7 @@ class LevelEditor {
       tilesize: this.config.layerDefaults.tilesize,
       system: this.system,
       config: this.config,
+      editor: this,
     });
     newLayer.resize(this.config.layerDefaults.width, this.config.layerDefaults.height);
     newLayer.setScreenPos(this.screen.actual.x, this.screen.actual.y);
@@ -686,7 +688,6 @@ class LevelEditor {
   }
 
   keyup(action) {
-    console.log(action);
     if (!this.activeLayer) return;
 
     switch (action) {

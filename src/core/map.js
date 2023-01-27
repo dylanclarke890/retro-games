@@ -38,8 +38,6 @@ class GameMap {
 }
 
 class BackgroundMap extends GameMap {
-  #scroll = { x: 0, y: 0 };
-
   anims = {};
   chunkSize = 512;
   debugChunks = false;
@@ -49,6 +47,7 @@ class BackgroundMap extends GameMap {
   preRender = false;
   preRenderedChunks = null;
   repeat = false;
+  scroll = { x: 0, y: 0 };
   tiles = null;
   tilesetName = "";
 
@@ -67,11 +66,11 @@ class BackgroundMap extends GameMap {
   }) {
     super({ system, tilesize, data });
     this.anims = anims || {};
-    this.distance = distance;
+    this.distance = distance || 1;
     this.foreground = !!foreground;
     this.name = name;
     this.preRender = !!preRender;
-    this.repeat = repeat;
+    this.repeat = !!repeat;
     if (autoset !== false) this.setTileset(tileset);
   }
 
@@ -82,8 +81,8 @@ class BackgroundMap extends GameMap {
   }
 
   setScreenPos(x, y) {
-    this.#scroll.x = x / this.distance;
-    this.#scroll.y = y / this.distance;
+    this.scroll.x = x / this.distance;
+    this.scroll.y = y / this.distance;
   }
 
   preRenderMapToChunks() {
@@ -160,8 +159,8 @@ class BackgroundMap extends GameMap {
   drawPreRendered() {
     if (!this.preRenderedChunks) this.preRenderMapToChunks();
 
-    let dx = this.system.drawPosition(this.#scroll.x),
-      dy = this.system.drawPosition(this.#scroll.y);
+    let dx = this.system.drawPosition(this.scroll.x),
+      dy = this.system.drawPosition(this.scroll.y);
 
     if (this.repeat) {
       const scaledTileSize = this.tilesize * this.system.scale;
@@ -228,10 +227,10 @@ class BackgroundMap extends GameMap {
   drawTiled() {
     let tile = 0,
       anim = null,
-      tileOffsetX = (this.#scroll.x / this.tilesize).toInt(),
-      tileOffsetY = (this.#scroll.y / this.tilesize).toInt(),
-      pxOffsetX = this.#scroll.x % this.tilesize,
-      pxOffsetY = this.#scroll.y % this.tilesize,
+      tileOffsetX = (this.scroll.x / this.tilesize).toInt(),
+      tileOffsetY = (this.scroll.y / this.tilesize).toInt(),
+      pxOffsetX = this.scroll.x % this.tilesize,
+      pxOffsetY = this.scroll.y % this.tilesize,
       pxMinX = -pxOffsetX - this.tilesize,
       pxMinY = -pxOffsetY - this.tilesize,
       pxMaxX = this.system.width + this.tilesize - pxOffsetX,
