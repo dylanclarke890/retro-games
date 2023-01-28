@@ -280,7 +280,6 @@ class EditEntities {
     const entityClass = Register.getEntityByType(className);
     if (!entityClass) return null;
     const newEntity = new entityClass({ x, y, game: this, settings });
-    newEntity._wmInEditor = true;
     newEntity._wmClassName = className;
     newEntity._wmSettings = {};
     for (let s in settings) newEntity._wmSettings[s] = settings[s];
