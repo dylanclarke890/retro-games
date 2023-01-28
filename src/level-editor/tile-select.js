@@ -1,36 +1,36 @@
 class TileSelect {
-  pos = { x: 0, y: 0 };
   layer = null;
+  pos = { x: 0, y: 0 };
   selectionBegin = null;
+  /** @type {System} */
+  system = null;
 
-  constructor(layer) {
+  constructor({ layer, system, config } = {}) {
+    Guard.againstNull({ layer });
+    Guard.againstNull({ system });
+    Guard.againstNull({ config });
     this.layer = layer;
+    this.system = system;
+    this.config = config;
   }
 
   getCurrentTile() {
     const brush = this.layer.brush;
-    return brush.length == 1 && brush[0].length == 1 ? brush[0][0] - 1 : -1;
+    return brush.length === 1 && brush[0].length === 1 ? brush[0][0] - 1 : -1;
   }
 
   setPosition(x, y) {
     this.selectionBegin = null;
     const tile = this.getCurrentTile();
-    this.pos.x =
-      Math.floor(x / this.layer.tilesize) * this.layer.tilesize -
-      (Math.floor(tile * this.layer.tilesize) % this.layer.tiles.width);
+    const { tilesize, tiles } = this.layer;
+    const { width, height } = this.system;
+    this.pos.x = Math.floor(x / tilesize) * tilesize - (Math.floor(tile * tilesize) % tiles.width);
     this.pos.y =
-      Math.floor(y / this.layer.tilesize) * this.layer.tilesize -
-      Math.floor((tile * this.layer.tilesize) / this.layer.tiles.width) * this.layer.tilesize -
-      (tile == -1 ? this.layer.tilesize : 0);
-    // TODO
-    this.pos.x = this.pos.x.constrain(
-      0,
-      ig.system.width - this.layer.tiles.width - (ig.system.width % this.layer.tilesize)
-    );
-    this.pos.y = this.pos.y.constrain(
-      0,
-      ig.system.height - this.layer.tiles.height - (ig.system.height % this.layer.tilesize)
-    );
+      Math.floor(y / tilesize) * tilesize -
+      Math.floor((tile * tilesize) / tiles.width) * tilesize -
+      (tile === -1 ? tilesize : 0);
+    this.pos.x = this.pos.x.constrain(0, width - tiles.width - (width % tilesize));
+    this.pos.y = this.pos.y.constrain(0, height - tiles.height - (height % tilesize));
   }
 
   beginSelecting(x, y) {
@@ -72,57 +72,56 @@ class TileSelect {
   }
 
   draw() {
-    // TODO
-    ig.system.clear("rgba(0,0,0,0.8)");
+    this.system.clear("rgba(0,0,0,0.8)");
+    const { scale, ctx } = this.system;
     if (!this.layer.tiles.loaded) return;
     // Tileset
-    ig.system.context.lineWidth = 1;
-    ig.system.context.strokeStyle = wm.config.colors.secondary;
-    ig.system.context.fillStyle = wm.config.colors.clear;
-    ig.system.context.fillRect(
-      this.pos.x * ig.system.scale,
-      this.pos.y * ig.system.scale,
-      this.layer.tiles.width * ig.system.scale,
-      this.layer.tiles.height * ig.system.scale
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.config.colors.secondary;
+    ctx.fillStyle = this.config.colors.clear;
+    ctx.fillRect(
+      this.pos.x * scale,
+      this.pos.y * scale,
+      this.layer.tiles.width * scale,
+      this.layer.tiles.height * scale
     );
-    ig.system.context.strokeRect(
-      this.pos.x * ig.system.scale - 0.5,
-      this.pos.y * ig.system.scale - 0.5,
-      this.layer.tiles.width * ig.system.scale + 1,
-      this.layer.tiles.height * ig.system.scale + 1
+    ctx.strokeRect(
+      this.pos.x * scale - 0.5,
+      this.pos.y * scale - 0.5,
+      this.layer.tiles.width * scale + 1,
+      this.layer.tiles.height * scale + 1
     );
 
     this.layer.tiles.draw(this.pos.x, this.pos.y);
 
     // Selected Tile
-    var tile = this.getCurrentTile();
-    var tx = (Math.floor(tile * this.layer.tilesize) % this.layer.tiles.width) + this.pos.x;
-    var ty =
+    const tile = this.getCurrentTile();
+    const tx = (Math.floor(tile * this.layer.tilesize) % this.layer.tiles.width) + this.pos.x;
+    const ty =
       Math.floor((tile * this.layer.tilesize) / this.layer.tiles.width) * this.layer.tilesize +
       this.pos.y +
       (tile == -1 ? this.layer.tilesize : 0);
 
-    // TODO
-    ig.system.context.lineWidth = 1;
-    ig.system.context.strokeStyle = wm.config.colors.highlight;
-    ig.system.context.strokeRect(
-      tx * ig.system.scale - 0.5,
-      ty * ig.system.scale - 0.5,
-      this.layer.tilesize * ig.system.scale + 1,
-      this.layer.tilesize * ig.system.scale + 1
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.config.colors.highlight;
+    ctx.strokeRect(
+      tx * scale - 0.5,
+      ty * scale - 0.5,
+      this.layer.tilesize * scale + 1,
+      this.layer.tilesize * scale + 1
     );
   }
 
   drawCursor(x, y) {
     const r = this.getSelectionRect(x, y);
-    // TODO
-    ig.system.context.lineWidth = 1;
-    ig.system.context.strokeStyle = wm.config.colors.selection;
-    ig.system.context.strokeRect(
-      (r.x * this.layer.tilesize + this.pos.x) * ig.system.scale - 0.5,
-      (r.y * this.layer.tilesize + this.pos.y) * ig.system.scale - 0.5,
-      r.w * this.layer.tilesize * ig.system.scale + 1,
-      r.h * this.layer.tilesize * ig.system.scale + 1
+    const { ctx, scale } = this.system;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.config.colors.selection;
+    ctx.strokeRect(
+      (r.x * this.layer.tilesize + this.pos.x) * scale - 0.5,
+      (r.y * this.layer.tilesize + this.pos.y) * scale - 0.5,
+      r.w * this.layer.tilesize * scale + 1,
+      r.h * this.layer.tilesize * scale + 1
     );
   }
 }

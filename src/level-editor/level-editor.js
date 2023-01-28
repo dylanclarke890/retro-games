@@ -577,17 +577,13 @@ class LevelEditor {
     this.mode = this.MODE.DEFAULT;
     $el("#layerIsCollision").checked = name === "collision";
 
-    if (name === "entities") fadeOut($el("#layerSettings"), { duration: 100 });
+    const layerSettings = $el("#layerSettings");
+    if (name === "entities") layerSettings.style.display = "none";
     else {
+      layerSettings.style.display = "block";
       this.entities.selectEntity(null);
       this.toggleCollisionLayer();
-      fadeOut($el("#layerSettings"), {
-        duration: 100,
-        cb: (el) => {
-          this.updateLayerSettings();
-          fadeIn(el, { duration: 100 });
-        },
-      });
+      this.updateLayerSettings();
     }
     this.draw();
   }
@@ -697,8 +693,9 @@ class LevelEditor {
     if (!this.activeLayer) return;
 
     switch (action) {
-      case "drag":
-        break; // handled by drag() method.
+      case "drag": // handled by drag()
+      case "select": // handled by keydown()
+        break;
       case "delete":
         this.entities.deleteSelectedEntity();
         this.setModified();

@@ -32,7 +32,7 @@ class EditMap extends BackgroundMap {
 
     if (this.foreground) $el("#layers").prepend(this.div);
     else $el("#layerEntities").after(this.div);
-    this.tileSelect = new TileSelect(this);
+    this.tileSelect = new TileSelect({ layer: this, system: this.system, config: this.config });
   }
 
   getSaveData() {

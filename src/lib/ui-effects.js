@@ -69,6 +69,7 @@ function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) 
 
 //#region fade
 
+// TODO: flickering effects - probs best to split this back out.
 function fade(target, { isFadeIn, easing, duration, cb } = {}) {
   isFadeIn = isFadeIn || false;
   easing = easing || "ease-in";
@@ -77,7 +78,7 @@ function fade(target, { isFadeIn, easing, duration, cb } = {}) {
 
   target.style.removeProperty("display");
   let display = window.getComputedStyle(target).display;
-  if (display === "none") display = "block";
+  if (display === "none" && !isFadeIn) display = "block";
   target.style.display = display;
   target.style.opacity = isFadeIn ? 0 : 1;
   target.offsetHeight; // Trigger repaint of DOM.
@@ -108,8 +109,8 @@ function fadeOut(target, { easing, duration, cb } = {}) {
   fade(target, { isFadeIn: false, easing, duration, cb });
 }
 
-function fadeToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
-  if (target.style.display === "block") fadeOut(target, easing, duration, cb);
+function fadeToggle(target, { easing, duration = 500, cb = (_target) => {} } = {}) {
+  if (window.getComputedStyle(target).display === "block") fadeOut(target, easing, duration, cb);
   else fadeIn(target, easing, duration, cb);
 }
 
