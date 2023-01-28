@@ -19,11 +19,11 @@ class LevelEditor {
   loadDialog = null;
   loseChangesDialog = null;
   MODE = {
-    DRAW: 1,
+    DEFAULT: 1,
     TILESELECT: 2,
     ENTITYSELECT: 4,
   };
-  mode = this.MODE.DRAW;
+  mode = this.MODE.DEFAULT;
   modified = false;
   mouseLast = { x: -1, y: -1 };
   needsDraw = true;
