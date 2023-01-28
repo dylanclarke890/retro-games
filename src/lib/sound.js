@@ -229,6 +229,7 @@ class Music extends GameAudio {
   }
 
   play(name) {
+    if (!Sound.enabled) return;
     // If a name was provided, stop playing the current track (if any)
     // and play the named track
     if (name && this.#namedTracks[name]) {
