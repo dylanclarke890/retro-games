@@ -416,12 +416,13 @@ class CollisionMap extends GameMap {
       // Still inside this collision map?
       if (tileX >= 0 && tileX < this.width) {
         for (let tileY = firstTileY; tileY < lastTileY; tileY++) {
-          if (prevTileX != -1) {
+          if (prevTileX !== -1) {
             tile = this.data[tileY][prevTileX];
             if (
               tile > 1 &&
               tile <= this.lastSlope &&
-              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, prevTileX, tileY)
+              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, prevTileX, tileY) &&
+              res.collision.slope.ny !== 0
             )
               break;
           }
@@ -460,12 +461,13 @@ class CollisionMap extends GameMap {
       // Still inside this collision map?
       if (tileY >= 0 && tileY < this.height) {
         for (let tileX = firstTileX; tileX < lastTileX; tileX++) {
-          if (prevTileY != -1) {
+          if (prevTileY !== -1) {
             tile = this.data[prevTileY][tileX];
             if (
               tile > 1 &&
               tile <= this.lastSlope &&
-              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, prevTileY)
+              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, prevTileY) &&
+              res.collision.slope.nx !== 0
             )
               break;
           }
