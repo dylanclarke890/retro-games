@@ -224,8 +224,8 @@ class EditEntities {
       this.selectedEntity.offset.y;
     if (this.selectedEntity.pos.x === x && this.selectedEntity.pos.y === y) return;
 
-    $el("#position-x").textContent = x; // TODO - invalid reference.
-    $el("#position-y").textContent = x; // TODO - invalid reference.
+    $el("#position-x").textContent = x;
+    $el("#position-y").textContent = y;
     this.selectedEntity.pos.x = x;
     this.selectedEntity.pos.y = y;
   }

@@ -29,6 +29,7 @@ class EditMap extends BackgroundMap {
 
     this.setName(name);
     this.setTileset(tileset || "");
+
     if (this.foreground) $el("#layers").prepend(this.div);
     else $el("#layerEntities").after(this.div);
     this.tileSelect = new TileSelect(this);
@@ -294,7 +295,7 @@ class AutoResizedImage extends GameImage {
   internalScale = 1;
 
   constructor({ path, internalScale, system }) {
-    console.log(path);
+    // console.log(path);
     super({ system, path });
     this.internalScale = internalScale;
   }

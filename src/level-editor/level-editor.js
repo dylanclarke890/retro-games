@@ -326,18 +326,14 @@ class LevelEditor {
     this.filePath = path;
     this.saveDialog.setPath(path);
     this.fileName = path.replace(/^.*\//, "");
-
-    this.httpClient.api
-      .file(path, { parseResponse: false }) // need to preprocess before we can parse as JSON
-      .then((data) => this.loadResponse(data));
+    this.httpClient.api.file(path, { parseResponse: false }).then((data) => this.parseData(data));
   }
 
-  loadResponse(data) {
+  parseData(data) {
     if (!data) {
-      console.debug("LevelEditor: loadResponse called but no data provided.");
+      console.debug("LevelEditor: parseData - no data provided.");
       return;
     }
-    setCookie("levelEditorLastLevel", this.filePath);
 
     // extract JS object from level data.
     const jsonMatch = data.match(/\/\*JSON-BEGIN\*\/\s?([\s\S]*?);?\s?\/\*JSON-END\*/);
@@ -361,6 +357,15 @@ class LevelEditor {
     }
 
     this.levelData = data;
+    this.loadFromData(data);
+  }
+
+  loadFromData(data) {
+    if (!data) {
+      console.debug("LevelEditor: loadFromData - no data provided.");
+      return;
+    }
+    setCookie("levelEditorLastLevel", this.filePath);
 
     while (this.layers.length) {
       this.layers[0].destroy();
@@ -370,33 +375,33 @@ class LevelEditor {
     this.entities.clear();
 
     for (let i = 0; i < data.entities.length; i++) {
-      const ent = data.entities[i];
-      this.entities.spawnEntity(ent.type, ent.x, ent.y, ent.settings);
+      const entity = data.entities[i];
+      this.entities.spawnEntity(entity.type, entity.x, entity.y, entity.settings);
     }
 
     for (let i = 0; i < data.layer.length; i++) {
-      const ld = data.layer[i];
+      const layer = data.layer[i];
       const newLayer = new EditMap({
-        name: ld.name,
-        tilesize: ld.tilesize,
-        tileset: ld.tilesetName,
-        foreground: !!ld.foreground,
+        name: layer.name,
+        tilesize: layer.tilesize,
+        tileset: layer.tilesetName || layer.tileset,
+        foreground: !!layer.foreground,
         system: this.system,
         config: this.config,
         editor: this,
       });
-      newLayer.resize(ld.width, ld.height);
-      newLayer.linkWithCollision = ld.linkWithCollision;
-      newLayer.repeat = ld.repeat;
-      newLayer.preRender = !!ld.preRender;
-      newLayer.distance = ld.distance;
-      newLayer.visible = !ld.visible;
-      newLayer.data = ld.data;
+      newLayer.resize(layer.width || layer.data[0].length, layer.height || layer.data.length);
+      newLayer.linkWithCollision = layer.linkWithCollision;
+      newLayer.repeat = layer.repeat;
+      newLayer.preRender = !!layer.preRender;
+      newLayer.distance = layer.distance;
+      newLayer.visible = !layer.visible;
+      newLayer.data = layer.data;
       newLayer.toggleVisibility();
       this.layers.push(newLayer);
 
-      if (ld.name == "collision") this.collisionLayer = newLayer;
-      this.setActiveLayer(ld.name);
+      if (layer.name === "collision") this.collisionLayer = newLayer;
+      this.setActiveLayer(layer.name);
     }
 
     this.setActiveLayer("entities");
@@ -491,11 +496,7 @@ class LevelEditor {
   }
 
   getLayerWithName(name) {
-    for (let i = 0; i < this.layers.length; i++) {
-      if (this.layers[i].name !== name) continue;
-      return this.layers[i];
-    }
-    return null;
+    return this.layers.find((layer) => layer.name === name);
   }
 
   reorderLayers() {

@@ -14,8 +14,8 @@ class GameMap {
     this.tilesize = tilesize;
     this.data = data || [[]];
     this.system = system;
-    this.height = data.length;
-    this.width = data[0].length;
+    this.height = this.data.length;
+    this.width = this.data[0].length;
     this.pxWidth = this.width * this.tilesize;
     this.pxHeight = this.height * this.tilesize;
   }
