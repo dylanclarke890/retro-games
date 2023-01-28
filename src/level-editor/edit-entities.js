@@ -45,8 +45,7 @@ class EditEntities {
     this.gridSize = config.entityGrid;
 
     this.menu = $el("#entityMenu");
-    this.entityDefinitions = $new("div");
-    this.entityDefinitions.id = "entityDefinitions";
+    this.entityDefinitions = $el("#entityDefinitions");
 
     const entityKey = $el("#entityKey");
     entityKey.addEventListener("keydown", (e) => {
@@ -315,19 +314,10 @@ class EditEntities {
 
   loadEntitySettings() {
     if (!this.selectedEntity) return;
-    let html = `
-      <div class="entityDefinition">
-        <span class="key">x</span>:
-        <span class="value" id="entityDefinitionPosX">${this.selectedEntity.pos.x}</span>
-      </div>
-      <div class="entityDefinition">
-        <span class="key">y</span>:
-        <span class="value" id="entityDefinitionPosY">${this.selectedEntity.pos.y}</span>
-      <div>
-    `;
-
-    html += this.loadEntitySettingsRecursive(this.selectedEntity._wmSettings);
-    this.entityDefinitions.innerHTML = html;
+    $el("#position-x").textContent = this.selectedEntity.pos.x;
+    $el("#position-y").textContent = this.selectedEntity.pos.y;
+    const html = this.loadEntitySettingsRecursive(this.selectedEntity._wmSettings);
+    this.entityDefinitions.innerHTML += html;
 
     const className = this.selectedEntity._wmClassName.replace(/^Entity/, "");
     $el("#entityClass").textContent = className;
