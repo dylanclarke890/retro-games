@@ -122,7 +122,7 @@ class Game {
     for (let i = 0; i < data.layer.length; i++) {
       const layer = data.layer[i];
       const shared = { system: this.system, tilesize: layer.tilesize, data: layer.data };
-      if (layer.name == "collision") this.collisionMap = new CollisionMap({ ...shared });
+      if (layer.name === "collision") this.collisionMap = new CollisionMap({ ...shared });
       else
         this.backgroundMaps.push(
           new BackgroundMap({

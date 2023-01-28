@@ -174,10 +174,10 @@ class Undo {
     const action = this.currentAction;
     if (
       !action ||
-      (action.old.x == action.current.x &&
-        action.old.y == action.current.y &&
-        action.old.w == action.current.w &&
-        action.old.h == action.current.h)
+      (action.old.x === action.current.x &&
+        action.old.y === action.current.y &&
+        action.old.w === action.current.w &&
+        action.old.h === action.current.h)
     )
       return;
     this.commit(this.currentAction);

@@ -358,7 +358,7 @@ class EditEntities {
     const value = eVal.value;
     const floatVal = parseFloat(value);
 
-    if (value == floatVal) value = floatVal;
+    if (value === floatVal) value = floatVal;
     if (key === "name") {
       if (this.selectedEntity.name) delete this.namedEntities[this.selectedEntity.name];
       this.namedEntities[value] = this.selectedEntity;

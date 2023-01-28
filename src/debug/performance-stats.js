@@ -176,7 +176,7 @@ class PerformanceStats {
   #nextPanel() {
     const { fps, ms, mem } = this.#DOMElements;
     this.#currentPanelIndex =
-      ++this.#currentPanelIndex == this.#maxPanels ? 0 : this.#currentPanelIndex;
+      ++this.#currentPanelIndex === this.#maxPanels ? 0 : this.#currentPanelIndex;
 
     fps.div.style.display = "none";
     ms.div.style.display = "none";

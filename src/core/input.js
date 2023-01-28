@@ -199,7 +199,7 @@ class Input {
     // Focus window element for mouse clicks. Prevents issues when
     // running the game in an iframe.
     if (code < 0 && !this.#userAgent.device.mobile) window.focus();
-    if (event.type == "touchstart" || event.type == "mousedown") this.mousemove(event);
+    if (event.type === "touchstart" || event.type === "mousedown") this.mousemove(event);
 
     const action = this.bindings[code];
     if (!action) return;

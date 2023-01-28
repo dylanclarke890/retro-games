@@ -7,9 +7,9 @@ class EventedInput extends Input {
   keydown(event) {
     if (this.targetIsInputOrText(event)) return;
     const code =
-      event.type == "keydown"
+      event.type === "keydown"
         ? event.keyCode
-        : event.button == 2
+        : event.button === 2
         ? Input.KEY.MOUSE2
         : Input.KEY.MOUSE1;
 
@@ -26,9 +26,9 @@ class EventedInput extends Input {
   keyup(event) {
     if (this.targetIsInputOrText(event)) return;
     const code =
-      event.type == "keyup"
+      event.type === "keyup"
         ? event.keyCode
-        : event.button == 2
+        : event.button === 2
         ? Input.KEY.MOUSE2
         : Input.KEY.MOUSE1;
 

@@ -32,7 +32,7 @@ class UserAgent {
       this.#cached = new UserAgent({
         device: {
           iPhone,
-          iPhone4: iPhone && pixelRatio == 2,
+          iPhone4: iPhone && pixelRatio === 2,
           iPad,
           android,
           winPhone,

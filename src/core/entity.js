@@ -298,7 +298,7 @@ class Entity {
 
       // Riding on a platform?
       let nudgeX = 0;
-      if (weak == top && Math.abs(weak.vel.y - strong.vel.y) < weak.minBounceVelocity) {
+      if (weak === top && Math.abs(weak.vel.y - strong.vel.y) < weak.minBounceVelocity) {
         weak.standing = true;
         nudgeX = strong.vel.x * this.game.system.tick;
       }
@@ -307,7 +307,7 @@ class Entity {
         weak.pos.x,
         weak.pos.y,
         nudgeX,
-        weak == top ? -nudge : nudge,
+        weak === top ? -nudge : nudge,
         weak.size.x,
         weak.size.y
       );

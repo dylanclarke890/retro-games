@@ -208,7 +208,7 @@ class BackgroundMap extends GameMap {
           nudgeX += this.chunkSize - chunk.width;
           // Only re-calculate maxChunkX during initial row to avoid
           // unnecessary off-screen draws on subsequent rows.
-          if (cy == minChunkY) maxChunkX++;
+          if (cy === minChunkY) maxChunkX++;
         }
       }
 
@@ -410,7 +410,7 @@ class CollisionMap extends GameMap {
       // We can skip this test if this is not the first step or the new tile position
       // is the same as the current one.
       let prevTileX = Math.floor((x + pxOffsetX) / this.tilesize);
-      if (step > 0 || tileX == prevTileX || prevTileX < 0 || prevTileX >= this.width)
+      if (step > 0 || tileX === prevTileX || prevTileX < 0 || prevTileX >= this.width)
         prevTileX = -1;
 
       // Still inside this collision map?
@@ -454,7 +454,7 @@ class CollisionMap extends GameMap {
       const tileY = Math.floor((res.pos.y + pxOffsetY) / this.tilesize);
 
       let prevTileY = Math.floor((y + pxOffsetY) / this.tilesize);
-      if (step > 0 || tileY == prevTileY || prevTileY < 0 || prevTileY >= this.height)
+      if (step > 0 || tileY === prevTileY || prevTileY < 0 || prevTileY >= this.height)
         prevTileY = -1;
 
       // Still inside this collision map?
@@ -472,7 +472,7 @@ class CollisionMap extends GameMap {
 
           tile = this.data[tileY][tileX];
           if (
-            tile == 1 ||
+            tile === 1 ||
             tile > this.lastSlope || // fully solid tile?
             (tile > 1 && this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, tileY)) // slope?
           ) {

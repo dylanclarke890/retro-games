@@ -10,8 +10,8 @@ function getCookie(name) {
   let cookie;
   for (let i = 0; i < cookieArr.length; i++) {
     let cookie = cookieArr[i];
-    while (cookie.charAt(0) == " ") cookie = cookie.substring(1);
-    if (cookie.indexOf(cName) == 0) cookie = cookie.substring(cName.length, cookie.length);
+    while (cookie.charAt(0) === " ") cookie = cookie.substring(1);
+    if (cookie.indexOf(cName) === 0) cookie = cookie.substring(cName.length, cookie.length);
   }
   return cookie;
 }

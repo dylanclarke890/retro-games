@@ -100,7 +100,7 @@ class TileSelect {
     const ty =
       Math.floor((tile * this.layer.tilesize) / this.layer.tiles.width) * this.layer.tilesize +
       this.pos.y +
-      (tile == -1 ? this.layer.tilesize : 0);
+      (tile === -1 ? this.layer.tilesize : 0);
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = this.config.colors.highlight;
