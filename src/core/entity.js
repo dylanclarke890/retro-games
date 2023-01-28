@@ -132,7 +132,7 @@ class Entity {
   handleMovementTrace(res) {
     this.standing = false;
     if (res.collision.y) this.handleMapCollisionOnYAxis();
-    if (res.collision.x) this.handleMapCollisionOnYAxis();
+    if (res.collision.x) this.handleMapCollisionOnXAxis();
     if (res.collision.slope) this.handleMapCollisionOnSlope(res.collision.slope);
     this.pos = res.pos;
   }

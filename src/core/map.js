@@ -394,7 +394,7 @@ class CollisionMap extends GameMap {
     res.pos.x += vx;
     res.pos.y += vy;
 
-    let t = 0;
+    let tile = 0;
 
     // Horizontal collision (walls)
     if (vx) {
@@ -417,25 +417,25 @@ class CollisionMap extends GameMap {
       if (tileX >= 0 && tileX < this.width) {
         for (let tileY = firstTileY; tileY < lastTileY; tileY++) {
           if (prevTileX != -1) {
-            t = this.data[tileY][prevTileX];
+            tile = this.data[tileY][prevTileX];
             if (
-              t > 1 &&
-              t <= this.lastSlope &&
-              this.#checkTileDef(res, t, x, y, rvx, rvy, width, height, prevTileX, tileY)
+              tile > 1 &&
+              tile <= this.lastSlope &&
+              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, prevTileX, tileY)
             )
               break;
           }
 
-          t = this.data[tileY][tileX];
+          tile = this.data[tileY][tileX];
           if (
-            t == 1 ||
-            t > this.lastSlope || // fully solid tile?
-            (t > 1 && this.#checkTileDef(res, t, x, y, rvx, rvy, width, height, tileX, tileY)) // slope?
+            tile === 1 ||
+            tile > this.lastSlope || // fully solid tile?
+            (tile > 1 && this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, tileY)) // slope?
           ) {
-            if (t > 1 && t <= this.lastSlope && res.collision.slope) break;
+            if (tile > 1 && tile <= this.lastSlope && res.collision.slope) break;
             // full tile collision!
             res.collision.x = true;
-            res.tile.x = t;
+            res.tile.x = tile;
             x = res.pos.x = tileX * this.tilesize - pxOffsetX + tileOffsetX;
             rvx = 0;
             break;
@@ -461,26 +461,26 @@ class CollisionMap extends GameMap {
       if (tileY >= 0 && tileY < this.height) {
         for (let tileX = firstTileX; tileX < lastTileX; tileX++) {
           if (prevTileY != -1) {
-            t = this.data[prevTileY][tileX];
+            tile = this.data[prevTileY][tileX];
             if (
-              t > 1 &&
-              t <= this.lastSlope &&
-              this.#checkTileDef(res, t, x, y, rvx, rvy, width, height, tileX, prevTileY)
+              tile > 1 &&
+              tile <= this.lastSlope &&
+              this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, prevTileY)
             )
               break;
           }
 
-          t = this.data[tileY][tileX];
+          tile = this.data[tileY][tileX];
           if (
-            t == 1 ||
-            t > this.lastSlope || // fully solid tile?
-            (t > 1 && this.#checkTileDef(res, t, x, y, rvx, rvy, width, height, tileX, tileY)) // slope?
+            tile == 1 ||
+            tile > this.lastSlope || // fully solid tile?
+            (tile > 1 && this.#checkTileDef(res, tile, x, y, rvx, rvy, width, height, tileX, tileY)) // slope?
           ) {
-            if (t > 1 && t <= this.lastSlope && res.collision.slope) break;
+            if (tile > 1 && tile <= this.lastSlope && res.collision.slope) break;
 
             // full tile collision!
             res.collision.y = true;
-            res.tile.y = t;
+            res.tile.y = tile;
             res.pos.y = tileY * this.tilesize - pxOffsetY + tileOffsetY;
             break;
           }

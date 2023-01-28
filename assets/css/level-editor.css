@@ -485,20 +485,22 @@ input[type="checkbox"] {
   width: 10px;
   height: 10px;
   display: inline-block;
-  appearance: none;
-  -webkit-appearance: none;
   transition: 0.1 linear;
   -webkit-transition: 0.1s linear;
 }
+
 input[type="checkbox"] {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
 input[type="checkbox"]:checked {
   background-color: rgba(255, 255, 255, 1);
 }
+
 input[type="checkbox"]:hover {
   cursor: pointer;
 }
+
 input[type="checkbox"]:disabled {
   background-color: rgba(255, 255, 255, 0.1);
 }
