@@ -232,8 +232,7 @@ class EditEntities {
 
   scaleSelectedEntity(x, y) {
     const scaleDir = this.wasSelectedOnScaleBorder;
-    let w = Math.round(x / this.gridSize) * this.gridSize - this.selectedEntity.pos.x;
-    let h;
+    let w, h;
     if (!this.selectedEntity._wmSettings.size) this.selectedEntity._wmSettings.size = {};
 
     switch (scaleDir) {
