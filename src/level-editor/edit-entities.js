@@ -162,15 +162,24 @@ class EditEntities {
   selectEntity(entity) {
     const entityKey = $el("#entityKey");
     const entityValue = $el("#entityValue");
+    const entitySettings = $el("#entitySettings");
+
     if (!entity) {
-      $el("#entitySettings").display = "none";
+      entitySettings.style.display = "none";
       entityKey.blur();
       entityValue.blur();
-    } else if (entity !== this.selectedEntity) this.loadEntitySettings();
+      this.selectedEntity = null;
+      return;
+    }
 
-    this.selectedEntity = entity;
-    entityKey.value = "";
-    entityValue.value = "";
+    if (entity !== this.selectedEntity) {
+      this.loadEntitySettings();
+      entitySettings.style.display = "block";
+      entityKey.value = "";
+      entityValue.value = "";
+      this.selectedEntity = entity;
+      return;
+    }
   }
 
   //#endregion Selecting
@@ -314,6 +323,7 @@ class EditEntities {
       <div class="entityDefinition">
         <span class="key">y</span>:
         <span class="value" id="entityDefinitionPosY">${this.selectedEntity.pos.y}</span>
+      <div>
     `;
 
     html += this.loadEntitySettingsRecursive(this.selectedEntity._wmSettings);
