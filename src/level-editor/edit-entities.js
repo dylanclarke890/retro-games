@@ -327,7 +327,7 @@ class EditEntities {
     const entityDefinitionElements = document.getElementsByClassName("entityDefinition");
     for (let i = 0; i < entityDefinitionElements.length; i++) {
       const element = entityDefinitionElements[i];
-      element.addEventListener("mouseup", (e) => this.selectEntitySetting(element));
+      element.addEventListener("mouseup", () => this.selectEntitySetting(element));
     }
   }
 
@@ -427,8 +427,8 @@ class EditEntities {
   showMenu(x, y) {
     const { scale } = this.system;
     this.selector.pos = {
-      x: Math.round((x + this.editor.screen.x) / this.gridSize) * this.gridSize,
-      y: Math.round((y + this.editor.screen.y) / this.gridSize) * this.gridSize,
+      x: Math.round((x + this.screen.actual.x) / this.gridSize) * this.gridSize,
+      y: Math.round((y + this.screen.actual.y) / this.gridSize) * this.gridSize,
     };
     this.menu.style.top = `${y * scale + 2}px`;
     this.menu.style.left = `${x * scale + 2}px`;
@@ -442,7 +442,7 @@ class EditEntities {
 
   setActive(active) {
     this.active = !!active;
-    this.div.classList.toggle("layerActive", this.active)
+    this.div.classList.toggle("layerActive", this.active);
   }
 
   toggleVisibility() {
