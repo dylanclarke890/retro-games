@@ -859,10 +859,6 @@ class LevelEditor {
   }
 
   //#endregion Drawing
-
-  getEntityByName(name) {
-    return this.entities.getEntityByName(name);
-  }
 }
 
 /** Custom loader, used to skip sound files and the run loop creation. */

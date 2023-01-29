@@ -538,7 +538,7 @@ class EditEntities {
   }
 
   drawLineToTarget(ent, target) {
-    target = this.editor.getEntityByName(target);
+    target = this.getEntityByName(target);
     if (!target) return;
 
     const { ctx, drawPosition } = this.system;
