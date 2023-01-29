@@ -46,5 +46,5 @@ class EntityPaddlePlayer extends EntityPaddle {
 }
 
 Register.entityTypes(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);
-Register.preloadImages("assets/images/paddle.png");
+Register.preloadImages("assets/images/paddle.png", "assets/images/ball.png");
 Register.preloadSounds("assets/sounds/hit.m4a");

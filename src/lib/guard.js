@@ -7,15 +7,20 @@ class Guard {
     return { key, value };
   }
 
+  /** Checks for correct instance types. Variables to validate must be passed wrapped in an object
+   * i.e { valueToCheck }. */
+  static isInstanceOf(keyValue, instanceOf) {
+    const { key, value } = this.#getKeyValue(keyValue);
+    if (!(value.prototype instanceof instanceOf))
+      throw new Error(`${key} must be instance of ${instanceOf.name}.`);
+  }
+
   /** Checks for null. Variables to validate must be passed wrapped in an object i.e { valueToCheck }. */
   static againstNull(keyValue) {
     const { key, value } = this.#getKeyValue(keyValue);
     if (!value) throw new Error(`${key} is required.`);
     return {
-      isInstanceOf: function (other) {
-        if (!(value.prototype instanceof other))
-          throw new Error(`${key} must be derived from ${other.name}`);
-      },
+      isInstanceOf: (other) => this.isInstanceOf(keyValue, other),
     };
   }
 }

@@ -107,8 +107,11 @@ class EditEntities {
       }
     }
 
-    if (invalidClasses.length > 0)
-      console.debug(`Entity class definitions could not be fetched: ${invalidClasses.join("\n")}`);
+    if (invalidClasses.length > 0) {
+      console.debug(`Entity class definitions could not be fetched. Please ensure you've correctly
+      registered the entity type by calling Register.entityType(classDefinition) or
+      Register.entityTypes(...classDefinitions): ${invalidClasses.join("\n")}`);
+    }
   }
 
   getEntityByName(name) {
@@ -284,6 +287,7 @@ class EditEntities {
     this.moveSelectedEntity(this.selector.pos.x, this.selector.pos.y);
     this.editor.setModified();
     this.undo.commitEntityCreate(newEntity);
+    this.editor.draw();
   }
 
   spawnEntity(className, x, y, settings = {}) {
