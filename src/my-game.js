@@ -27,6 +27,7 @@ class MyGame extends Game {
 const runner = new GameRunner({
   canvasId: "play-area",
   gameClass: MyGame,
+  scale: 2,
   fps: 60,
   width: 768,
   height: 624,

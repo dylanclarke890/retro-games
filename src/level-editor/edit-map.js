@@ -296,7 +296,7 @@ class AutoResizedImage extends GameImage {
 
   constructor({ path, internalScale, system }) {
     super({ system, path });
-    this.internalScale = internalScale;
+    this.internalScale = internalScale || 1;
   }
 
   onload(_event) {

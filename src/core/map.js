@@ -256,10 +256,12 @@ class BackgroundMap extends GameMap {
         }
 
         // Draw!
-        if ((tile = this.data[tileY][tileX])) {
-          if ((anim = this.anims[tile - 1])) anim.draw(pxX, pxY);
-          else this.tiles.drawTile(pxX, pxY, tile - 1, this.tilesize);
-        }
+        tile = this.data[tileY][tileX];
+        if (!tile) continue;
+        
+        anim = this.anims[tile - 1];
+        if (anim) anim.draw(pxX, pxY);
+        else this.tiles.drawTile(pxX, pxY, tile - 1, this.tilesize);
       } // end for x
     } // end for y
   }

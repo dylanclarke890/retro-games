@@ -934,7 +934,6 @@ class LevelEditorRunner {
   injectImageOverrides() {
     GameImage.prototype.baseResize = GameImage.prototype.resize;
     GameImage.prototype.resize = function (scale) {
-      console.log(scale);
       if (!this.loaded) return;
       if (!this.scaleCache) this.scaleCache = {};
       if (this.scaleCache["x" + scale]) {
@@ -943,7 +942,9 @@ class LevelEditorRunner {
       }
 
       // Retain the original image when scaling
-      this.origData = this.data = this.origData || this.data;
+      if (!this.origData) this.origData = this.data;
+      this.data = this.origData;
+
       // Nearest neighbor when zooming in
       if (scale > 1) this.baseResize(scale);
       // Otherwise blur

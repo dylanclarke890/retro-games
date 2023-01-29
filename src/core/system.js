@@ -28,12 +28,17 @@ class System {
     if (insertElement) document.body.insertBefore(this.canvas, document.body.firstChild);
     this.width = width;
     this.height = height;
+
+    // Automatically switch to crisp scaling when using a scale other than 1
+    if (this.scale !== 1) this.scaleMode = this.SCALE.CRISP;
+    this.scaleMode(this.ctx);
   }
 
   resize(width, height, scale) {
     this.width = width;
     this.height = height;
     this.scale = scale || this.scale;
+
     this.realWidth = this.width * this.scale;
     this.realHeight = this.height * this.scale;
     this.canvas.width = this.realWidth;
@@ -80,16 +85,21 @@ class System {
     };
   }
 
-  /** Normalizes getImageData to extract the real, actual pixels from an image. */
+  /** Extract the real, actual pixels from an image. */
   getImagePixels(image, x, y, width, height) {
     const canvas = $new("canvas");
     canvas.width = image.width;
     canvas.height = image.height;
     const ctx = canvas.getContext("2d");
+
     this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
 
-    const realWidth = image.width / this.scale,
-      realHeight = image.height / this.scale;
+    const ratio = this.scale; // we used to have to care about backingStorePixelRatio but not anymore
+    const realWidth = image.width / ratio,
+      realHeight = image.height / ratio;
+    // console.log(image.width);
+    // console.log(width);
+    // console.log(realWidth);
     canvas.width = Math.ceil(realWidth);
     canvas.height = Math.ceil(realHeight);
     ctx.drawImage(image, 0, 0, realWidth, realWidth);

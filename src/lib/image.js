@@ -44,8 +44,8 @@ class GameImage {
    * The original image is drawn into an offscreen canvas of the same size
    * and copied into another offscreen canvas with the new size.
    * The scaled offscreen canvas becomes the image (data) of this object.*/
-  resize() {
-    const scale = this.system.scale;
+  resize(scale) {
+    scale = scale || this.system.scale;
     const origPixels = this.system.getImagePixels(this.data, 0, 0, this.width, this.height);
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
@@ -53,6 +53,7 @@ class GameImage {
     const scaled = $new("canvas");
     scaled.width = widthScaled;
     scaled.height = heightScaled;
+
     const scaledCtx = scaled.getContext("2d");
     const scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
 
@@ -88,11 +89,15 @@ class GameImage {
 
     const scaleX = flipX ? -1 : 1;
     const scaleY = flipY ? -1 : 1;
+
     const { scale, ctx, drawPosition } = this.system;
-    const sourceX = (Math.floor(tile * tileWidth) % this.width) * scale;
-    const sourceY = Math.floor((tile * tileWidth) / this.width) * tileHeight * scale;
+
     tileWidth = Math.floor(tileWidth * scale);
     tileHeight = Math.floor(tileHeight * scale);
+
+    const sourceX = (Math.floor(tile * tileWidth) % this.width) * scale;
+    const sourceY = Math.floor((tile * tileWidth) / this.width) * tileHeight * scale;
+
     targetX = drawPosition(targetX) * scaleX - (flipX ? tileWidth : 0);
     targetY = drawPosition(targetY) * scaleY - (flipY ? tileHeight : 0);
 
@@ -101,6 +106,19 @@ class GameImage {
       ctx.scale(scaleX, scaleY);
     }
 
+    if (this.path === "assets/images/ball.png") {
+      console.log(
+        this.data,
+        sourceX,
+        sourceY,
+        tileWidth,
+        tileHeight,
+        targetX,
+        targetY,
+        tileWidth,
+        tileHeight
+      );
+    }
     ctx.drawImage(
       this.data,
       sourceX,
