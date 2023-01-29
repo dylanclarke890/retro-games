@@ -1,3 +1,6 @@
+import { Register } from "../lib/register.js";
+import { Entity } from "../core/entity.js";
+
 export class EntityBall extends Entity {
   name = "Ball baby";
   size = { x: 48, y: 48 };
