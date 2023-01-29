@@ -1,4 +1,4 @@
-class System {
+export class System {
   #runner = null;
 
   canvas = null;

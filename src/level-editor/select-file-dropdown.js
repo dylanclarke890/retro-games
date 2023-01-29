@@ -1,4 +1,4 @@
-class SelectFileDropdown {
+export class SelectFileDropdown {
   boundShow = null;
   /** @type {HTMLElement} */
   div = null;

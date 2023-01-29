@@ -1,4 +1,4 @@
-class ModalDialog {
+export class ModalDialog {
   onOk = null;
   onCancel = null;
 
@@ -64,7 +64,7 @@ class ModalDialog {
   }
 }
 
-class ModalDialogPathSelect extends ModalDialog {
+export class ModalDialogPathSelect extends ModalDialog {
   pathDropdown = null;
   pathInput = null;
   fileType = "";

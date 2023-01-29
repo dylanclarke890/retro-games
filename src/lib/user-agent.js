@@ -1,4 +1,4 @@
-class UserAgent {
+export class UserAgent {
   device = {
     iPhone: false,
     iPhone4: false,

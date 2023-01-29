@@ -1,4 +1,4 @@
-class GameLoop {
+export class GameLoop {
   #clock = null;
   #lastFrame = -1;
   #rafId = -1;

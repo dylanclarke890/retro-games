@@ -1,5 +1,5 @@
 /** Helper class for validation. */
-class Guard {
+export class Guard {
   static #getKeyValue(keyValue) {
     if (!keyValue) throw new Error(`Non object passed: ${keyValue}`);
     const key = Object.keys(keyValue)[0];

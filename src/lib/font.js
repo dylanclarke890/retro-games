@@ -1,4 +1,4 @@
-class Font {
+export class Font {
   static ALIGN = {
     LEFT: 1,
     RIGHT: 2,

@@ -1,4 +1,4 @@
-class Timer {
+export class Timer {
   static #last = 0;
 
   static maxStep = 0.05;

@@ -1,4 +1,4 @@
-class GameDebugger {
+export class GameDebugger {
   /** @type {Game} */
   game = null;
   /** @type {System} */

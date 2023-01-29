@@ -1,4 +1,4 @@
-class GameAnimationSheet {
+export class GameAnimationSheet {
   height = 0;
   image = null;
   system = null;
@@ -14,7 +14,7 @@ class GameAnimationSheet {
   }
 }
 
-class GameAnimation {
+export class GameAnimation {
   #frame = 0;
   #frameTime = 0;
   #loopCount = 0;

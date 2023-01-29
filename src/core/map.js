@@ -1,4 +1,4 @@
-class GameMap {
+export class GameMap {
   tilesize = 8;
   width = 1;
   height = 1;
@@ -37,7 +37,7 @@ class GameMap {
   }
 }
 
-class BackgroundMap extends GameMap {
+export class BackgroundMap extends GameMap {
   anims = {};
   chunkSize = 512;
   debugChunks = false;
@@ -258,7 +258,7 @@ class BackgroundMap extends GameMap {
         // Draw!
         tile = this.data[tileY][tileX];
         if (!tile) continue;
-        
+
         anim = this.anims[tile - 1];
         if (anim) anim.draw(pxX, pxY);
         else this.tiles.drawTile(pxX, pxY, tile - 1, this.tilesize);
@@ -267,7 +267,7 @@ class BackgroundMap extends GameMap {
   }
 }
 
-class CollisionMap extends GameMap {
+export class CollisionMap extends GameMap {
   lastSlope = 1;
   tiledef = null;
 

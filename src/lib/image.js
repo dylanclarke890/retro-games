@@ -1,4 +1,4 @@
-class GameImage {
+export class GameImage {
   data = null;
   failed = false;
   height = 0;

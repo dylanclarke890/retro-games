@@ -1,4 +1,4 @@
-class VendorAttributes {
+export class VendorAttributes {
   static set(element, attribute, value) {
     const uc = attribute.charAt(0).toUpperCase() + attribute.substr(1); // for camel casing.
     element[attribute] =

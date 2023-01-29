@@ -1,4 +1,4 @@
-class GameLoader {
+export class GameLoader {
   #assetsToPreload = [];
   #debugMode = false;
   #done = false;

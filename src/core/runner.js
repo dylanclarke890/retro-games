@@ -1,4 +1,4 @@
-class GameRunner {
+export class GameRunner {
   #customGameOptions = null;
   #font = null;
   #loader = null;

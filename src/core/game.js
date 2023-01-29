@@ -1,4 +1,4 @@
-class Game {
+export class Game {
   #autoSort = false;
   #cellSize = 64;
   #deferredKills = [];

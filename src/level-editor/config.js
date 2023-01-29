@@ -1,4 +1,4 @@
-const levelEditorConfig = {
+export const levelEditorConfig = {
   project: {
     /** Takes an array of glob regexes which specify where to load entities from.
      *  Can be individual files or entire directories.

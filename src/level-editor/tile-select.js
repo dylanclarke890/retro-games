@@ -1,4 +1,4 @@
-class TileSelect {
+export class TileSelect {
   layer = null;
   pos = { x: 0, y: 0 };
   selectionBegin = null;

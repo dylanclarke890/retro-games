@@ -1,4 +1,4 @@
-class SoundManager {
+export class SoundManager {
   #clips = {};
   #format = null;
   #userAgent = null;
@@ -146,7 +146,7 @@ class SoundManager {
   }
 }
 
-class GameAudio {
+export class GameAudio {
   soundManager = null;
 
   constructor({ soundManager }) {
@@ -155,7 +155,7 @@ class GameAudio {
   }
 }
 
-class Music extends GameAudio {
+export class Music extends GameAudio {
   #currentIndex = 0;
   #currentTrack = null;
   #tracks = [];
@@ -265,7 +265,7 @@ class Music extends GameAudio {
   }
 }
 
-class Sound extends GameAudio {
+export class Sound extends GameAudio {
   static FORMAT = {
     M4A: { ext: "m4a", mime: "audio/mp4; codecs=mp4a.40.2" },
     MP3: { ext: "mp3", mime: "audio/mpeg" },
@@ -325,7 +325,7 @@ class Sound extends GameAudio {
   }
 }
 
-class WebAudioSource extends GameAudio {
+export class WebAudioSource extends GameAudio {
   #gain = null;
   #loop = false;
   #sources = [];

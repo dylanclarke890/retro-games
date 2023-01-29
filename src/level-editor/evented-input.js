@@ -1,4 +1,4 @@
-class EventedInput extends Input {
+export class EventedInput extends Input {
   delayedKeyup = { push: function () {}, length: 0 };
   keydownCallback = null;
   keyupCallback = null;

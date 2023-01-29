@@ -1,4 +1,4 @@
-class Input {
+export class Input {
   static KEY = {
     MOUSE1: -1,
     MOUSE2: -3,

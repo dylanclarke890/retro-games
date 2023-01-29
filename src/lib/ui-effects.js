@@ -1,6 +1,6 @@
 //#region slide
 
-function slideUp(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+export function slideUp(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
   target.style.transitionProperty = "height, margin, padding";
   target.style.transitionDuration = duration + "ms";
   target.style.transitionTimingFunction = easing;
@@ -27,7 +27,7 @@ function slideUp(target, easing = "ease-in", duration = 500, cb = (_target) => {
   }, duration);
 }
 
-function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+export function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
   target.style.removeProperty("display");
   let display = window.getComputedStyle(target).display;
   if (display === "none") display = "block";
@@ -61,7 +61,7 @@ function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) =>
   }, duration);
 }
 
-function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+export function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
   if (window.getComputedStyle(target).display === "block") slideUp(target, easing, duration, cb);
   else slideDown(target, easing, duration, cb);
 }
@@ -70,7 +70,7 @@ function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) 
 //#region fade
 
 // TODO: flickering effects - probs best to split this back out.
-function fade(target, { isFadeIn, easing, duration, cb } = {}) {
+export function fade(target, { isFadeIn, easing, duration, cb } = {}) {
   isFadeIn = isFadeIn || false;
   easing = easing || "ease-in";
   duration = duration || 500;
@@ -101,22 +101,22 @@ function fade(target, { isFadeIn, easing, duration, cb } = {}) {
   }, duration);
 }
 
-function fadeIn(target, { easing, duration, cb } = {}) {
+export function fadeIn(target, { easing, duration, cb } = {}) {
   fade(target, { isFadeIn: true, easing, duration, cb });
 }
 
-function fadeOut(target, { easing, duration, cb } = {}) {
+export function fadeOut(target, { easing, duration, cb } = {}) {
   fade(target, { isFadeIn: false, easing, duration, cb });
 }
 
-function fadeToggle(target, { easing, duration = 500, cb = (_target) => {} } = {}) {
+export function fadeToggle(target, { easing, duration = 500, cb = (_target) => {} } = {}) {
   if (window.getComputedStyle(target).display === "block") fadeOut(target, easing, duration, cb);
   else fadeIn(target, easing, duration, cb);
 }
 
 //#endregion fade
 
-function dragElement(el) {
+export function dragElement(el) {
   let pos1 = 0,
     pos2 = 0,
     pos3 = 0,

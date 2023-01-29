@@ -2,7 +2,7 @@
  * To be used when the asset passed to MediaFactory.create-* is just a path to the resource, instead of one of the various
  * media classes that are used for them (GameImage etc). Will call the relevant load logic for each media type.
  */
-class AssetToPreload {
+export class AssetToPreload {
   path = "";
   type = "";
   data = null;
@@ -47,7 +47,7 @@ class AssetToPreload {
   }
 }
 
-class Register {
+export class Register {
   static #assetCache = {};
 
   static #preloadCache = {

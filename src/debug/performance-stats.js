@@ -1,11 +1,11 @@
-class PanelColorScheme {
+export class PanelColorScheme {
   constructor(bg, fg) {
     this.bg = bg;
     this.fg = fg;
   }
 }
 
-class Color {
+export class Color {
   constructor(r, g, b) {
     this.r = r;
     this.g = g;
@@ -13,7 +13,7 @@ class Color {
   }
 }
 
-class PerformanceStats {
+export class PerformanceStats {
   static colorSchemes = {
     fps: new PanelColorScheme(new Color(16, 16, 48), new Color(0, 255, 255)),
     ms: new PanelColorScheme(new Color(16, 48, 16), new Color(0, 255, 0)),

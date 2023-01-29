@@ -1,4 +1,4 @@
-class MediaFactory {
+export class MediaFactory {
   #system = null;
   #soundManager = null;
 

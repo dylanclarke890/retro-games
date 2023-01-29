@@ -1,4 +1,4 @@
-class MyGame extends Game {
+export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
@@ -24,7 +24,7 @@ class MyGame extends Game {
   }
 }
 
-const runner = new GameRunner({
+new GameRunner({
   canvasId: "play-area",
   gameClass: MyGame,
   fps: 60,

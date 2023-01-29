@@ -1,4 +1,4 @@
-class Undo {
+export class Undo {
   static TYPE = {
     MAP_DRAW: 1,
     ENTITY_EDIT: 2,

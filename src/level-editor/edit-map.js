@@ -1,4 +1,4 @@
-class EditMap extends BackgroundMap {
+export class EditMap extends BackgroundMap {
   name = "";
   visible = true;
   active = true;
@@ -291,7 +291,7 @@ class EditMap extends BackgroundMap {
   // #endregion Drawing
 }
 
-class AutoResizedImage extends GameImage {
+export class AutoResizedImage extends GameImage {
   internalScale = 1;
 
   constructor({ path, internalScale, system }) {

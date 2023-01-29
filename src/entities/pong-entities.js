@@ -1,4 +1,4 @@
-class EntityBall extends Entity {
+export class EntityBall extends Entity {
   name = "Ball baby";
   size = { x: 48, y: 48 };
   vel = { x: 250, y: 100 };
@@ -13,7 +13,7 @@ class EntityBall extends Entity {
   }
 }
 
-class EntityPaddle extends Entity {
+export class EntityPaddle extends Entity {
   name = "Paddle";
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;
@@ -25,7 +25,7 @@ class EntityPaddle extends Entity {
   }
 }
 
-class EntityPaddleCpu extends EntityPaddle {
+export class EntityPaddleCpu extends EntityPaddle {
   update() {
     const ball = this.game.getEntitiesByType(EntityBall)[0];
     this.vel.y =
@@ -35,7 +35,7 @@ class EntityPaddleCpu extends EntityPaddle {
     super.update();
   }
 }
-class EntityPaddlePlayer extends EntityPaddle {
+export class EntityPaddlePlayer extends EntityPaddle {
   update() {
     const inputState = (v) => this.game.input.state(v);
     if (inputState("up")) this.vel.y = -this.paddleSpeed;

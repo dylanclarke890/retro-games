@@ -1,4 +1,4 @@
-class Entity {
+export class Entity {
   /** Collision Types - Determine if and how entities collide with each other.
    *
    * In ACTIVE vs. LITE or FIXED vs. ANY collisions, only the "weak" entity moves,

@@ -16,7 +16,7 @@ const QUEUE = [];
 let id = 0;
 let last = 0;
 
-function requestFixedTick(cb, fps = 60) {
+export function requestFixedTick(cb, fps = 60) {
   if (QUEUE.length === 0) {
     const frame = performance.now();
     const next = Math.max(0, 1000 / fps - (frame - last));
@@ -37,12 +37,12 @@ function requestFixedTick(cb, fps = 60) {
   return id;
 }
 
-function raf(cb, fps = -1) {
+export function raf(cb, fps = -1) {
   if (fps < 0 && requestAnimationFrame) return requestAnimationFrame(cb);
   return requestFixedTick(cb, fps);
 }
 
-function caf(id) {
+export function caf(id) {
   if (cancelAnimationFrame) cancelAnimationFrame(id);
   for (let i = 0; i < QUEUE.length; i++) if (QUEUE[i].handle === id) QUEUE[i].cancelled = true;
 }

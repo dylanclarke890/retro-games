@@ -1,4 +1,4 @@
-class EditEntities {
+export class EditEntities {
   active = true;
   config = null;
   div = null;

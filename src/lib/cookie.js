@@ -4,7 +4,7 @@
  * @param {string} name The cookie name.
  * @return {string|undefined} The cookie value or "undefined", if not set.
  */
-function getCookie(name) {
+export function getCookie(name) {
   const cName = name + "=";
   const cookieArr = document.cookie.split(";");
   let cookie;
@@ -25,7 +25,7 @@ function getCookie(name) {
  * or "undefined" to make the cookie expire at the end of the session.
  * @return {undefined}
  */
-function setCookie(name, value, exdays) {
+export function setCookie(name, value, exdays) {
   let expires = "";
   if (exdays) {
     const d = new Date();
@@ -40,6 +40,6 @@ function setCookie(name, value, exdays) {
  * @param {string} cookieName The cookie name.
  * @return {undefined}
  */
-function clearCookie(cookieName) {
+export function clearCookie(cookieName) {
   setCookie(cookieName, "", -365);
 }

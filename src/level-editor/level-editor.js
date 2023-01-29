@@ -1,4 +1,4 @@
-class LevelEditor {
+export class LevelEditor {
   activeLayer = null;
   collisionLayer = null;
   collisionSolid = 1;
@@ -860,7 +860,7 @@ class LevelEditor {
 }
 
 /** Custom loader, used to skip sound files and the run loop creation. */
-class LevelEditorLoader extends GameLoader {
+export class LevelEditorLoader extends GameLoader {
   httpClient = null;
   config = null;
 
@@ -881,7 +881,7 @@ class LevelEditorLoader extends GameLoader {
   }
 }
 
-class LevelEditorRunner {
+export class LevelEditorRunner {
   httpClient = null;
   config = null;
   game = null;
@@ -973,4 +973,4 @@ class LevelEditorRunner {
   }
 }
 
-const runner = new LevelEditorRunner();
+new LevelEditorRunner(); // TODO: move to entry point file.

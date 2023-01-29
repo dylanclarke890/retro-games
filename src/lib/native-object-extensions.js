@@ -34,7 +34,7 @@ Number.prototype.toDeg = function () {
 /**
  * @returns {HTMLElement}
  */
-function $el(selector) {
+export function $el(selector) {
   if (selector instanceof HTMLElement) return selector;
   return document.querySelector(selector);
 }
@@ -42,27 +42,27 @@ function $el(selector) {
 /**
  * @returns {HTMLElement}
  */
-function $new(tagname, opts = null) {
+export function $new(tagname, opts = null) {
   return document.createElement(tagname, opts);
 }
 
-function getInnerHeight(element) {
+export function getInnerHeight(element) {
   const computed = getComputedStyle(element),
     padding = parseInt(computed.paddingTop) + parseInt(computed.paddingBottom);
   return element.clientHeight - padding;
 }
 
-function getInnerWidth(element) {
+export function getInnerWidth(element) {
   const computed = getComputedStyle(element),
     padding = parseInt(computed.paddingLeft) + parseInt(computed.paddingRight);
   return element.clientWidth - padding;
 }
 
-function boolToOnOff(bool) {
+export function boolToOnOff(bool) {
   return bool ? "On" : "Off";
 }
 
-function loadScript({ src, cb = (_e, _path) => {} } = {}) {
+export function loadScript({ src, cb = (_e, _path) => {} } = {}) {
   const script = document.createElement("script");
   script.type = "text/javascript";
   script.addEventListener("load", (e) => cb(e, src));
@@ -70,17 +70,17 @@ function loadScript({ src, cb = (_e, _path) => {} } = {}) {
   document.body.appendChild(script);
 }
 
-function JSONFormat(json) {
+export function JSONFormat(json) {
   const p = [];
-  push = function (m) {
+  function push(m) {
     return "\\" + p.push(m) + "\\";
-  };
-  pop = function (_m, i) {
+  }
+  function pop(_m, i) {
     return p[i - 1];
-  };
-  tabs = function (count) {
+  }
+  function tabs(count) {
     return Array.from({ length: count + 1 }).join("\t");
-  };
+  }
   let out = "",
     indent = 0;
 
@@ -168,7 +168,7 @@ Function.prototype.bind =
     return fBound;
   };
 
-class NativeExtensions {
+export class NativeExtensions {
   static extend(/** @type {Object} */ target, /** @type {Object[]} */ ...sources) {
     for (let source of sources)
       for (let sourceKey in source) {

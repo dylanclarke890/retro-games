@@ -1,4 +1,4 @@
-class HttpClient {
+export class HttpClient {
   /** @type {string} */
   #baseUrl;
   /** @type {Array<string>} */
@@ -83,7 +83,7 @@ class HttpClient {
   }
 }
 
-class LevelEditorHttpClient extends HttpClient {
+export class LevelEditorHttpClient extends HttpClient {
   constructor(returnFormat = "application/json") {
     super({
       baseUrl: `${window.location.origin}/server/level-editor/`,
