@@ -952,6 +952,7 @@ class LevelEditorRunner {
         const scaled = $new("canvas");
         scaled.width = Math.ceil(this.width * scale);
         scaled.height = Math.ceil(this.height * scale);
+
         const scaledCtx = scaled.getContext("2d");
         scaledCtx.drawImage(
           this.data,

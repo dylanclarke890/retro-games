@@ -5,6 +5,8 @@ class GameImage {
   loadCallback = (_path, _loadingWasSuccessful) => {};
   loaded = false;
   path = "";
+  /** @type {System} */
+  system;
   width = 0;
 
   constructor({ system, path } = {}) {
@@ -30,7 +32,7 @@ class GameImage {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
-    if (this.system.scale !== 1) this.resize();
+    if (this.system.scale !== 1) this.resize(this.system.scale);
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
@@ -45,7 +47,6 @@ class GameImage {
    * and copied into another offscreen canvas with the new size.
    * The scaled offscreen canvas becomes the image (data) of this object.*/
   resize(scale) {
-    scale = scale || this.system.scale;
     const origPixels = this.system.getImagePixels(this.data, 0, 0, this.width, this.height);
     const widthScaled = this.width * scale;
     const heightScaled = this.height * scale;
@@ -53,7 +54,6 @@ class GameImage {
     const scaled = $new("canvas");
     scaled.width = widthScaled;
     scaled.height = heightScaled;
-
     const scaledCtx = scaled.getContext("2d");
     const scaledPixels = scaledCtx.getImageData(0, 0, widthScaled, heightScaled);
 
@@ -84,53 +84,33 @@ class GameImage {
   }
 
   drawTile(targetX, targetY, tile, tileWidth, tileHeight, flipX, flipY) {
-    tileHeight = tileHeight ?? tileWidth;
+    tileHeight = tileHeight ? tileHeight : tileWidth;
+
     if (!this.loaded || tileWidth > this.width || tileHeight > this.height) return;
+
+    const { scale, ctx, drawPosition } = this.system;
+    const tileWidthScaled = Math.floor(tileWidth * scale);
+    const tileHeightScaled = Math.floor(tileHeight * scale);
 
     const scaleX = flipX ? -1 : 1;
     const scaleY = flipY ? -1 : 1;
-
-    const { scale, ctx, drawPosition } = this.system;
-
-    tileWidth = Math.floor(tileWidth * scale);
-    tileHeight = Math.floor(tileHeight * scale);
-
-    const sourceX = (Math.floor(tile * tileWidth) % this.width) * scale;
-    const sourceY = Math.floor((tile * tileWidth) / this.width) * tileHeight * scale;
-
-    targetX = drawPosition(targetX) * scaleX - (flipX ? tileWidth : 0);
-    targetY = drawPosition(targetY) * scaleY - (flipY ? tileHeight : 0);
 
     if (flipX || flipY) {
       ctx.save();
       ctx.scale(scaleX, scaleY);
     }
 
-    if (this.path === "assets/images/ball.png") {
-      console.log(
-        this.data,
-        sourceX,
-        sourceY,
-        tileWidth,
-        tileHeight,
-        targetX,
-        targetY,
-        tileWidth,
-        tileHeight
-      );
-    }
     ctx.drawImage(
       this.data,
-      sourceX,
-      sourceY,
-      tileWidth,
-      tileHeight,
-      targetX,
-      targetY,
-      tileWidth,
-      tileHeight
+      (Math.floor(tile * tileWidth) % this.width) * scale,
+      Math.floor((tile * tileWidth) / this.width) * tileHeight * scale,
+      tileWidthScaled,
+      tileHeightScaled,
+      drawPosition(targetX) * scaleX - (flipX ? tileWidthScaled : 0),
+      drawPosition(targetY) * scaleY - (flipY ? tileHeightScaled : 0),
+      tileWidthScaled,
+      tileHeightScaled
     );
-
     if (flipX || flipY) ctx.restore();
   }
 }

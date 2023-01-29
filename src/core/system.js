@@ -93,16 +93,14 @@ class System {
     const ctx = canvas.getContext("2d");
 
     this.SCALE.CRISP(ctx); // Try to draw pixels as accurately as possible
+    const ratio = 1;
 
-    const ratio = this.scale; // we used to have to care about backingStorePixelRatio but not anymore
     const realWidth = image.width / ratio,
       realHeight = image.height / ratio;
-    // console.log(image.width);
-    // console.log(width);
-    // console.log(realWidth);
     canvas.width = Math.ceil(realWidth);
     canvas.height = Math.ceil(realHeight);
-    ctx.drawImage(image, 0, 0, realWidth, realWidth);
+
+    ctx.drawImage(image, 0, 0, realWidth, realHeight);
     return ctx.getImageData(x, y, width, height);
   }
 }
