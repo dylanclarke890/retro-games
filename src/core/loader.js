@@ -1,3 +1,6 @@
+import { Guard } from "../lib/guard.js";
+import { Register } from "../lib/register.js";
+
 export class GameLoader {
   #assetsToPreload = [];
   #debugMode = false;

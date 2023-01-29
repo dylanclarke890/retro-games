@@ -1,3 +1,10 @@
+import { System } from "./system.js";
+import { SoundManager } from "../lib/sound.js";
+import { MediaFactory } from "../lib/media-factory.js";
+import { GameLoop } from "./loop.js";
+import { GameLoader } from "./loader.js";
+import { Entity } from "./entity.js";
+
 export class GameRunner {
   #customGameOptions = null;
   #font = null;
@@ -62,11 +69,13 @@ export class GameRunner {
 
   launchDebugger() {
     console.debug("GameDebugger: Loading...");
-    this.gameDebugger = new GameDebugger({
-      baseEntityClass: Entity,
-      game: this.game,
-      gameLoop: this.#loop,
-      system: this.system,
+    import("../debug/debug.js").then(({ GameDebugger }) => {
+      this.gameDebugger = new GameDebugger({
+        baseEntityClass: Entity,
+        game: this.game,
+        gameLoop: this.#loop,
+        system: this.system,
+      });
     });
   }
 }

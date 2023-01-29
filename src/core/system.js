@@ -1,3 +1,7 @@
+import { Guard } from "../lib/guard.js";
+import { $el, $new, NativeExtensions } from "../lib/native-object-extensions.js";
+import { VendorAttributes } from "../lib/vendor-attributes.js";
+
 export class System {
   #runner = null;
 

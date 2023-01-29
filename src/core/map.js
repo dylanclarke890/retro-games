@@ -1,3 +1,7 @@
+import { $new } from "../lib/native-object-extensions.js";
+import { Guard } from "../lib/guard.js";
+import { GameImage } from "../lib/image.js";
+
 export class GameMap {
   tilesize = 8;
   width = 1;
@@ -210,16 +214,16 @@ export class BackgroundMap extends GameMap {
           // unnecessary off-screen draws on subsequent rows.
           if (cy === minChunkY) maxChunkX++;
         }
-      }
 
-      // Same as above, but for Y
-      if (
-        this.repeat &&
-        chunk.height < this.chunkSize &&
-        y + chunk.height < this.system.realHeight
-      ) {
-        nudgeY += this.chunkSize - chunk.height;
-        maxChunkY++;
+        // Same as above, but for Y
+        if (
+          this.repeat &&
+          chunk.height < this.chunkSize &&
+          y + chunk.height < this.system.realHeight
+        ) {
+          nudgeY += this.chunkSize - chunk.height;
+          maxChunkY++;
+        }
       }
     }
   }
@@ -373,8 +377,8 @@ export class CollisionMap extends GameMap {
       this.#traceStep(res, x, y, vx, vy, objectWidth, objectHeight, vx, vy, 0);
       return res;
     }
-    const sx = vx / steps;
-    const sy = vy / steps;
+    let sx = vx / steps;
+    let sy = vy / steps;
     for (let i = 0; i < steps && (sx || sy); i++) {
       this.#traceStep(res, x, y, sx, sy, objectWidth, objectHeight, vx, vy, i);
       x = res.pos.x;

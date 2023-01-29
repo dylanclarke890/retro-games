@@ -1,3 +1,5 @@
+import { Guard } from "../lib/guard.js";
+import { UserAgent } from "../lib/user-agent.js";
 export class Input {
   static KEY = {
     MOUSE1: -1,
@@ -193,8 +195,8 @@ export class Input {
       event.type === "keydown"
         ? event.keyCode
         : event.button === 2
-        ? Input.KEY.MOUSE2
-        : Input.KEY.MOUSE1;
+          ? Input.KEY.MOUSE2
+          : Input.KEY.MOUSE1;
 
     // Focus window element for mouse clicks. Prevents issues when
     // running the game in an iframe.
@@ -217,8 +219,8 @@ export class Input {
       event.type === "keyup"
         ? event.keyCode
         : event.button === 2
-        ? Input.KEY.MOUSE2
-        : Input.KEY.MOUSE1;
+          ? Input.KEY.MOUSE2
+          : Input.KEY.MOUSE1;
 
     const action = this.bindings[code];
     if (!action) return;

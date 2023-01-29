@@ -1,3 +1,9 @@
+import { Guard } from "../lib/guard.js";
+import { Register } from "../lib/register.js";
+import { Input } from "./input.js";
+import { CollisionMap, BackgroundMap } from "./map.js";
+import { Entity } from "./entity.js";
+
 export class Game {
   #autoSort = false;
   #cellSize = 64;

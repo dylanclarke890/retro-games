@@ -1,3 +1,9 @@
+/* eslint-disable no-unused-vars */ // - left in for override purposes.
+import { Guard } from "../lib/guard.js";
+import { Register } from "../lib/register.js";
+import { NativeExtensions } from "../lib/native-object-extensions.js";
+import { GameAnimation } from "../lib/animation.js";
+
 export class Entity {
   /** Collision Types - Determine if and how entities collide with each other.
    *
