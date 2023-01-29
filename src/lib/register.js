@@ -19,8 +19,8 @@ class AssetToPreload {
         document.fonts.add(fontFace);
         this.data = fontFace;
         this.data.load().then(
-          () => loadCallback(path, true),
-          () => loadCallback(path, false)
+          () => loadCallback(path, true), // Success
+          () => loadCallback(path, false) // Failure
         );
         break;
       case "image":
@@ -129,7 +129,26 @@ class Register {
     return this.#assetCache[path];
   }
 
+  /**
+   * Get all the assets currently cached, optionally omitting some asset types.
+   * @example getCacheEntries(GameImage, GameAudio)
+   * @param {type[]} omitEntriesOfType
+   */
+  static getAssetCacheEntries(...omitEntriesOfType) {
+    const cacheEntries = Object.values(this.#assetCache);
+    const filtered = [];
+    cacheEntries.forEach((asset) => {
+      if (omitEntriesOfType.some((type) => asset instanceof type)) return;
+      filtered.push(asset);
+    });
+    return filtered;
+  }
+
   static get classDefinitions() {
     return this.#preloadCache.classDefinitions;
+  }
+
+  static get assetCache() {
+    return this.#assetCache;
   }
 }

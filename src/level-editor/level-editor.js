@@ -296,10 +296,8 @@ class LevelEditor {
     this.input.mouse.y = my / config.view.zoom;
     this.drag();
 
-    // for (let i in ig.Image.cache) {
-    //   ig.Image.cache[i].resize(config.view.zoom);
-    // } // TODO
-
+    const assets = Register.getAssetCacheEntries(GameAudio); // We don't need to resize audio.
+    assets.forEach((a) => a.resize(config.view.zoom));
     this.resize();
   }
 
@@ -936,6 +934,7 @@ class LevelEditorRunner {
   injectImageOverrides() {
     GameImage.prototype.baseResize = GameImage.prototype.resize;
     GameImage.prototype.resize = function (scale) {
+      console.log(scale);
       if (!this.loaded) return;
       if (!this.scaleCache) this.scaleCache = {};
       if (this.scaleCache["x" + scale]) {
@@ -945,7 +944,6 @@ class LevelEditorRunner {
 
       // Retain the original image when scaling
       this.origData = this.data = this.origData || this.data;
-
       // Nearest neighbor when zooming in
       if (scale > 1) this.baseResize(scale);
       // Otherwise blur
