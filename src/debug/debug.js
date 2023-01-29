@@ -1,3 +1,8 @@
+import { Guard } from "../lib/guard.js";
+import { $new, $el, boolToOnOff } from "../lib/native-object-extensions.js";
+import { dragElement } from "../lib/ui-effects.js";
+import { PerformanceStats } from "./performance-stats.js";
+
 export class GameDebugger {
   /** @type {Game} */
   game = null;
@@ -67,7 +72,7 @@ export class GameDebugger {
     activeEntityList.classList.add("debug-subpanel");
     activeEntityList.id = "debug-active-entities";
     activeEntityList.append(this.#newHeading("Active Entities"));
-    activeEntityList.innerHTML = `<div>No active entities.</div>`;
+    activeEntityList.innerHTML = "<div>No active entities.</div>";
     this.DOMElements.activeEntityList = activeEntityList;
     return activeEntityList;
   }

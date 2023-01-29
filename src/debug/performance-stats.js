@@ -1,11 +1,13 @@
-export class PanelColorScheme {
+import { $new } from "../lib/native-object-extensions.js";
+
+class PanelColorScheme {
   constructor(bg, fg) {
     this.bg = bg;
     this.fg = fg;
   }
 }
 
-export class Color {
+class Color {
   constructor(r, g, b) {
     this.r = r;
     this.g = g;
@@ -75,7 +77,9 @@ export class PerformanceStats {
         this.#createPanel("mem", false);
         this.#maxPanels = 3;
       }
-    } catch (ex) {}
+    } catch (ex) {
+      /* empty */
+    }
 
     this.minFps = 1000;
     this.maxFps = 0;
