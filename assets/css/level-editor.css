@@ -288,21 +288,9 @@ div.entityDefinition .value {
 
 dl#entityDefinitionInput {
   padding: 8px 0;
-}
-
-dl#entityDefinitionInput dt {
-  width: 40px;
-  display: block;
-  float: left;
-  margin: 0 4px 0 0;
-  padding: 4px 0 0 0;
-  text-align: right;
-}
-
-dl#entityDefinitionInput dd {
-  display: block;
-  margin: 0;
-  padding: 2px 0;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  column-gap: 10px;
 }
 
 #entityMenu {
@@ -508,17 +496,21 @@ input[type="checkbox"]:disabled {
 ::-webkit-scrollbar {
   width: 2px;
 }
+
 ::-webkit-scrollbar-button:start:decrement,
 ::-webkit-scrollbar-button:end:increment {
   display: block;
   height: 2px;
 }
+
 ::-webkit-scrollbar-button:vertical:increment {
   background-color: transparent;
 }
+
 ::-webkit-scrollbar-track-piece {
   background-color: rgba(0, 0, 0, 0);
 }
+
 ::-webkit-scrollbar-thumb:vertical {
   background-color: rgba(255, 255, 255, 1);
 }

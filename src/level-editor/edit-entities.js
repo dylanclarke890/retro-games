@@ -118,10 +118,10 @@ class EditEntities {
   getSaveData() {
     const entitiesToSave = [];
     for (let i = 0; i < this.entities.length; i++) {
-      const ent = this.entities[i];
-      const type = ent._wmClassName;
-      const data = { type: type, x: ent.pos.x, y: ent.pos.y };
-      if (ent._wmSettings) data.settings = ent._wmSettings;
+      const entity = this.entities[i];
+      const type = entity.constructor.name;
+      const data = { type, ...entity.pos };
+      if (entity._additionalSettings) data.settings = entity._additionalSettings;
       entitiesToSave.push(data);
     }
     return entitiesToSave;
@@ -172,11 +172,12 @@ class EditEntities {
     }
 
     if (entity !== this.selectedEntity) {
+      this.selectedEntity = entity;
       this.loadEntitySettings();
+
       entitySettings.style.display = "block";
       entityKey.value = "";
       entityValue.value = "";
-      this.selectedEntity = entity;
       return;
     }
   }
@@ -200,13 +201,13 @@ class EditEntities {
 
   cloneSelectedEntity() {
     if (!this.selectedEntity) return false;
-    const className = this.selectedEntity._wmClassName;
-    const settings = NativeExtensions.copy(this.selectedEntity._wmSettings);
+    const className = this.selectedEntity.constructor.name;
+    const settings = NativeExtensions.copy(this.selectedEntity._additionalSettings);
     if (settings.name) settings.name = settings.name + "_clone";
     const x = this.selectedEntity.pos.x + this.gridSize;
     const y = this.selectedEntity.pos.y;
     const newEntity = this.spawnEntity(className, x, y, settings);
-    newEntity._wmSettings = settings;
+    newEntity._additionalSettings = settings;
     this.selectEntity(newEntity);
     this.undo.commitEntityCreate(newEntity);
     return true;
@@ -241,7 +242,8 @@ class EditEntities {
   scaleSelectedEntity(x, y) {
     const scaleDir = this.wasSelectedOnScaleBorder;
     let w, h;
-    if (!this.selectedEntity._wmSettings.size) this.selectedEntity._wmSettings.size = {};
+    if (!this.selectedEntity._additionalSettings.size)
+      this.selectedEntity._additionalSettings.size = {};
 
     switch (scaleDir) {
       case "n":
@@ -270,8 +272,8 @@ class EditEntities {
         throw new Error(`Unrecognised direction: ${scaleDir}`);
     }
 
-    this.selectedEntity._wmSettings.size.x = this.selectedEntity.size.x;
-    this.selectedEntity._wmSettings.size.y = this.selectedEntity.size.y;
+    this.selectedEntity._additionalSettings.size.x = this.selectedEntity.size.x;
+    this.selectedEntity._additionalSettings.size.y = this.selectedEntity.size.y;
     this.loadEntitySettings();
   }
 
@@ -288,9 +290,8 @@ class EditEntities {
     const entityClass = Register.getEntityByType(className);
     if (!entityClass) return null;
     const newEntity = new entityClass({ x, y, game: this, settings });
-    newEntity._wmClassName = className;
-    newEntity._wmSettings = {};
-    for (let s in settings) newEntity._wmSettings[s] = settings[s];
+    newEntity._additionalSettings = {};
+    for (let s in settings) newEntity._additionalSettings[s] = settings[s];
     this.entities.push(newEntity);
     if (settings.name) this.namedEntities[settings.name] = newEntity;
     this.sort();
@@ -316,10 +317,10 @@ class EditEntities {
     if (!this.selectedEntity) return;
     $el("#position-x").textContent = this.selectedEntity.pos.x;
     $el("#position-y").textContent = this.selectedEntity.pos.y;
-    const html = this.loadEntitySettingsRecursive(this.selectedEntity._wmSettings);
+    const html = this.loadEntitySettingsRecursive(this.selectedEntity._additionalSettings);
     this.entityDefinitions.innerHTML += html;
 
-    const className = this.selectedEntity._wmClassName.replace(/^Entity/, "");
+    const className = this.selectedEntity.constructor.name.replace(/^Entity/, "");
     $el("#entityClass").textContent = className;
 
     const entityDefinitionElements = document.getElementsByClassName("entityDefinition");
@@ -365,8 +366,8 @@ class EditEntities {
     if (key === "x") this.selectedEntity.pos.x = Math.round(value);
     else if (key === "y") this.selectedEntity.pos.y = Math.round(value);
     else {
-      this.writeSettingAtPath(this.selectedEntity._wmSettings, key, value);
-      NativeExtensions.extend(this.selectedEntity, this.selectedEntity._wmSettings);
+      this.writeSettingAtPath(this.selectedEntity._additionalSettings, key, value);
+      NativeExtensions.extend(this.selectedEntity, this.selectedEntity._additionalSettings);
     }
 
     this.sort();
@@ -484,6 +485,7 @@ class EditEntities {
   //#region Drawing
 
   draw() {
+    console.log(this.visible);
     if (!this.visible) return;
     for (let i = 0; i < this.entities.length; i++) this.drawEntity(this.entities[i]);
   }
@@ -506,8 +508,8 @@ class EditEntities {
 
     if (this.config.labels.draw) {
       // description
-      const className = entity._wmClassName.replace(/^Entity/, "");
-      const description = className + (entity.name ? ": " + entity.name : "");
+      const className = entity.constructor.name.replace(/^Entity/, "");
+      const description = className + (entity.name ? `" ${entity.name}` : "");
 
       // text-shadow
       ctx.fillStyle = "rgba(0,0,0,0.4)";
