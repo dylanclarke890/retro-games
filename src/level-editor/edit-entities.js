@@ -485,7 +485,6 @@ class EditEntities {
   //#region Drawing
 
   draw() {
-    console.log(this.visible);
     if (!this.visible) return;
     for (let i = 0; i < this.entities.length; i++) this.drawEntity(this.entities[i]);
   }

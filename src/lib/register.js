@@ -123,6 +123,7 @@ class Register {
 
   static cacheAsset(path, asset) {
     this.#assetCache[path] = asset;
+    console.log("Cached: ", path, asset);
   }
 
   static getCachedAsset(path) {

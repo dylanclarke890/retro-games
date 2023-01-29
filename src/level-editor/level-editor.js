@@ -168,7 +168,6 @@ class LevelEditor {
     $el("#buttonAddLayer").addEventListener("click", () => this.addLayer());
     $el("#buttonRemoveLayer").addEventListener("click", () => this.deleteLayerDialog.open());
     $el("#buttonSaveLayerSettings").addEventListener("click", () => this.saveLayerSettings());
-    // $el("#reloadImages").addEventListener("click", ig.Image.reloadCache); // TODO
     $el("#layerIsCollision").addEventListener("change", (e) => this.toggleCollisionLayer(e));
 
     $el("input#toggleSidebar").addEventListener("click", () => {

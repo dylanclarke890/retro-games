@@ -10,12 +10,13 @@ class MediaFactory {
   }
 
   #createAsset(path, data, type) {
-    // Animations end up calling the factory again to create the image anyway,
-    // may as well just cache that instead as the image class can be more generically used.
+    /* Animations end up calling the factory again to create the image anyway,
+     * may as well just cache that instead as the image class can be more generically used. */
     if (type !== "animation") {
       const cached = Register.getCachedAsset(path);
       if (cached) return cached;
     }
+
     let asset;
     switch (type) {
       case "font":
