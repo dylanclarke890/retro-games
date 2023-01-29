@@ -5,34 +5,18 @@ class GameImage {
   loadCallback = (_path, _loadingWasSuccessful) => {};
   loaded = false;
   path = "";
-  /** @type {Image | null} */
-  preloadedImage = null;
   width = 0;
 
-  constructor({ system, path, preloadedImage } = {}) {
+  constructor({ system, path } = {}) {
     Guard.againstNull({ system });
+    Guard.againstNull({ path });
     this.system = system;
-
-    // TODO - CHECK THIS
-    if (preloadedImage) {
-      Guard.isInstanceOf({ preloadedImage }, Image);
-      this.preloadedImage = preloadedImage;
-    } else {
-      Guard.againstNull({ path });
-      this.path = path;
-    }
+    this.path = path;
     this.load();
   }
 
   load(loadCallback) {
     this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
-    if (this.preloadedImage) {
-      this.data = this.preloadedImage;
-      this.path = this.data.src;
-      this.loaded = true;
-      console.log(this.data, this.path);
-    }
-
     if (!this.loaded && this.system.ready) {
       this.data = new Image();
       this.data.onload = (ev) => this.onload(ev);

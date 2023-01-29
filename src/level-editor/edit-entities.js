@@ -104,6 +104,7 @@ class EditEntities {
         entityDiv.addEventListener("mouseup", (e) => this.newEntityClick(e));
         this.menu.append(entityDiv);
         this.entityClasses[className] = filepath;
+        new classDef({ x: 0, y: 0, game: this }); // images are already loaded but need caching.
       }
     }
 
