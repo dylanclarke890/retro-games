@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */ // - left in for override purposes.
 import { Guard } from "../lib/guard.js";
 import { Register } from "../lib/register.js";
 import { NativeExtensions } from "../lib/native-object-extensions.js";
@@ -183,7 +182,7 @@ export class Entity {
     this.game.removeEntity(this);
   }
 
-  receiveDamage(amount, _from) {
+  receiveDamage(amount) {
     this.health -= amount;
     if (this.health <= 0) this.kill();
   }
@@ -368,8 +367,8 @@ export class Entity {
     }
   }
 
-  check(other) {}
-  collideWith(other, axis) {}
+  check() {}
+  collideWith() {}
   ready() {}
   erase() {}
 }

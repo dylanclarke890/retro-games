@@ -1,3 +1,9 @@
+import { Input } from "./core/input.js";
+import { Font } from "./lib/font.js";
+import { Game } from "./core/game.js";
+import { GameRunner } from "./core/runner.js";
+import { level } from "./levels/level.js";
+
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
@@ -24,14 +30,16 @@ export class MyGame extends Game {
   }
 }
 
-new GameRunner({
-  canvasId: "play-area",
-  gameClass: MyGame,
-  fps: 60,
-  width: 768,
-  height: 624,
-  debugMode: true,
-  font: {
-    path: "assets/fonts/arcade-classic.TTF",
-  },
+document.addEventListener("DOMContentLoaded", () => {
+  new GameRunner({
+    canvasId: "play-area",
+    gameClass: MyGame,
+    fps: 60,
+    width: 768,
+    height: 624,
+    debugMode: true,
+    font: {
+      path: "assets/fonts/arcade-classic.TTF",
+    },
+  });
 });
