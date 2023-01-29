@@ -1,8 +1,12 @@
+import { Guard } from "./guard.js";
+import { Register } from "./register.js";
+import { $new } from "./native-object-extensions.js";
+
 export class GameImage {
   data = null;
   failed = false;
   height = 0;
-  loadCallback = (_path, _loadingWasSuccessful) => {};
+  loadCallback = () => {};
   loaded = false;
   path = "";
   /** @type {System} */
@@ -18,7 +22,7 @@ export class GameImage {
   }
 
   load(loadCallback) {
-    this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
+    this.loadCallback = loadCallback || (() => {});
     if (!this.loaded && this.system.ready) {
       this.data = new Image();
       this.data.onload = (ev) => this.onload(ev);
@@ -28,7 +32,7 @@ export class GameImage {
     else Register.preloadImage(this);
   }
 
-  onload(_event) {
+  onload() {
     this.width = this.data.width;
     this.height = this.data.height;
     this.loaded = true;
@@ -36,7 +40,7 @@ export class GameImage {
     if (this.loadCallback) this.loadCallback(this.path, true);
   }
 
-  onerror(_event) {
+  onerror() {
     this.failed = true;
     if (this.loadCallback) this.loadCallback(this.path, false);
   }

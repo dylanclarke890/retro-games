@@ -1,3 +1,7 @@
+import { Guard } from "./guard.js";
+import { NativeExtensions } from "./native-object-extensions.js";
+import { Register } from "./register.js";
+
 export class Font {
   static ALIGN = {
     LEFT: 1,
@@ -18,12 +22,12 @@ export class Font {
     this.loaded = false;
     this.failed = false;
     this.load();
-    this.loadCallback = (_path, _wasSuccessful) => {};
+    this.loadCallback = () => {};
   }
 
   load(loadCallback) {
     if (!this.loaded && this.system.ready) {
-      this.loadCallback = loadCallback || ((_path, _loadingWasSuccessful) => {});
+      this.loadCallback = loadCallback || (() => {});
       const fontFace = new FontFace(this.name, `url(${this.path})`);
       document.fonts.add(fontFace);
       this.data = fontFace;
@@ -40,7 +44,7 @@ export class Font {
     this.loadCallback(this.path, true);
   }
 
-  onerror(_err) {
+  onerror() {
     this.failed = true;
     this.loadCallback(this.path, false);
   }

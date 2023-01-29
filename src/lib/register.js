@@ -1,3 +1,6 @@
+import { NativeExtensions } from "./native-object-extensions.js";
+import { Guard } from "./guard.js";
+
 /**
  * To be used when the asset passed to MediaFactory.create-* is just a path to the resource, instead of one of the various
  * media classes that are used for them (GameImage etc). Will call the relevant load logic for each media type.
@@ -14,16 +17,17 @@ export class AssetToPreload {
 
   load(loadCallback) {
     switch (this.type) {
-      case "font":
+      case "font": {
         const fontFace = new FontFace(NativeExtensions.uniqueId(), `url(${this.path})`);
         document.fonts.add(fontFace);
         this.data = fontFace;
         this.data.load().then(
-          () => loadCallback(path, true), // Success
-          () => loadCallback(path, false) // Failure
+          () => loadCallback(this.path, true), // Success
+          () => loadCallback(this.path, false) // Failure
         );
         break;
-      case "image":
+      }
+      case "image": {
         this.data = new Image();
         this.data.onload = () => {
           loadCallback(this.path, true);
@@ -33,7 +37,8 @@ export class AssetToPreload {
         };
         this.data.src = this.path;
         break;
-      case "sound":
+      }
+      case "sound": {
         this.data = new Audio(this.path);
         this.data.oncanplaythrough = () => {
           this.data.oncanplaythrough = null;
@@ -41,6 +46,7 @@ export class AssetToPreload {
         };
         this.data.onerror = () => loadCallback(this.path, false);
         break;
+      }
       default:
         throw new Error(`Unable to determine type of asset to preload: ${this.type}`);
     }

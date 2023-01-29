@@ -1,3 +1,9 @@
+import { VendorAttributes } from "./vendor-attributes.js";
+import { UserAgent } from "./user-agent.js";
+import { Guard } from "./guard.js";
+import { Timer } from "./timer.js";
+import { Register } from "./register.js";
+
 export class SoundManager {
   #clips = {};
   #format = null;
@@ -55,7 +61,7 @@ export class SoundManager {
 
   loadWebAudio(path, _multiChannel, loadCallback) {
     if (this.#clips[path]) return this.#clips[path];
-    loadCallback = loadCallback || ((_path, _success, _event) => {});
+    loadCallback = loadCallback || (() => {});
     const audioSource = new WebAudioSource();
     this.#clips[path] = audioSource;
 
@@ -117,7 +123,7 @@ export class SoundManager {
     this.#clips[path] = [clip];
     if (multiChannel)
       for (let i = 1; i < Sound.channels; i++) {
-        const a = new Audio(realPath);
+        const a = new Audio(path);
         a.load();
         this.#clips[path].push(a);
       }
@@ -304,7 +310,7 @@ export class Sound extends GameAudio {
   }
 
   load(loadCallback) {
-    loadCallback = loadCallback || ((_path, _sucess) => {});
+    loadCallback = loadCallback || (() => {});
     if (!Sound.enabled) loadCallback(this.path, true); // Probably mobile, no need to load.
     else if (!this.soundManager.runner.ready) Register.preloadSound(this);
     else this.soundManager.load(this.path, this.#multiChannel, loadCallback);
@@ -370,7 +376,9 @@ export class WebAudioSource extends GameAudio {
     for (let i = 0; i < this.#sources.length; i++) {
       try {
         this.#sources[i].stop();
-      } catch (err) {}
+      } catch (err) {
+        /* empty */
+      }
     }
   }
 }

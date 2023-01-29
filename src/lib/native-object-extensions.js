@@ -62,7 +62,7 @@ export function boolToOnOff(bool) {
   return bool ? "On" : "Off";
 }
 
-export function loadScript({ src, cb = (_e, _path) => {} } = {}) {
+export function loadScript({ src, cb = () => {} } = {}) {
   const script = document.createElement("script");
   script.type = "text/javascript";
   script.addEventListener("load", (e) => cb(e, src));

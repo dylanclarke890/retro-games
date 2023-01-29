@@ -1,6 +1,8 @@
 //#region slide
 
-export function slideUp(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+import { $el } from "./native-object-extensions.js";
+
+export function slideUp(target, easing = "ease-in", duration = 500, cb = () => {}) {
   target.style.transitionProperty = "height, margin, padding";
   target.style.transitionDuration = duration + "ms";
   target.style.transitionTimingFunction = easing;
@@ -27,7 +29,7 @@ export function slideUp(target, easing = "ease-in", duration = 500, cb = (_targe
   }, duration);
 }
 
-export function slideDown(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+export function slideDown(target, easing = "ease-in", duration = 500, cb = () => {}) {
   target.style.removeProperty("display");
   let display = window.getComputedStyle(target).display;
   if (display === "none") display = "block";
@@ -61,7 +63,7 @@ export function slideDown(target, easing = "ease-in", duration = 500, cb = (_tar
   }, duration);
 }
 
-export function slideToggle(target, easing = "ease-in", duration = 500, cb = (_target) => {}) {
+export function slideToggle(target, easing = "ease-in", duration = 500, cb = () => {}) {
   if (window.getComputedStyle(target).display === "block") slideUp(target, easing, duration, cb);
   else slideDown(target, easing, duration, cb);
 }
@@ -74,7 +76,7 @@ export function fade(target, { isFadeIn, easing, duration, cb } = {}) {
   isFadeIn = isFadeIn || false;
   easing = easing || "ease-in";
   duration = duration || 500;
-  cb = cb || ((_target) => {});
+  cb = cb || (() => {});
 
   target.style.removeProperty("display");
   let display = window.getComputedStyle(target).display;
@@ -109,7 +111,7 @@ export function fadeOut(target, { easing, duration, cb } = {}) {
   fade(target, { isFadeIn: false, easing, duration, cb });
 }
 
-export function fadeToggle(target, { easing, duration = 500, cb = (_target) => {} } = {}) {
+export function fadeToggle(target, { easing, duration = 500, cb = () => {} } = {}) {
   if (window.getComputedStyle(target).display === "block") fadeOut(target, easing, duration, cb);
   else fadeIn(target, easing, duration, cb);
 }

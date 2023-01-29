@@ -1,3 +1,6 @@
+import { Guard } from "./guard.js";
+import { Timer } from "./timer.js";
+
 export class GameAnimationSheet {
   height = 0;
   image = null;
