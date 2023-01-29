@@ -1,3 +1,27 @@
+import { raf, caf } from "../lib/polyfills.js";
+import { $el, $new, JSONFormat } from "../lib/native-object-extensions.js";
+import { slideToggle, fadeOut } from "../lib/ui-effects.js";
+import { getCookie, setCookie } from "../lib/cookie.js";
+import { Register } from "../lib/register.js";
+import { Guard } from "../lib/guard.js";
+import { MediaFactory } from "../lib/media-factory.js";
+import { GameAudio, SoundManager } from "../lib/sound.js";
+import { GameImage } from "../lib/image.js";
+
+import { ModalDialog, ModalDialogPathSelect } from "./modal-dialogs.js";
+import { LevelEditorHttpClient } from "./http-client.js";
+import { SelectFileDropdown } from "./select-file-dropdown.js";
+import { EditEntities } from "./edit-entities.js";
+import { EventedInput } from "./evented-input.js";
+import { EditMap } from "./edit-map.js";
+import { Undo } from "./undo.js";
+
+import { GameLoader } from "../core/loader.js";
+import { Input } from "../core/input.js";
+import { System } from "../core/system.js";
+
+import { levelEditorConfig } from "./config.js";
+
 export class LevelEditor {
   activeLayer = null;
   collisionLayer = null;
@@ -84,9 +108,11 @@ export class LevelEditor {
       system: this.system,
     });
 
+    // eslint-disable-next-line no-undef
     $("#layers").sortable({
       update: () => this.reorderLayers(),
     });
+    // eslint-disable-next-line no-undef
     $("#layers").disableSelection();
     this.resetModified();
 
@@ -186,6 +212,7 @@ export class LevelEditor {
     const key = String.fromCharCode(event.which);
     if (key.match(/^\d$/)) {
       const index = parseInt(key);
+      // eslint-disable-next-line no-undef
       const name = $("#layers div.layer:nth-child(" + index + ") span.name").text();
       const layer = name === "entities" ? this.entities : this.getLayerWithName(name);
       if (!layer) return;
@@ -229,7 +256,7 @@ export class LevelEditor {
   }
 
   confirmClose(event) {
-    const returnValue = undefined;
+    let returnValue = undefined;
     if (this.modified && this.config.askBeforeClose) returnValue = "Unsaved changes. Leave anyway?";
     event.returnValue = returnValue;
     return returnValue;
@@ -342,12 +369,12 @@ export class LevelEditor {
         matches.forEach((v) => {
           // v = match + : - we want it to be "match":
           const match = v.substring(0, v.length - 1);
-          json = json.replace(v, `\"${match}\":`);
+          json = json.replace(v, `"${match}":`);
         });
       }
 
       // Remove all trailing commas on arrays and objects.
-      json = json.replace(/\,(?=\s*[}|\]])/gm, "");
+      json = json.replace(/,(?=\s*[}|\]])/gm, "");
 
       // Finally, we can parse it:
       data = JSON.parse(json);
@@ -404,6 +431,7 @@ export class LevelEditor {
     this.setActiveLayer("entities");
 
     this.reorderLayers();
+    // eslint-disable-next-line no-undef
     $("#layers").sortable("refresh");
 
     this.resetModified();
@@ -474,6 +502,7 @@ export class LevelEditor {
     this.setActiveLayer(name);
     this.updateLayerSettings();
     this.reorderLayers();
+    // eslint-disable-next-line no-undef
     $("#layers").sortable("refresh");
   }
 
@@ -485,6 +514,7 @@ export class LevelEditor {
       if (this.layers[i].name !== name) continue;
       this.layers.splice(i, 1);
       this.reorderLayers();
+      // eslint-disable-next-line no-undef
       $("#layers").sortable("refresh");
       this.setActiveLayer("entities");
       return true;
@@ -805,6 +835,7 @@ export class LevelEditor {
     this.needsDraw = true;
   }
 
+  // eslint-disable-next-line no-unused-vars
   drawIfNeeded(_timestamp) {
     this.#rafId = raf((t) => this.drawIfNeeded(t));
     if (!this.needsDraw) return; // Only draw if flag is set

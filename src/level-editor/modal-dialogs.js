@@ -1,3 +1,8 @@
+import { $new } from "../lib/native-object-extensions.js";
+import { Guard } from "../lib/guard.js";
+import { fadeOut, fadeIn } from "../lib/ui-effects.js";
+import { SelectFileDropdown } from "./select-file-dropdown.js";
+
 export class ModalDialog {
   onOk = null;
   onCancel = null;
@@ -79,7 +84,7 @@ export class ModalDialogPathSelect extends ModalDialog {
   }
 
   setPath(path) {
-    const dir = path.replace(/\/[^\/]*$/, "");
+    const dir = path.replace(/\/[^/]*$/, "");
     this.pathInput.value = path;
     this.pathDropdown.loadDir(dir);
   }

@@ -1,3 +1,9 @@
+import { $new, $el, NativeExtensions } from "../lib/native-object-extensions.js";
+import { Guard } from "../lib/guard.js";
+import { GameImage } from "../lib/image.js";
+import { BackgroundMap } from "../core/map.js";
+import { TileSelect } from "./tile-select.js";
+
 export class EditMap extends BackgroundMap {
   name = "";
   visible = true;
@@ -299,7 +305,7 @@ export class AutoResizedImage extends GameImage {
     this.internalScale = internalScale || 1;
   }
 
-  onload(_event) {
+  onload() {
     this.width = Math.ceil(this.data.width * this.internalScale);
     this.height = Math.ceil(this.data.height * this.internalScale);
 

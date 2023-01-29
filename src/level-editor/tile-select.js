@@ -1,3 +1,5 @@
+import { Guard } from "../lib/guard.js";
+
 export class TileSelect {
   layer = null;
   pos = { x: 0, y: 0 };

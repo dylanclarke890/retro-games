@@ -1,3 +1,5 @@
+import { Input } from "../core/input.js";
+
 export class EventedInput extends Input {
   delayedKeyup = { push: function () {}, length: 0 };
   keydownCallback = null;

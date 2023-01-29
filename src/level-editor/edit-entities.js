@@ -1,3 +1,8 @@
+import { Guard } from "../lib/guard.js";
+import { Register } from "../lib/register.js";
+import { $el, $new, loadScript, NativeExtensions } from "../lib/native-object-extensions.js";
+import { Game } from "../core/game.js";
+
 export class EditEntities {
   active = true;
   config = null;
@@ -359,10 +364,10 @@ export class EditEntities {
     const eKey = $el("#entityKey");
     const eVal = $el("#entityValue");
     const key = eKey.value;
-    const value = eVal.value;
+    let value = eVal.value;
     const floatVal = parseFloat(value);
 
-    if (value === floatVal) value = floatVal;
+    if (!Number.isNaN(floatVal)) value = floatVal;
     if (key === "name") {
       if (this.selectedEntity.name) delete this.namedEntities[this.selectedEntity.name];
       this.namedEntities[value] = this.selectedEntity;
@@ -558,6 +563,7 @@ export class EditEntities {
     ctx.closePath();
   }
 
+  // eslint-disable-next-line no-unused-vars
   drawCursor(_x, _y) {
     if (!this.selectedEntity) return;
     const { ctx, drawPosition, scale } = this.system;

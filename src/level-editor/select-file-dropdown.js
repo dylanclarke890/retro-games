@@ -1,3 +1,7 @@
+import { Guard } from "../lib/guard.js";
+import { $new, $el, getInnerHeight, getInnerWidth } from "../lib/native-object-extensions.js";
+import { slideUp, slideDown } from "../lib/ui-effects.js";
+
 export class SelectFileDropdown {
   boundShow = null;
   /** @type {HTMLElement} */
@@ -55,15 +59,14 @@ export class SelectFileDropdown {
 
   showFiles(data) {
     this.div.innerHTML = "";
-    if (data.parent !== false)
-      this.addDropdownOption(data.parent, "...parent directory", "dir");
+    if (data.parent !== false) this.addDropdownOption(data.parent, "...parent directory", "dir");
 
     for (let i = 0; i < data.dirs.length; i++) {
-      const name = data.dirs[i].match(/[^\/]*$/)[0] + "/";
+      const name = data.dirs[i].match(/[^/]*$/)[0] + "/";
       this.addDropdownOption(data.dirs[i], name, "dir");
     }
     for (let i = 0; i < data.files.length; i++) {
-      const name = data.files[i].match(/[^\/]*$/)[0];
+      const name = data.files[i].match(/[^/]*$/)[0];
       this.addDropdownOption(data.files[i], name, "file");
     }
   }
@@ -72,6 +75,7 @@ export class SelectFileDropdown {
     event.stopPropagation();
   }
 
+  // eslint-disable-next-line no-unused-vars
   show(_event) {
     const top = this.input.offsetTop;
     const left = this.input.offsetLeft;

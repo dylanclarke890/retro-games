@@ -1,3 +1,5 @@
+import { Guard } from "../lib/guard.js";
+
 export class Undo {
   static TYPE = {
     MAP_DRAW: 1,
