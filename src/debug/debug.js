@@ -338,7 +338,7 @@ export class GameDebugger {
       const e = this.game.entities[i];
       const item = $new("li");
       item.classList.add("debug-active-entities-item");
-      item.innerHTML = `(#${e.id}) ${e.constructor.name}`;
+      item.textContent = `(#${e.id}) ${e.constructor.name}`;
       item.addEventListener("click", () => this.#setSelectedEntity(e));
       entityList.append(item);
     }
@@ -381,16 +381,16 @@ export class GameDebugger {
         </tr>
         <tr>
           <td>Position</td>
-          <td id="debug-entity-position" class="dual-row">
-            <span>x: ${r(entity.pos.x)}</span>
-            <span>y: ${r(entity.pos.y)}</span>
+          <td class="dual-row">
+            <span id="debug-entity-position-x">x: ${r(entity.pos.x)}</span>
+            <span id="debug-entity-position-y">y: ${r(entity.pos.y)}</span>
           </td>
         </tr>
         <tr>
           <td>Speed</td>
-          <td id="debug-entity-speed" class="dual-row">
-            <span>x: ${r(entity.vel.x)}</span>
-            <span>y: ${r(entity.vel.y)}</span>
+          <td class="dual-row">
+            <span id="debug-entity-speed-x">x: ${r(entity.vel.x)}</span>
+            <span id="debug-entity-speed-y">y: ${r(entity.vel.y)}</span>
           </td>
         </tr>
       </tbody>
@@ -438,10 +438,10 @@ export class GameDebugger {
 
     const r = Math.round;
     const entity = this.selectedEntity;
-    $el("#debug-entity-position").innerHTML = `<span>x: ${r(entity.pos.x)}</span>
-      <span>y: ${r(entity.pos.y)}</span>`;
-    $el("#debug-entity-speed").innerHTML = `<span>x: ${r(entity.vel.x)}</span>
-      <span>y: ${r(entity.vel.y)}</span>`;
+    $el("#debug-entity-position-x").textContent = `x: ${r(entity.pos.x)}`;
+    $el("#debug-entity-position-y").textContent = `y: ${r(entity.pos.y)}`;
+    $el("#debug-entity-speed-x").textContent = `x: ${r(entity.vel.x)}`;
+    $el("#debug-entity-speed-y").textContent = `y: ${r(entity.vel.y)}`;
 
     $el("#debug-entity-collision-on").textContent = `${boolToOnOff(
       entity._debugCollisionWithEntity
