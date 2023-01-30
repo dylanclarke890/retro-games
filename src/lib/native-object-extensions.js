@@ -62,9 +62,10 @@ export function boolToOnOff(bool) {
   return bool ? "On" : "Off";
 }
 
-export function loadScript({ src, cb = () => {} } = {}) {
+export function loadScript({ src, isES6Module, cb = () => {} } = {}) {
+  if (isES6Module !== false) isES6Module = true;
   const script = document.createElement("script");
-  script.type = "text/javascript";
+  script.type = isES6Module ? "module" : "text/javascript";
   script.addEventListener("load", (e) => cb(e, src));
   script.src = src;
   document.body.appendChild(script);
