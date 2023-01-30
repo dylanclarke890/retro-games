@@ -71,7 +71,7 @@ export function loadScript({ src, isES6Module, cb = () => {} } = {}) {
   document.body.appendChild(script);
 }
 
-export function JSONFormat(json) {
+export function JSONFormat(json, opts = {}) {
   const p = [];
   function push(m) {
     return "\\" + p.push(m) + "\\";
@@ -80,7 +80,7 @@ export function JSONFormat(json) {
     return p[i - 1];
   }
   function tabs(count) {
-    return Array.from({ length: count + 1 }).join("\t");
+    return Array.from({ length: count + 1 }).join(opts.indentWithTabs ? "\t" : "  ");
   }
   let out = "",
     indent = 0;

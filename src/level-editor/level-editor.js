@@ -459,7 +459,7 @@ export class LevelEditor {
     let dataString = JSON.stringify(data);
     if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
     const levelName = this.fileName.substring(0, this.fileName.lastIndexOf("."));
-    dataString = `const ${levelName} = /*JSON-BEGIN*/ ${dataString}; /*JSON-END*/`;
+    dataString = `export const ${levelName} = /*JSON-BEGIN*/ ${dataString}; /*JSON-END*/`;
 
     this.httpClient.api
       .save(path, dataString)
