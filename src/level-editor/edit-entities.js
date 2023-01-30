@@ -1,6 +1,7 @@
 import { Guard } from "../lib/guard.js";
-import { Register } from "../lib/register.js";
 import { $el, $new, loadScript, NativeExtensions } from "../lib/native-object-extensions.js";
+
+import { Register } from "../core/register.js";
 import { Game } from "../core/game.js";
 
 export class EditEntities {

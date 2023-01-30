@@ -1,11 +1,13 @@
 import { $new } from "../lib/native-object-extensions.js";
-import { LevelEditorHttpClient } from "./http-client.js";
+
 import { System } from "../core/system.js";
-import { GameImage } from "../lib/image.js";
-import { LevelEditor, LevelEditorLoader } from "./level-editor.js";
+import { GameImage } from "../core/image.js";
+import { SoundManager } from "../core/sound.js";
+import { MediaFactory } from "../core/media-factory.js";
+
+import { LevelEditorHttpClient } from "./http-client.js";
 import { EventedInput } from "./evented-input.js";
-import { SoundManager } from "../lib/sound.js";
-import { MediaFactory } from "../lib/media-factory.js";
+import { LevelEditor, LevelEditorLoader } from "./level-editor.js";
 import { levelEditorConfig } from "./config.js";
 
 export class LevelEditorRunner {

@@ -1,4 +1,4 @@
-import { Register } from "../lib/register.js";
+import { Register } from "../core/register.js";
 import { Entity } from "../core/entity.js";
 
 export class EntityBall extends Entity {

@@ -1,7 +1,9 @@
 import { $new, $el, NativeExtensions } from "../lib/native-object-extensions.js";
 import { Guard } from "../lib/guard.js";
-import { GameImage } from "../lib/image.js";
+
+import { GameImage } from "../core/image.js";
 import { BackgroundMap } from "../core/map.js";
+
 import { TileSelect } from "./tile-select.js";
 
 export class EditMap extends BackgroundMap {

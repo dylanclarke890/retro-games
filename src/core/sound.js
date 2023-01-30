@@ -1,7 +1,7 @@
-import { VendorAttributes } from "./vendor-attributes.js";
-import { UserAgent } from "./user-agent.js";
-import { Guard } from "./guard.js";
-import { Timer } from "./timer.js";
+import { VendorAttributes } from "../lib/vendor-attributes.js";
+import { UserAgent } from "../lib/user-agent.js";
+import { Guard } from "../lib/guard.js";
+import { Timer } from "../lib/timer.js";
 import { Register } from "./register.js";
 
 export class SoundManager {

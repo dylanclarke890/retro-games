@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { Register } from "../lib/register.js";
+import { Register } from "./register.js";
 
 export class GameLoader {
   #assetsToPreload = [];

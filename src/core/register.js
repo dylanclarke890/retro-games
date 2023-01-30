@@ -1,5 +1,5 @@
-import { NativeExtensions } from "./native-object-extensions.js";
-import { Guard } from "./guard.js";
+import { NativeExtensions } from "../lib/native-object-extensions.js";
+import { Guard } from "../lib/guard.js";
 
 /**
  * To be used when the asset passed to MediaFactory.create-* is just a path to the resource, instead of one of the various

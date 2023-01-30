@@ -1,6 +1,6 @@
 import { System } from "./system.js";
-import { SoundManager } from "../lib/sound.js";
-import { MediaFactory } from "../lib/media-factory.js";
+import { SoundManager } from "./sound.js";
+import { MediaFactory } from "./media-factory.js";
 import { GameLoop } from "./loop.js";
 import { GameLoader } from "./loader.js";
 import { Entity } from "./entity.js";

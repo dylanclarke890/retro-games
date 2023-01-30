@@ -1,5 +1,5 @@
 import { Input } from "./core/input.js";
-import { Font } from "./lib/font.js";
+import { Font } from "./core/font.js";
 import { Game } from "./core/game.js";
 import { GameRunner } from "./core/runner.js";
 import { level } from "./levels/level.js";

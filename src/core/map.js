@@ -1,6 +1,6 @@
 import { $new } from "../lib/native-object-extensions.js";
 import { Guard } from "../lib/guard.js";
-import { GameImage } from "../lib/image.js";
+import { GameImage } from "../core/image.js";
 
 export class GameMap {
   tilesize = 8;

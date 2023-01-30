@@ -4,20 +4,23 @@
 /// <reference path="src/lib/ui-effects.js"/>
 /// <reference path="src/lib/cookie.js"/>
 /// <reference path="src/lib/guard.js"/>
-/// <reference path="src/lib/register.js"/>
 /// <reference path="src/lib/vendor-attributes.js"/>
 /// <reference path="src/lib/user-agent.js"/>
 /// <reference path="src/lib/timer.js"/>
-/// <reference path="src/lib/image.js"/>
-/// <reference path="src/lib/font.js"/>
-/// <reference path="src/lib/animation.js"/>
-/// <reference path="src/lib/sound.js"/>
-/// <reference path="src/lib/media-factory.js"/>
 // #endregion LIB
 
-// #region CORE
+// #region DEBUG
 /// <reference path="src/debug/performance-stats.js"/>
 /// <reference path="src/debug/debug.js"/>
+// #endregion DEBUG
+
+// #region CORE
+/// <reference path="src/core/register.js"/>
+/// <reference path="src/core/image.js"/>
+/// <reference path="src/core/font.js"/>
+/// <reference path="src/core/animation.js"/>
+/// <reference path="src/core/sound.js"/>
+/// <reference path="src/core/media-factory.js"/>
 /// <reference path="src/core/entity.js"/>
 /// <reference path="src/core/game.js"/>
 /// <reference path="src/core/input.js"/>

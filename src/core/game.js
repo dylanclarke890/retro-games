@@ -1,7 +1,9 @@
 import { Guard } from "../lib/guard.js";
-import { Register } from "../lib/register.js";
-import { Input } from "./input.js";
+
+import { Register } from "../core/register.js";
+
 import { CollisionMap, BackgroundMap } from "./map.js";
+import { Input } from "./input.js";
 import { Entity } from "./entity.js";
 
 export class Game {

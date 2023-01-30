@@ -1,5 +1,5 @@
-import { Guard } from "./guard.js";
-import { Timer } from "./timer.js";
+import { Guard } from "../lib/guard.js";
+import { Timer } from "../lib/timer.js";
 
 export class GameAnimationSheet {
   height = 0;

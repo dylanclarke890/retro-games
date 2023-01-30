@@ -1,6 +1,6 @@
-import { Guard } from "./guard.js";
+import { Guard } from "../lib/guard.js";
 import { Register } from "./register.js";
-import { $new } from "./native-object-extensions.js";
+import { $new } from "../lib/native-object-extensions.js";
 
 export class GameImage {
   data = null;

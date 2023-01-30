@@ -1,5 +1,5 @@
-import { Guard } from "./guard.js";
-import { NativeExtensions } from "./native-object-extensions.js";
+import { Guard } from "../lib/guard.js";
+import { NativeExtensions } from "../lib/native-object-extensions.js";
 import { Register } from "./register.js";
 
 export class Font {

@@ -1,4 +1,4 @@
-import { Guard } from "./guard.js";
+import { Guard } from "../lib/guard.js";
 import { Register } from "./register.js";
 import { Font } from "./font.js";
 import { Sound } from "./sound.js";

@@ -2,9 +2,7 @@ import { raf, caf } from "../lib/polyfills.js";
 import { $el, JSONFormat } from "../lib/native-object-extensions.js";
 import { slideToggle, fadeOut } from "../lib/ui-effects.js";
 import { getCookie, setCookie } from "../lib/cookie.js";
-import { Register } from "../lib/register.js";
 import { Guard } from "../lib/guard.js";
-import { GameAudio } from "../lib/sound.js";
 
 import { ModalDialog, ModalDialogPathSelect } from "./modal-dialogs.js";
 import { SelectFileDropdown } from "./select-file-dropdown.js";
@@ -12,6 +10,8 @@ import { EditEntities } from "./edit-entities.js";
 import { EditMap } from "./edit-map.js";
 import { Undo } from "./undo.js";
 
+import { Register } from "../core/register.js";
+import { GameAudio } from "../core/sound.js";
 import { GameLoader } from "../core/loader.js";
 import { Input } from "../core/input.js";
 
