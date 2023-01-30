@@ -30,16 +30,14 @@ export class MyGame extends Game {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  new GameRunner({
-    canvasId: "play-area",
-    gameClass: MyGame,
-    fps: 60,
-    width: 768,
-    height: 624,
-    debugMode: true,
-    font: {
-      path: "assets/fonts/arcade-classic.TTF",
-    },
-  });
+new GameRunner({
+  canvasId: "play-area",
+  gameClass: MyGame,
+  fps: 60,
+  width: 768,
+  height: 624,
+  debugMode: true,
+  font: {
+    path: "assets/fonts/arcade-classic.TTF",
+  },
 });
