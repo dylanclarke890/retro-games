@@ -142,13 +142,17 @@ export class PerformanceStats {
   #panelText(panelType, target) {
     const div = $new("div");
     const { r, g, b } = PerformanceStats.colorSchemes[panelType].fg;
-    div.innerHTML = `<strong>${panelType.toUpperCase()}</strong>`;
+    const current = $new("strong");
+    current.textContent = panelType.toUpperCase();
+    const range = $new("span");
+    div.append(current);
+    div.append(range);
     this.#assignStyles(div, {
       color: `rgb(${r},${g},${b})`,
       margin: "0px 0px 1px 3px",
     });
     target.appendChild(div);
-    return div;
+    return { current, range };
   }
 
   #panelCanvas({ r, g, b }, target) {
@@ -225,7 +229,8 @@ export class PerformanceStats {
       Math.min(30, 30 - (msValue / 200) * 30),
       PerformanceStats.colorSchemes.ms
     );
-    ms.text.innerHTML = `<strong>${msValue} MS</strong>(${this.minMs}-${this.maxMs})`;
+    ms.text.current.textContent = `${msValue} MS `;
+    ms.text.range.textContent = ` (${this.minMs}-${this.maxMs})`;
     ms.ctx.putImageData(ms.data, 0, 0);
 
     if (this.now < this.lastFrame + 1000) return; // exit early if less than a second since last update.
@@ -239,7 +244,8 @@ export class PerformanceStats {
       Math.min(30, 30 - (fpsValue / 100) * 30),
       PerformanceStats.colorSchemes.fps
     );
-    fps.text.innerHTML = `<strong>${fpsValue} FPS</strong> (${this.minFps}-${this.maxFps})`;
+    fps.text.current.textContent = `${fpsValue} FPS `;
+    fps.text.range.textContent = ` (${this.minFps}-${this.maxFps})`;
     fps.ctx.putImageData(fps.data, 0, 0);
 
     this.lastFrame = this.now;
@@ -255,7 +261,8 @@ export class PerformanceStats {
       Math.min(30, 30 - memValue / 2),
       PerformanceStats.colorSchemes.mem
     );
-    mem.text.innerHTML = `<strong>${memValue} MEM</strong> (${this.minMem}-${this.maxMem})`;
+    mem.text.current.textContent = `${memValue} MEM`;
+    mem.text.range.textContent = ` (${this.minMem}-${this.maxMem})`;
     mem.ctx.putImageData(mem.data, 0, 0);
   }
 }
