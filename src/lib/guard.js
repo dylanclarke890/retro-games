@@ -18,7 +18,7 @@ export class Guard {
   /** Checks for null. Variables to validate must be passed wrapped in an object i.e { valueToCheck }. */
   static againstNull(keyValue) {
     const { key, value } = this.#getKeyValue(keyValue);
-    if (!value) throw new Error(`${key} is required.`);
+    if (value == null) throw new Error(`${key} is required.`);
     return {
       isInstanceOf: (other) => this.isInstanceOf(keyValue, other),
     };
