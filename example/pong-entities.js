@@ -1,5 +1,5 @@
-import { Register } from "../core/register.js";
-import { Entity } from "../core/entity.js";
+import { Register } from "../modules/core/register.js";
+import { Entity } from "../modules/core/entity.js";
 
 export class EntityBall extends Entity {
   name = "Ball baby";

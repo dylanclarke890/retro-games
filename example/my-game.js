@@ -1,8 +1,8 @@
-import { Input } from "./core/input.js";
-import { Font } from "./core/font.js";
-import { Game } from "./core/game.js";
-import { GameRunner } from "./core/runner.js";
-import { level } from "./levels/level.js";
+import { Input } from "../modules/core/input.js";
+import { Font } from "../modules/core/font.js";
+import { Game } from "../modules/core/game.js";
+import { GameRunner } from "../modules/core/runner.js";
+import { level } from "./level.js";
 
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
