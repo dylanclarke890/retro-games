@@ -13,7 +13,7 @@ export class GameAnimationSheet {
     this.system = system;
     this.width = size.x ?? 8;
     this.height = size.y ?? 8;
-    this.image = mediaFactory.createImage({ system, path });
+    this.image = mediaFactory.createImage({ path });
   }
 }
 
