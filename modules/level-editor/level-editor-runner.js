@@ -1,4 +1,5 @@
 import { $new } from "../lib/native-object-extensions.js";
+import { inject } from "../lib/inject.js";
 
 import { System } from "../core/system.js";
 import { GameImage } from "../core/image.js";
@@ -61,44 +62,46 @@ export class LevelEditorRunner {
    *  keep the original image, maintain a cache of scaled versions and use the default
    *  Canvas scaling (~bicubic) instead of nearest neighbor when zooming out. */
   injectImageOverrides() {
-    GameImage.prototype.baseResize = GameImage.prototype.resize;
-    GameImage.prototype.resize = function (scale) {
-      if (!this.loaded) return;
-      if (!this.scaleCache) this.scaleCache = {};
-      if (this.scaleCache["x" + scale]) {
-        this.data = this.scaleCache["x" + scale];
-        return;
-      }
+    const imageOverrides = {
+      resize(scale) {
+        if (!this.loaded) return;
+        if (!this.scaleCache) this.scaleCache = {};
+        if (this.scaleCache["x" + scale]) {
+          this.data = this.scaleCache["x" + scale];
+          return;
+        }
 
-      // Retain the original image when scaling
-      if (!this.origData) this.origData = this.data;
-      this.data = this.origData;
+        // Retain the original image when scaling
+        if (!this.origData) this.origData = this.data;
+        this.data = this.origData;
 
-      // Nearest neighbor when zooming in
-      if (scale > 1) this.baseResize(scale);
-      // Otherwise blur
-      else {
-        const scaled = $new("canvas");
-        scaled.width = Math.ceil(this.width * scale);
-        scaled.height = Math.ceil(this.height * scale);
+        // Nearest neighbor when zooming in
+        if (scale > 1) this.parent(scale);
+        // Otherwise blur
+        else {
+          const scaled = $new("canvas");
+          scaled.width = Math.ceil(this.width * scale);
+          scaled.height = Math.ceil(this.height * scale);
 
-        const scaledCtx = scaled.getContext("2d");
-        scaledCtx.drawImage(
-          this.data,
-          0,
-          0,
-          this.width,
-          this.height,
-          0,
-          0,
-          scaled.width,
-          scaled.height
-        );
-        this.data = scaled;
-      }
+          const scaledCtx = scaled.getContext("2d");
+          scaledCtx.drawImage(
+            this.data,
+            0,
+            0,
+            this.width,
+            this.height,
+            0,
+            0,
+            scaled.width,
+            scaled.height
+          );
+          this.data = scaled;
+        }
 
-      this.scaleCache["x" + scale] = this.data;
+        this.scaleCache["x" + scale] = this.data;
+      },
     };
+    inject(GameImage).with(imageOverrides);
   }
 }
 
