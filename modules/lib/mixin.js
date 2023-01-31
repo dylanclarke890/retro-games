@@ -1,3 +1,34 @@
+/**
+ * Apply a series of mixins to a class. Applies mixins one at a time so take care
+ * that subsequent mixins do not override.
+ * @example
+ * class Base {
+ *   do() {
+ *     console.log("Doing.");
+ *   }
+ * }
+ *
+ * const Mixin = (superclass) =>
+ *   class extends superclass {
+ *     do() {
+ *       super.do();
+ *       console.log("Mixin also doing.");
+ *     }
+ *   };
+ *
+ * class Example extends mix(Base).with(Mixin) {
+ *   do() {
+ *     super.do();
+ *     console.log("Example also also doing.");
+ *   }
+ * }
+ *
+ * // logs:
+ * // Doing.
+ * // Mixin also doing.
+ * // Example also also doing.
+ * new Example().do();
+ */
 export function mix(superclass) {
   return new MixinBuilder(superclass);
 }
@@ -11,18 +42,3 @@ class MixinBuilder {
     return mixins.reduce((c, mixin) => mixin(c), this.superclass);
   }
 }
-
-class Base {
-  do() {
-    console.log("Doing");
-  }
-}
-
-class Test extends mix(Base).with() {
-  do() {
-    super.do();
-    console.log("Also Doing");
-  }
-}
-
-new Test().do();
