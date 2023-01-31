@@ -1,38 +1,47 @@
-/**
- * Apply a series of mixins to a class. Applies mixins one at a time so take care
- * that subsequent mixins do not override.
- * @example
- * class Example {
- *   do() {
- *     console.log("Doing.");
- *   }
- * }
- *
- * const overrides = {
- *  do() {
- *    this.parent();
- *    console.log("Injector also doing.");
- *  }
- * }
- *
- * inject(Example).with(overrides);
- *
- * // logs:
- * // Doing.
- * // Injector also doing.
- * new Example().do();
- */
-export function inject(baseclass) {
-  return new Injector(baseclass);
+export function injectClass(baseclass) {
+  return new Injector({ baseclass });
+}
+
+export function injectInstance(instance) {
+  return new Injector({ instance });
 }
 
 class Injector {
-  constructor(baseclass) {
+  constructor({ baseclass, instance }) {
+    if (!baseclass && !instance)
+      throw new Error(
+        "Must pass either a class declaration via `injectClass()` or a class instance via injectInstance()"
+      );
     this.baseclass = baseclass;
+    this.instance = instance;
   }
 
+  /**
+   * Apply a series of mixins to a class. Applies mixins one at a time so take care
+   * that subsequent mixins do not override.
+   * @example
+   * class Example {
+   *   do() {
+   *     console.log("Doing.");
+   *   }
+   * }
+   *
+   * const overrides = {
+   *  do() {
+   *    this.parent();
+   *    console.log("Injector also doing.");
+   *  }
+   * }
+   *
+   * injectClass(Example).with(overrides);
+   *
+   * // logs:
+   * // Doing.
+   * // Injector also doing.
+   * new Example().do();
+   */
   with(overrides) {
-    const proto = this.baseclass.prototype;
+    const proto = this.baseclass ? this.baseclass.prototype : Object.getPrototypeOf(this.instance);
     const tmpFnCache = {};
     for (let name in overrides) {
       if (typeof overrides[name] !== "function" || typeof proto[name] !== "function") {

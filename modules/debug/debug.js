@@ -1,4 +1,5 @@
 import { Guard } from "../lib/guard.js";
+import { injectClass, injectInstance } from "../lib/inject.js";
 import { $new, $el, boolToOnOff } from "../lib/native-object-extensions.js";
 import { dragElement } from "../lib/ui-effects.js";
 import { PerformanceStats } from "./performance-stats.js";
@@ -181,97 +182,93 @@ export class GameDebugger {
   #injectEntityOverrides() {
     const gameDebugger = this;
 
-    const entityProto = this.baseEntityClass.prototype;
-    entityProto._debugColors = {
+    const _debugColors = {
       names: "#fff",
       velocities: "#0f0",
       boxes: "#f00",
     };
-    entityProto._debugShowHitbox = true;
-    entityProto._debugShowVelocity = true;
-    entityProto._debugShowName = true;
-    entityProto._debugCollisionWithEntity = true;
-
-    // Entity Debug methods
-    entityProto._debugDrawLine = function (color, sx, sy, dx, dy) {
-      const { ctx, drawPosition } = this.game.system;
-      const { x, y } = this.game.screen.actual;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.0;
-      ctx.beginPath();
-      ctx.moveTo(drawPosition(sx - x), drawPosition(sy - y));
-      ctx.lineTo(drawPosition(dx - x), drawPosition(dy - y));
-      ctx.stroke();
-      ctx.closePath();
-    };
-
-    entityProto.baseDraw = entityProto.draw;
-    entityProto.draw = function () {
-      this.baseDraw();
-      const { ctx, drawPosition, scale } = this.game.system;
-      // Collision Boxes
-      if (this._debugShowHitbox) {
+    const entityOverrides = {
+      _debugColors,
+      _debugShowHitbox: true,
+      _debugShowVelocity: true,
+      _debugShowName: true,
+      _debugCollisionWithEntity: true,
+      _debugDrawLine(color, sx, sy, dx, dy) {
+        const { ctx, drawPosition } = this.game.system;
         const { x, y } = this.game.screen.actual;
-        ctx.strokeStyle = this._debugColors.boxes;
+        ctx.strokeStyle = color;
         ctx.lineWidth = 1.0;
-        ctx.strokeRect(
-          drawPosition(this.pos.x.round() - x) - 0.5,
-          drawPosition(this.pos.y.round() - y) - 0.5,
-          this.size.x * scale,
-          this.size.y * scale
-        );
-      }
-
-      // Velocities
-      if (this._debugShowVelocity) {
-        const x = this.pos.x + this.size.x / 2;
-        const y = this.pos.y + this.size.y / 2;
-        this._debugDrawLine(this._debugColors.velocities, x, y, x + this.vel.x, y + this.vel.y);
-      }
-
-      // Names & Targets
-      if (this._debugShowName) {
-        if (this.name) {
+        ctx.beginPath();
+        ctx.moveTo(drawPosition(sx - x), drawPosition(sy - y));
+        ctx.lineTo(drawPosition(dx - x), drawPosition(dy - y));
+        ctx.stroke();
+        ctx.closePath();
+      },
+      update() {
+        this.parent();
+        // if (this === gameDebugger.selectedEntity)
+        gameDebugger.#updateSelectedEntity();
+      },
+      checkWith(other) {
+        if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
+        this.parent(other);
+      },
+      draw() {
+        this.parent();
+        const { ctx, drawPosition, scale } = this.game.system;
+        // Collision Boxes
+        if (this._debugShowHitbox) {
           const { x, y } = this.game.screen.actual;
-          ctx.fillStyle = this._debugColors.names;
-          this.game.font.write(
-            this.name,
-            drawPosition(this.pos.x - x),
-            drawPosition(this.pos.y - y) - 10,
-            {
-              color: "green",
-              size: 20,
-            }
+          ctx.strokeStyle = this._debugColors.boxes;
+          ctx.lineWidth = 1.0;
+          ctx.strokeRect(
+            drawPosition(this.pos.x.round() - x) - 0.5,
+            drawPosition(this.pos.y.round() - y) - 0.5,
+            this.size.x * scale,
+            this.size.y * scale
           );
         }
 
-        if (typeof this.target === "object") {
-          for (let t in this.target) {
-            const ent = this.game.getEntityByName(this.target[t]);
-            if (!ent) continue;
-            this._debugDrawLine(
-              this._debugColors.names,
-              this.pos.x + this.size.x / 2,
-              this.pos.y + this.size.y / 2,
-              ent.pos.x + ent.size.x / 2,
-              ent.pos.y + ent.size.y / 2
+        // Velocities
+        if (this._debugShowVelocity) {
+          const x = this.pos.x + this.size.x / 2;
+          const y = this.pos.y + this.size.y / 2;
+          this._debugDrawLine(this._debugColors.velocities, x, y, x + this.vel.x, y + this.vel.y);
+        }
+
+        // Names & Targets
+        if (this._debugShowName) {
+          if (this.name) {
+            const { x, y } = this.game.screen.actual;
+            ctx.fillStyle = this._debugColors.names;
+            this.game.font.write(
+              this.name,
+              drawPosition(this.pos.x - x),
+              drawPosition(this.pos.y - y) - 10,
+              {
+                color: "green",
+                size: 20,
+              }
             );
           }
+
+          if (typeof this.target === "object") {
+            for (let t in this.target) {
+              const ent = this.game.getEntityByName(this.target[t]);
+              if (!ent) continue;
+              this._debugDrawLine(
+                this._debugColors.names,
+                this.pos.x + this.size.x / 2,
+                this.pos.y + this.size.y / 2,
+                ent.pos.x + ent.size.x / 2,
+                ent.pos.y + ent.size.y / 2
+              );
+            }
+          }
         }
-      }
+      },
     };
-
-    entityProto.baseUpdate = entityProto.update;
-    entityProto.update = function () {
-      this.baseUpdate();
-      gameDebugger.#updateSelectedEntity();
-    };
-
-    entityProto.baseCheckWith = entityProto.checkWith;
-    entityProto.checkWith = function (other) {
-      if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
-      this.baseCheckWith(other);
-    };
+    injectClass(this.baseEntityClass).with(entityOverrides);
 
     const canvas = this.system.canvas;
     canvas.addEventListener("click", ({ clientX, clientY }) => {
@@ -288,29 +285,29 @@ export class GameDebugger {
   }
 
   #injectGameOverrides() {
-    const game = this.game;
     const gameDebugger = this;
-    game.baseSpawnEntity = game.spawnEntity;
-    game.spawnEntity = function (type, x, y, settings) {
-      this.baseSpawnEntity(type, x, y, settings);
-      gameDebugger.#updateActiveEntityList();
+    const gameOverrides = {
+      spawnEntity(type, x, y, settings) {
+        this.parent(type, x, y, settings);
+        gameDebugger.#updateActiveEntityList();
+      },
+      removeEntity(entity) {
+        this.parent(entity);
+        gameDebugger.#updateActiveEntityList();
+      },
     };
-
-    game.baseRemoveEntity = game.removeEntity;
-    game.removeEntity = function (entity) {
-      this.baseRemoveEntity(entity);
-      gameDebugger.#updateActiveEntityList();
-    };
+    injectInstance(this.game).with(gameOverrides);
   }
 
   #injectLoopOverrides() {
-    const loop = this.gameLoop;
     const gameDebugger = this;
-    loop.baseMain = loop.main;
-    loop.main = function (timestamp) {
-      this.baseMain(timestamp);
-      gameDebugger.stats.update();
+    const loopOverrides = {
+      main(timestamp) {
+        this.parent(timestamp);
+        gameDebugger.stats.update();
+      },
     };
+    injectInstance(this.gameLoop).with(loopOverrides);
   }
 
   #attachDebugMethods() {
