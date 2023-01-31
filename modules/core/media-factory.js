@@ -9,6 +9,16 @@ export class MediaFactory {
   #system = null;
   #soundManager = null;
 
+  /**
+   * Array of asset types to exclude from caching.
+   * @type {string[]}
+   */
+  static noCache = [
+    /* Animations end up calling the factory again to create the image anyway,
+     * may as well just cache that instead as the image can be more generically used. */
+    "animation",
+  ];
+
   constructor({ system, soundManager } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ soundManager });
@@ -17,9 +27,7 @@ export class MediaFactory {
   }
 
   #createAsset(path, data, type) {
-    /* Animations end up calling the factory again to create the image anyway,
-     * may as well just cache that instead as the image class can be more generically used. */
-    if (type !== "animation") {
+    if (!MediaFactory.noCache.includes(type)) {
       const cached = Register.getCachedAsset(path);
       if (cached) return cached;
     }
@@ -41,8 +49,8 @@ export class MediaFactory {
       default:
         throw new Error(`Couldn't determine asset type of ${type}`);
     }
-    // We don't want to overwrite a cached image with an animation.
-    if (type !== "animation") Register.cacheAsset(path, asset);
+
+    if (!MediaFactory.noCache.includes(type)) Register.cacheAsset(path, asset);
     return asset;
   }
 
