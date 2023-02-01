@@ -25,8 +25,7 @@ export class Timer {
 
   set(seconds) {
     this.target = seconds || 0;
-    this.base = Timer.time;
-    this.pausedAt = 0;
+    this.reset();
   }
 
   reset() {
