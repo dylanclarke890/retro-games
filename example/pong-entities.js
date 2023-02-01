@@ -45,7 +45,6 @@ export class EntityPaddleCpu extends EntityPaddle {
       ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2
         ? this.paddleSpeed
         : -this.paddleSpeed;
-
     super.update();
   }
 }

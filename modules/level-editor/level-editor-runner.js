@@ -1,5 +1,5 @@
 import { $new } from "../lib/native-object-extensions.js";
-import { injectClass } from "../lib/inject.js";
+import { plug } from "../lib/inject.js";
 
 import { System } from "../core/system.js";
 import { GameImage } from "../core/image.js";
@@ -101,7 +101,7 @@ export class LevelEditorRunner {
         this.scaleCache["x" + scale] = this.data;
       },
     };
-    injectClass(GameImage).with(imageOverrides);
+    plug(imageOverrides).into(GameImage);
   }
 }
 

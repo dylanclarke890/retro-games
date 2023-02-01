@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { injectClass, injectInstance } from "../lib/inject.js";
+import { plug } from "../lib/inject.js";
 import { $new, $el, boolToOnOff } from "../lib/native-object-extensions.js";
 import { dragElement } from "../lib/ui-effects.js";
 import { PerformanceStats } from "./performance-stats.js";
@@ -268,7 +268,7 @@ export class GameDebugger {
         }
       },
     };
-    injectClass(this.baseEntityClass).with(entityOverrides);
+    plug(entityOverrides).into(this.baseEntityClass);
 
     const canvas = this.system.canvas;
     canvas.addEventListener("click", ({ clientX, clientY }) => {
@@ -296,7 +296,7 @@ export class GameDebugger {
         gameDebugger.#updateActiveEntityList();
       },
     };
-    injectInstance(this.game).with(gameOverrides);
+    plug(gameOverrides).into(this.game);
   }
 
   #injectLoopOverrides() {
@@ -307,7 +307,7 @@ export class GameDebugger {
         gameDebugger.stats.update();
       },
     };
-    injectInstance(this.gameLoop).with(loopOverrides);
+    plug(loopOverrides).into(this.gameLoop);
   }
 
   #attachDebugMethods() {
