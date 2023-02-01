@@ -40,27 +40,30 @@ class Injector {
    * // Injector also doing.
    * new Example().do();
    */
-  with(overrides) {
+  with(...overrides) {
     const proto = this.baseclass ? this.baseclass.prototype : Object.getPrototypeOf(this.instance);
-    const tmpFnCache = {};
-    for (let name in overrides) {
-      if (typeof overrides[name] !== "function" || typeof proto[name] !== "function") {
-        proto[name] = overrides[name];
-        continue;
+    let tmpFnCache = {};
+    for (let i = 0; i < overrides.length; i++) {
+      const plugin = overrides[i];
+      for (let name in plugin) {
+        if (typeof plugin[name] !== "function" || typeof proto[name] !== "function") {
+          proto[name] = plugin[name];
+          continue;
+        }
+
+        tmpFnCache[name] = proto[name];
+        proto[name] = (function (name, fn) {
+          return function () {
+            const tmp = this.parent;
+            this.parent = tmpFnCache[name];
+
+            const ret = fn.apply(this, arguments);
+            this.parent = tmp;
+
+            return ret;
+          };
+        })(name, plugin[name]);
       }
-
-      tmpFnCache[name] = proto[name];
-      proto[name] = (function (name, fn) {
-        return function () {
-          const tmp = this.parent;
-          this.parent = tmpFnCache[name];
-
-          const ret = fn.apply(this, arguments);
-          this.parent = tmp;
-
-          return ret;
-        };
-      })(name, overrides[name]);
     }
   }
 }
