@@ -1,7 +1,12 @@
 import { Register } from "../modules/core/register.js";
 import { Entity } from "../modules/core/entity.js";
 
-export class EntityBall extends Entity {
+import { mix } from "../modules/lib/mixin.js";
+import { ClickableMixin } from "../modules/plugins/clickable.js";
+
+class PongEntityBase extends mix(Entity).with(ClickableMixin) {}
+
+export class EntityBall extends PongEntityBase {
   name = "Ball baby";
   size = { x: 48, y: 48 };
   vel = { x: 250, y: 100 };
@@ -16,7 +21,7 @@ export class EntityBall extends Entity {
   }
 }
 
-export class EntityPaddle extends Entity {
+export class EntityPaddle extends PongEntityBase {
   name = "Paddle";
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;
