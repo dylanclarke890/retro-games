@@ -6,17 +6,16 @@ import { GameLoader } from "./loader.js";
 import { Entity } from "./entity.js";
 
 export class GameRunner {
-  #customGameOptions = null;
-  #font = null;
-  #loader = null;
-  #loop = null;
-  #mediaFactory = null;
-  #soundManager = null;
-
+  customGameOptions = null;
   debugSystem = null;
+  fonts = {};
   game = null;
+  loader = null;
+  loop = null;
   newGameClass = null; // TODO: link up to run() in loop
+  mediaFactory = null;
   ready = false;
+  soundManager = null;
   system = null;
 
   constructor({
@@ -29,27 +28,34 @@ export class GameRunner {
     loaderClass,
     debugMode,
     showStats,
-    font,
+    fonts,
     ...customGameOptions
   } = {}) {
-    this.system = new System({ runner: this, canvasId, width, height, scale, fps });
-    this.#soundManager = new SoundManager(this);
-    this.#mediaFactory = new MediaFactory({
-      system: this.system,
-      soundManager: this.#soundManager,
-    });
-    this.#loop = new GameLoop({ runner: this, showStats, targetFps: fps });
-    this.#font = this.#mediaFactory.createFont(font);
     this.customGameOptions = customGameOptions;
+    this.system = new System({ runner: this, canvasId, width, height, scale, fps });
+    this.soundManager = new SoundManager(this);
+    this.mediaFactory = new MediaFactory({
+      system: this.system,
+      soundManager: this.soundManager,
+    });
+    this.loop = new GameLoop({ runner: this, showStats, targetFps: fps });
+
+    // TODO - handle cases of no fonts being specified i.e fallback to a font that's always available.
+    Object.keys(fonts).forEach((fontName) => {
+      this.fonts[fontName] = this.mediaFactory.createFont({
+        name: fontName,
+        path: fonts[fontName],
+      });
+    });
 
     this.ready = true;
     loaderClass ??= GameLoader;
-    this.#loader = new loaderClass({
+    this.loader = new loaderClass({
       runner: this,
       gameClass,
       debugMode,
     });
-    this.#loader.load();
+    this.loader.load();
   }
 
   setGame(gameClass) {
@@ -60,11 +66,11 @@ export class GameRunner {
   setGameNow(gameClass) {
     this.game = new gameClass({
       system: this.system,
-      font: this.#font,
-      mediaFactory: this.#mediaFactory,
-      ...this.#customGameOptions,
+      fonts: this.fonts,
+      mediaFactory: this.mediaFactory,
+      ...this.customGameOptions,
     });
-    this.#loop.start();
+    this.loop.start();
   }
 
   launchDebugger() {
@@ -73,7 +79,7 @@ export class GameRunner {
       this.gameDebugger = new GameDebugger({
         baseEntityClass: Entity,
         game: this.game,
-        gameLoop: this.#loop,
+        gameLoop: this.loop,
         system: this.system,
       });
     });

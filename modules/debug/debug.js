@@ -241,7 +241,7 @@ export class GameDebugger {
           if (this.name) {
             const { x, y } = this.game.screen.actual;
             ctx.fillStyle = this._debugColors.names;
-            this.game.font.write(
+            this.game.fonts.standard.write(
               this.name,
               drawPosition(this.pos.x - x),
               drawPosition(this.pos.y - y) - 10,

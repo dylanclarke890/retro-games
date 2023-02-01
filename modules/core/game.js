@@ -19,7 +19,7 @@ export class Game {
   clearColor = "#000000";
   collisionMap = CollisionMap.staticNoCollision;
   entities = [];
-  font = null;
+  fonts = {};
   gravity = 0;
   namedEntities = {};
   screen = {
@@ -35,12 +35,12 @@ export class Game {
     };
   }
 
-  constructor({ system, font, mediaFactory } = {}) {
+  constructor({ system, fonts, mediaFactory } = {}) {
     Guard.againstNull({ system });
     Guard.againstNull({ mediaFactory });
     this.system = system;
     this.media = mediaFactory;
-    this.font = font;
+    this.fonts = fonts;
     this.input = new Input({ system: this.system });
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }
@@ -172,7 +172,7 @@ export class Game {
   }
 
   spawnEntity(type, x, y, settings) {
-    settings = settings || {};
+    settings ??= {};
     const entityClass = Register.getEntityByType(type);
     if (!entityClass) throw new Error(`Can't spawn entity of type ${type}`);
     const ent = new entityClass({ x, y, game: this, settings });

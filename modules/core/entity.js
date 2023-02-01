@@ -27,7 +27,6 @@ export class Entity {
   static #lastId = 0;
 
   id = 0;
-  settings = {};
   size = { x: 16, y: 16 };
   offset = { x: 0, y: 0 };
   pos = { x: 0, y: 0 };
@@ -65,7 +64,7 @@ export class Entity {
     this.game = game;
     this.pos.x = this.last.x = x;
     this.pos.y = this.last.y = y;
-    NativeExtensions.extend(this, settings);
+    Object.assign(this, settings);
   }
 
   reset(x, y, settings) {
