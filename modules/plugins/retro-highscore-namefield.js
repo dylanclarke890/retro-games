@@ -82,7 +82,6 @@ export class EntityRetroHighscoreNameField extends Entity {
     super.update();
   }
   draw() {
-    super.draw();
     // Draw each char
     for (let i = 0; i < this.numberOfChars; i++)
       this.drawCharacter(i, this.pos.x + this.letterSpacing * i, this.pos.y);
