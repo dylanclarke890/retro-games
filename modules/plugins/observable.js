@@ -1,4 +1,4 @@
-export const observablePlugin = {
+export const ObservablePlugin = {
   _listeners: {},
   on(eventName, handler) {
     const listeners = (this._listeners[eventName] ??= []);
