@@ -1,10 +1,20 @@
+import { Guard } from "../lib/guard.js";
+
 import { Font } from "../core/font.js";
 import { Input } from "../core/input.js";
 import { Entity } from "../core/entity.js";
-import { Guard } from "../lib/guard.js";
 import { Register } from "../core/register.js";
 
-export class EntityRetroHighscoreNameField extends Entity {
+/**
+ * @example
+ * this.retroNameField = this.spawnEntity(EntityRetroHighscoreNameField, 50, 100, {
+ *   fontNormal: this.fonts.standard,
+ *   fontHighlighted: this.fonts.freedom,
+ *   numberOfChars: 3,
+ *   letterSpacing: 20,
+ * });
+ */
+export class RetroHighscoreNameField extends Entity {
   highlightedChar = 0;
   name = [];
 
@@ -72,7 +82,7 @@ export class EntityRetroHighscoreNameField extends Entity {
     if (input.pressed("prev_char") && this.highlightedChar > 0) this.highlightedChar--;
     else if (input.pressed("next_char") && this.highlightedChar < this.numberOfChars - 1)
       this.highlightedChar++;
-
+    console.log(this.highlightedChar);
     const current = this.highlightedChar;
     // Switch between symbols
     if (input.pressed("prev_symbol") && this.name[current].symbol > 0) this.name[current].symbol--;
@@ -101,4 +111,4 @@ export class EntityRetroHighscoreNameField extends Entity {
   }
 }
 
-Register.entityType(EntityRetroHighscoreNameField);
+Register.entityType(RetroHighscoreNameField);
