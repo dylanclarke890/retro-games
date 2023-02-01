@@ -1,9 +1,14 @@
 import { Register } from "../modules/core/register.js";
 import { Entity } from "../modules/core/entity.js";
+import { mix } from "../modules/lib/mixin.js";
+import { FadeEntityMixin } from "../modules/plugins/fade-entity.js";
 
-class PongEntityBase extends Entity {
+class PongEntityBase extends mix(Entity).with(FadeEntityMixin) {
   constructor({ settings, ...rest }) {
-    super({ ...rest, settings: { ...settings, fixed: true } });
+    super({
+      ...rest,
+      settings: { ...settings, fadeInDuration: 5, solidDuration: 5, fadeOutDuration: 4 },
+    });
   }
 }
 
@@ -14,7 +19,6 @@ export class EntityBall extends PongEntityBase {
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
   hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
-
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/ball.png");
