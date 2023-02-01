@@ -29,12 +29,17 @@ export class EntityPaddle extends Entity {
 }
 
 export class EntityPaddleCpu extends EntityPaddle {
+  constructor(opts) {
+    super(opts);
+  }
+
   update() {
     const ball = this.game.getEntitiesByType(EntityBall)[0];
     this.vel.y =
       ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2
         ? this.paddleSpeed
         : -this.paddleSpeed;
+
     super.update();
   }
 }

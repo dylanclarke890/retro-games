@@ -7,6 +7,8 @@
 /// <reference path="modules/lib/vendor-attributes.js"/>
 /// <reference path="modules/lib/user-agent.js"/>
 /// <reference path="modules/lib/timer.js"/>
+/// <reference path="modules/lib/inject.js"/>
+/// <reference path="modules/lib/mixin.js"/>
 // #endregion LIB
 
 // #region DEBUG
@@ -44,6 +46,12 @@
 /// <reference path="modules/level-editor/tile-select.js"/>
 /// <reference path="modules/level-editor/undo.js"/>
 //#endregion LEVEL-EDITOR
+
+//#region PLUGINS
+/// <reference path="modules/plugins/retro-highscore-namefield.js"/>
+/// <reference path="modules/plugins/observable.js"/>
+//#endregion PLUGINS
+
 
 // #region CUSTOM
 /// <reference path="example/my-game.js"/>
