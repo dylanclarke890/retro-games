@@ -1,10 +1,7 @@
 import { Register } from "../modules/core/register.js";
 import { Entity } from "../modules/core/entity.js";
 
-import { mix } from "../modules/lib/mixin.js";
-import { FixedEntityMixin } from "../modules/plugins/fixed-entity.js";
-
-class PongEntityBase extends mix(Entity).with(FixedEntityMixin) {
+class PongEntityBase extends Entity {
   constructor({ settings, ...rest }) {
     super({ ...rest, settings: { ...settings, fixed: true } });
   }

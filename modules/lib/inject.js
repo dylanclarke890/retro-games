@@ -6,6 +6,43 @@ export function injectInstance(instance) {
   return new Injector({ instance });
 }
 
+export function plug(...overrides) {
+  return new Inject(overrides);
+}
+
+class Inject {
+  constructor(...overrides) {
+    this.overrides = overrides;
+  }
+
+  into(obj, isInstance) {
+    const proto = isInstance ? obj.prototype : Object.getPrototypeOf(obj);
+    let tmpFnCache = {};
+    for (let i = 0; i < this.overrides.length; i++) {
+      const plugin = this.overrides[i];
+      for (let name in plugin) {
+        if (typeof plugin[name] !== "function" || typeof proto[name] !== "function") {
+          proto[name] = plugin[name];
+          continue;
+        }
+
+        tmpFnCache[name] = proto[name];
+        proto[name] = (function (name, fn) {
+          return function () {
+            const tmp = this.parent;
+            this.parent = tmpFnCache[name];
+
+            const ret = fn.apply(this, arguments);
+            this.parent = tmp;
+
+            return ret;
+          };
+        })(name, plugin[name]);
+      }
+    }
+  }
+}
+
 class Injector {
   constructor({ baseclass, instance }) {
     if (!baseclass && !instance)
