@@ -4,7 +4,10 @@ export const FadeEntityMixin = (superclass) =>
   class extends superclass {
     constructor(opts) {
       super(opts);
-      this.fadeInTimer = new Timer(this.fadeInDuration ?? 0);
+      this.fadeInDuration ??= 0;
+      this.solidDuration ??= Infinity;
+      this.fadeOutDuration ??= 0;
+      this.fadeInTimer = new Timer(this.fadeInDuration);
     }
 
     draw() {
@@ -23,16 +26,22 @@ export const FadeEntityMixin = (superclass) =>
     }
 
     fadeInEntity_getAlpha() {
-      if (this.fadeInTimer.delta() < 0)
+      if (this.fadeInTimer.delta() < 0) {
         return 1 - Math.abs(this.fadeInTimer.delta() / this.fadeInDuration);
-      else if (!this.solidDurationTimer)
-        this.solidDurationTimer = new Timer(this.solidDuration ?? Infinity);
+      } else if (!this.solidDurationTimer) this.solidDurationTimer = new Timer(this.solidDuration);
 
       if (this.solidDurationTimer.delta() < 0) return 1;
-      else if (!this.fadeOutTimer) this.fadeOutTimer = new Timer(this.fadeOutDuration ?? 0);
+      else if (!this.fadeOutTimer) this.fadeOutTimer = new Timer(this.fadeOutDuration);
 
       if (this.fadeOutTimer.delta() < 0)
         return Math.abs(this.fadeOutTimer.delta() / this.fadeOutDuration);
+
+      if (this.loopFade) {
+        this.fadeInTimer.set(this.fadeInDuration);
+        this.solidDurationTimer = null;
+        this.fadeOutTimer = null;
+        if (typeof this.loopFade === "number") this.loopFade--;
+      }
 
       if (this.killAfterFadeOut) this.kill();
 

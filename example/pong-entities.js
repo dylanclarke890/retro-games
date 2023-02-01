@@ -7,7 +7,13 @@ class PongEntityBase extends mix(Entity).with(FadeEntityMixin) {
   constructor({ settings, ...rest }) {
     super({
       ...rest,
-      settings: { ...settings, fadeInDuration: 5, solidDuration: 5, fadeOutDuration: 4 },
+      settings: {
+        ...settings,
+        fadeInDuration: 1,
+        solidDuration: 1,
+        fadeOutDuration: 1,
+        loopFade: 5,
+      },
     });
   }
 }
