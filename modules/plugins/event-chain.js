@@ -4,7 +4,7 @@ export class EventChain {
   constructor() {
     this.chain = [];
     this.chainCopy = [];
-    this.index = 0;
+    this.currentStep = 0;
     this.isNextStep = true;
     this.timer = new Timer(0);
   }
@@ -16,7 +16,7 @@ export class EventChain {
   }
 
   nextStep() {
-    this.index++;
+    this.currentStep++;
     this.isNextStep = true;
   }
 
@@ -59,7 +59,8 @@ export class EventChain {
       console.log(`Do that again ${amount} times.`);
       return () => {
         // Add all the previous steps excluding the current one (to avoid endless repeats) to the chain.
-        for (let i = 0; i < amount; i++) this.chain.push(...this.chain.slice(0, this.index - 1));
+        for (let i = 0; i < amount; i++)
+          this.chain.push(...this.chainCopy.slice(0, this.currentStep - 1));
         this.nextStep();
       };
     },
@@ -108,7 +109,7 @@ export class EventChain {
   reset() {}
 
   update() {
-    const link = this.chain[this.index];
+    const link = this.chain[this.currentStep];
     if (!link) return;
     if (this.isNextStep) {
       link.handler = link.action();
