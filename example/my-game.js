@@ -16,7 +16,11 @@ export class MyGame extends Game {
       .wait(5)
       .waitUntil(() => Math.random() > 0.5)
       .then(() => console.log("Doing something."))
-      .thenUntil(() => Math.random() > 0.5, () => console.log("Repeatable action."));
+      .thenUntil(
+        () => Math.random() > 0.5,
+        () => console.log("Repeatable action.")
+      )
+      .repeat(1);
     
     this.loadLevel(level);
   }

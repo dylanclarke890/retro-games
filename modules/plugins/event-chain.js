@@ -3,9 +3,16 @@ import { Timer } from "../lib/timer.js";
 export class EventChain {
   constructor() {
     this.chain = [];
+    this.chainCopy = [];
     this.index = 0;
     this.isNextStep = true;
     this.timer = new Timer(0);
+  }
+
+  createStep(action) {
+    const step = { action, handler: null };
+    this.chain.push(step);
+    this.chainCopy.push(step);
   }
 
   nextStep() {
@@ -48,25 +55,38 @@ export class EventChain {
         return false;
       };
     },
+    repeat: (amount) => {
+      console.log(`Do that again ${amount} times.`);
+      return () => {
+        // Add all the previous steps excluding the current one (to avoid endless repeats) to the chain.
+        for (let i = 0; i < amount; i++) this.chain.push(...this.chain.slice(0, this.index - 1));
+        this.nextStep();
+      };
+    },
   };
 
   wait(duration) {
-    this.chain.push({ action: () => this.actions.wait(duration) });
+    this.createStep(() => this.actions.wait(duration));
     return this;
   }
 
   waitUntil(predicate) {
-    this.chain.push({ action: () => this.actions.waitUntil(predicate) });
+    this.createStep(() => this.actions.waitUntil(predicate));
     return this;
   }
 
   then(action) {
-    this.chain.push({ action: () => this.actions.then(action) });
+    this.createStep(() => this.actions.then(action));
     return this;
   }
 
   thenUntil(predicate, action) {
-    this.chain.push({ action: () => this.actions.thenUntil(predicate, action) });
+    this.createStep(() => this.actions.thenUntil(predicate, action));
+    return this;
+  }
+
+  repeat(amount) {
+    this.createStep(() => this.actions.repeat(amount));
     return this;
   }
 
@@ -82,11 +102,6 @@ export class EventChain {
 
   during(action) {
     console.log(`Doing ${action} at the same time.`);
-    return this;
-  }
-
-  repeat(amount) {
-    console.log(`Do that again ${amount} times.`);
     return this;
   }
 
