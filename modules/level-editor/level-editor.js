@@ -1,4 +1,5 @@
 import { raf, caf } from "../lib/polyfills.js";
+import { constrain } from "../lib/number-utils.js";
 import { $el, JSONFormat } from "../lib/native-object-extensions.js";
 import { slideToggle, fadeOut } from "../lib/ui-effects.js";
 import { getCookie, setCookie } from "../lib/cookie.js";
@@ -303,7 +304,7 @@ export class LevelEditor {
       else z *= 2;
     } else z += delta;
 
-    config.view.zoom = z.constrain(config.view.zoomMin, config.view.zoomMax);
+    config.view.zoom = constrain(z, config.view.zoomMin, config.view.zoomMax);
     config.labels.step = Math.round(this.labelsStep / config.view.zoom);
 
     const zoomDisplay = $el("#zoomIndicator");

@@ -5,6 +5,7 @@ import { GameImage } from "../core/image.js";
 import { BackgroundMap } from "../core/map.js";
 
 import { TileSelect } from "./tile-select.js";
+import { toInt } from "../lib/number-utils.js";
 
 export class EditMap extends BackgroundMap {
   name = "";
@@ -246,8 +247,8 @@ export class EditMap extends BackgroundMap {
     const w = this.brush[0].length;
     const h = this.brush.length;
     return {
-      x: (w / 2 - 0.5).toInt() * this.tilesize,
-      y: (h / 2 - 0.5).toInt() * this.tilesize,
+      x: toInt(w / 2 - 0.5) * this.tilesize,
+      y: toInt(h / 2 - 0.5) * this.tilesize,
     };
   }
 

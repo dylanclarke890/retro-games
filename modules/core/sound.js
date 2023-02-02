@@ -1,4 +1,5 @@
 import { VendorAttributes } from "../lib/vendor-attributes.js";
+import { constrain, map } from "../lib/number-utils.js";
 import { UserAgent } from "../lib/user-agent.js";
 import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
@@ -186,7 +187,7 @@ export class Music extends GameAudio {
     return {
       get: () => this.#volume,
       set: (value) => {
-        this.#volume = value.constrain(0, 1);
+        this.#volume = constrain(value, 0, 1);
         for (let i in this.#tracks) this.#tracks[i].volume = this.#volume;
       },
     };
@@ -257,7 +258,9 @@ export class Music extends GameAudio {
 
   #fadeStep() {
     const v =
-      this.#fadeTimer.delta().map(-this.#fadeTimer.target, 0, 1, 0).constrain(0, 1) * this.#volume;
+      constrain(map(this.#fadeTimer.delta(), -this.#fadeTimer.target, 0, 1, 0), 0, 1) *
+      this.#volume;
+
     if (v <= 0.01) {
       this.stop();
       this.#currentTrack.volume = this.#volume;
@@ -351,7 +354,7 @@ export class WebAudioSource extends GameAudio {
   get volume() {
     return {
       get: () => this.#gain.gain.value,
-      set: (value) => (this.#gain.gain.value = value.constrain(0, 1)),
+      set: (value) => (this.#gain.gain.value = constrain(value, 0, 1)),
     };
   }
 

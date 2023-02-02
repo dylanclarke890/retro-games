@@ -1,6 +1,7 @@
 import { $new } from "../lib/native-object-extensions.js";
 import { Guard } from "../lib/guard.js";
 import { GameImage } from "../core/image.js";
+import { toInt } from "../lib/number-utils.js";
 
 export class GameMap {
   tilesize = 8;
@@ -231,8 +232,8 @@ export class BackgroundMap extends GameMap {
   drawTiled() {
     let tile = 0,
       anim = null,
-      tileOffsetX = (this.scroll.x / this.tilesize).toInt(),
-      tileOffsetY = (this.scroll.y / this.tilesize).toInt(),
+      tileOffsetX = toInt(this.scroll.x / this.tilesize),
+      tileOffsetY = toInt(this.scroll.y / this.tilesize),
       pxOffsetX = this.scroll.x % this.tilesize,
       pxOffsetY = this.scroll.y % this.tilesize,
       pxMinX = -pxOffsetX - this.tilesize,

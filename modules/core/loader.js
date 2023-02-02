@@ -48,10 +48,10 @@ export class GameLoader {
   #drawLoadingScreen() {
     this.#progressPercent += (this.#status - this.#progressPercent) / 5;
     const { scale, width, height, ctx } = this.runner.system;
-    let barWidth = (width * 0.6).floor();
-    let barHeight = (height * 0.1).floor();
-    const x = (width * 0.5 - barWidth / 2).floor() * scale;
-    const y = (height * 0.5 - barHeight / 2).floor() * scale;
+    let barWidth = Math.floor(width * 0.6);
+    let barHeight = Math.floor(height * 0.1);
+    const x = Math.floor(width * 0.5 - barWidth / 2) * scale;
+    const y = Math.floor(height * 0.5 - barHeight / 2) * scale;
     barWidth = barWidth * scale;
     barHeight = barHeight * scale;
 

@@ -1,4 +1,4 @@
-import { NativeExtensions } from "../lib/native-object-extensions.js";
+import { constrain, toRad } from "../lib/number-utils.js";
 import { Guard } from "../lib/guard.js";
 import { Register } from "./register.js";
 import { GameAnimation } from "./animation.js";
@@ -47,7 +47,7 @@ export class Entity {
   type = Entity.TYPE.NONE;
   checkAgainst = Entity.TYPE.NONE;
   collides = Entity.COLLIDES.NEVER;
-  slopeStanding = { min: (44).toRad(), max: (136).toRad() };
+  slopeStanding = { min: toRad(44), max: toRad(136) };
   killed = false;
 
   get skipCollisionChecks() {
@@ -83,8 +83,7 @@ export class Entity {
     this.type = proto.type;
     this.checkAgainst = proto.checkAgainst;
     this.collides = proto.collides;
-
-    NativeExtensions.extend(this, settings);
+    Object.assign(this, settings);
   }
 
   createAnimationSheet(path, size = this.size) {
@@ -123,14 +122,14 @@ export class Entity {
   }
 
   getNewVelocity(vel, accel, friction, max) {
-    if (accel) return (vel + accel * this.game.system.tick).constrain(-max, max);
+    if (accel) return constrain(vel + accel * this.game.system.tick, -max, max);
     else if (friction) {
       const delta = friction * this.game.system.tick;
       if (vel - delta > 0) return vel - delta;
       else if (vel + delta < 0) return vel + delta;
       else return 0;
     }
-    return vel.constrain(-max, max);
+    return constrain(vel, -max, max);
   }
 
   handleMovementTrace(res) {

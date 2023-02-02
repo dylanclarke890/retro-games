@@ -222,8 +222,8 @@ export class GameDebugger {
           ctx.strokeStyle = this._debugColors.boxes;
           ctx.lineWidth = 1.0;
           ctx.strokeRect(
-            drawPosition(this.pos.x.round() - x) - 0.5,
-            drawPosition(this.pos.y.round() - y) - 0.5,
+            drawPosition(Math.round(this.pos.x) - x) - 0.5,
+            drawPosition(Math.round(this.pos.y) - y) - 0.5,
             this.size.x * scale,
             this.size.y * scale
           );

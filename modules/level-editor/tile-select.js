@@ -1,4 +1,5 @@
 import { Guard } from "../lib/guard.js";
+import { constrain } from "../lib/number-utils.js";
 
 export class TileSelect {
   layer = null;
@@ -31,8 +32,8 @@ export class TileSelect {
       Math.floor(y / tilesize) * tilesize -
       Math.floor((tile * tilesize) / tiles.width) * tilesize -
       (tile === -1 ? tilesize : 0);
-    this.pos.x = this.pos.x.constrain(0, width - tiles.width - (width % tilesize));
-    this.pos.y = this.pos.y.constrain(0, height - tiles.height - (height % tilesize));
+    this.pos.x = constrain(this.pos.x, 0, width - tiles.width - (width % tilesize));
+    this.pos.y = constrain(this.pos.y, 0, height - tiles.height - (height % tilesize));
   }
 
   beginSelecting(x, y) {
