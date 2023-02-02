@@ -27,7 +27,6 @@ export class MyGame extends Game {
 
   update() {
     super.update();
-    this.chain.update();
     /** Extra update logic goes here. */
   }
 }
