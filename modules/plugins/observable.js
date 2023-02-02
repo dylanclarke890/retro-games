@@ -6,8 +6,9 @@ export const ObservablePlugin = {
   },
   off(eventName, handler) {
     const listeners = this._listeners[eventName];
-    if (listeners) return;
-    listeners.erase(handler);
+    if (!listeners) return;
+    if (handler) listeners.erase(handler);
+    else this._listeners = [];
   },
   trigger(eventName, data = {}) {
     const listeners = this._listeners[eventName];
