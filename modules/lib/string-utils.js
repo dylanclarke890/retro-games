@@ -45,6 +45,8 @@ export function formatAsJSON(json, opts = {}) {
 
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 export function uniqueId(prefix = null) {
-  const id = Array.from({ length: 10 }, () => CHARS[Math.floor(Math.random() * 52)]).join("");
+  const id = Array.from({ length: 10 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]).join(
+    ""
+  );
   return prefix ? `${prefix}${id}` : id;
 }

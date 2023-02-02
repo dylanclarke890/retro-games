@@ -1,3 +1,4 @@
+import { removeItem } from "../lib/array-utils.js";
 import { Guard } from "../lib/guard.js";
 import { Register } from "./register.js";
 
@@ -67,7 +68,7 @@ export class GameLoader {
 
   #loadCallback(path, wasSuccessful) {
     if (!wasSuccessful) throw new Error(`Failed to load resource: ${path}`);
-    this.#unloaded.erase(path);
+    removeItem(this.#unloaded, path);
     this.#status = 1 - this.#unloaded.length / this.#assetsToPreload.length;
     if (this.#unloaded.length === 0) setTimeout(() => this.end(), 250);
   }

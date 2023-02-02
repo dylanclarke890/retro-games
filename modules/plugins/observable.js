@@ -1,3 +1,5 @@
+import { removeItem } from "../lib/array-utils.js";
+
 export const ObservablePlugin = {
   _listeners: {},
   on(eventName, handler) {
@@ -7,7 +9,7 @@ export const ObservablePlugin = {
   off(eventName, handler) {
     const listeners = this._listeners[eventName];
     if (!listeners) return;
-    if (handler) listeners.erase(handler);
+    if (handler) removeItem(listeners, handler);
     else this._listeners = [];
   },
   trigger(eventName, data = {}) {

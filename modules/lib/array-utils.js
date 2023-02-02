@@ -1,16 +1,12 @@
-Object.defineProperty(Array.prototype, "erase", {
-  value: function (item) {
-    for (let i = this.length; i--; )
-      if (this[i] === item) {
-        this.splice(i, 1);
-        break;
-      }
-    return this;
-  },
-});
+export function removeItem(array, item) {
+  for (let i = array.length; i > 0; i--)
+    if (array[i] === item) {
+      array.splice(i, 1);
+      break;
+    }
+  return array;
+}
 
-Object.defineProperty(Array.prototype, "random", {
-  value: function () {
-    return this[Math.floor(Math.random() * this.length)];
-  },
-});
+export function randomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}

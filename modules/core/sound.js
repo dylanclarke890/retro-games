@@ -1,8 +1,10 @@
 import { VendorAttributes } from "../lib/vendor-attributes.js";
 import { constrain, map } from "../lib/number-utils.js";
+import { removeItem } from "../lib/array-utils.js";
 import { UserAgent } from "../lib/user-agent.js";
 import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
+
 import { Register } from "./register.js";
 
 export class SoundManager {
@@ -370,8 +372,8 @@ export class WebAudioSource extends GameAudio {
     source.buffer = this.buffer;
     source.connect(this.#gain);
     source.loop = this.#loop;
-    this.#sources.push(source); // Add this new source to our sources array
-    source.onended = () => this.#sources.erase(source); // remove it when it has finished playing.
+    this.#sources.push(source);
+    source.onended = () => removeItem(this.#sources, source);
     source.start(0);
   }
 

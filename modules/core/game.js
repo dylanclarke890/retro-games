@@ -1,4 +1,5 @@
 import { Guard } from "../lib/guard.js";
+import { removeItem } from "../lib/array-utils.js";
 
 import { Register } from "../core/register.js";
 
@@ -58,15 +59,16 @@ export class Game {
     }
 
     for (let i = 0; i < this.entities.length; i++) {
-      const ent = this.entities[i];
-      if (!ent.killed) ent.update();
+      const entity = this.entities[i];
+      if (!entity.killed) entity.update();
     }
     this.checkEntities();
 
     // remove all killed entities
     for (let i = 0; i < this.#deferredKills.length; i++) {
-      this.#deferredKills[i].erase();
-      this.entities.erase(this.#deferredKills[i]);
+      const entity = this.#deferredKills[i];
+      removeItem(this.#deferredKills, entity);
+      entity.erase();
     }
     this.#deferredKills = [];
     if (this.#doSortEntities || this.#autoSort) this.sortEntities();
