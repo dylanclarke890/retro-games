@@ -7,6 +7,7 @@ export class EventChain {
     this.index = 0;
     this.isNextStep = true;
     this.timer = new Timer(0);
+    this.stepMap = new Map();
   }
 
   actions = {
@@ -18,6 +19,9 @@ export class EventChain {
         this.nextStep();
       };
     },
+    orUntil: (predicate) => {},
+    every: (duration, action) => {},
+    whilst: (action) => {},
     waitUntil: (predicate) => {
       console.log(`Waiting until ${predicate} is true.`);
       return () => {
@@ -45,25 +49,22 @@ export class EventChain {
       };
     },
     repeat: (amount) => {
-      this.repeatMap ??= new Map();
-      const repeatKey = this.index;
-
-      if (!this.repeatMap.has(repeatKey)) {
-        this.repeatMap.set(repeatKey, { original: amount, current: amount });
+      const stepKey = this.index;
+      if (!this.stepMap.has(stepKey)) {
+        this.stepMap.set(stepKey, { totalRepeats: amount, repeatsLeft: amount });
         // Reset the counters of any repeat steps before this one.
-        for (const [key, { original }] of this.repeatMap.entries())
-          if (key < repeatKey) this.repeatMap.set(key, { original, current: original });
+        for (const [key, { totalRepeats }] of this.stepMap.entries())
+          if (totalRepeats != null && key < stepKey)
+            this.stepMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
       }
       return () => {
-        const timesLeft = this.repeatMap.get(repeatKey);
-        if (timesLeft.current <= 0) {
+        const { totalRepeats, repeatsLeft } = this.stepMap.get(stepKey);
+        if (repeatsLeft <= 0) {
           this.nextStep();
           return;
         }
-        console.log(`Do that again ${timesLeft.current} more times.`);
-
-        timesLeft.current--;
-        this.repeatMap.set(repeatKey, timesLeft);
+        console.log(`Do that again ${repeatsLeft} more times.`);
+        this.stepMap.set(stepKey, { totalRepeats, repeatsLeft: repeatsLeft - 1 });
         this.reset();
       };
     },
@@ -97,6 +98,26 @@ export class EventChain {
     return this;
   }
 
+  orUntil(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
+    console.log(`Or until ${predicate} is true.`);
+    return this;
+  }
+
+  every(duration, action) {
+    Guard.isTypeOf({ action }, "function");
+    duration ??= 1;
+    console.log(`Doing ${action} every ${duration} seconds.`);
+    return this;
+  }
+
+  whilst(action) {
+    Guard.isTypeOf({ action }, "function");
+    this.createStep(() => this.actions.whilst(action));
+    console.log(`Doing ${action} while waiting.`);
+    return this;
+  }
+
   waitUntil(predicate) {
     Guard.isTypeOf({ predicate }, "function");
     this.createStep(() => this.actions.waitUntil(predicate));
@@ -118,25 +139,6 @@ export class EventChain {
   repeat(amount) {
     amount ??= 1;
     this.createStep(() => this.actions.repeat(amount));
-    return this;
-  }
-
-  orUntil(predicate) {
-    Guard.isTypeOf({ predicate }, "function");
-    console.log(`Or until ${predicate} is true.`);
-    return this;
-  }
-
-  every(duration, action) {
-    Guard.isTypeOf({ action }, "function");
-    duration ??= 1;
-    console.log(`Doing ${action} every ${duration} seconds.`);
-    return this;
-  }
-
-  during(action) {
-    Guard.isTypeOf({ action }, "function");
-    console.log(`Doing ${action} at the same time.`);
     return this;
   }
 
