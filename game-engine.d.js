@@ -1,4 +1,5 @@
 // #region CORE
+
 /// <reference path="modules/core/animation.js"/>
 /// <reference path="modules/core/entity.js"/>
 /// <reference path="modules/core/font.js"/>
@@ -13,20 +14,26 @@
 /// <reference path="modules/core/runner.js"/>
 /// <reference path="modules/core/sound.js"/>
 /// <reference path="modules/core/system.js"/>
+
 // #endregion CORE
 
 // #region DEBUG
+
 /// <reference path="modules/debug/performance-stats.js"/>
 /// <reference path="modules/debug/debug.js"/>
+
 // #endregion DEBUG
 
 // #region EXAMPLE
+
 /// <reference path="example/my-game.js"/>
 /// <reference path="example/pong-entities.js"/>
 /// <reference path="example/level.js"/>
+
 // #endregion EXAMPLE
 
 //#region LEVEL-EDITOR
+
 /// <reference path="modules/level-editor/jQuery/jquery-1.7.1.min.js"/>
 /// <reference path="modules/level-editor/jQuery/jquery-ui-1.8.1.custom.min.js"/>
 /// <reference path="modules/level-editor/config.js"/>
@@ -40,9 +47,11 @@
 /// <reference path="modules/level-editor/select-file-dropdown.js"/>
 /// <reference path="modules/level-editor/tile-select.js"/>
 /// <reference path="modules/level-editor/undo.js"/>
+
 //#endregion LEVEL-EDITOR
 
 // #region LIB
+
 /// <reference path="modules/lib/array-utils.js"/>
 /// <reference path="modules/lib/bezier.js"/>
 /// <reference path="modules/lib/cookie.js"/>
@@ -58,9 +67,11 @@
 /// <reference path="modules/lib/ui-effects.js"/>
 /// <reference path="modules/lib/user-agent.js"/>
 /// <reference path="modules/lib/vendor-attributes.js"/>
+
 // #endregion LIB
 
 //#region PLUGINS
+
 /// <reference path="modules/plugins/clear-map-tile.js"/>
 /// <reference path="modules/plugins/clickable.js"/>
 /// <reference path="modules/plugins/combo-manager.js"/>
@@ -71,4 +82,5 @@
 /// <reference path="modules/plugins/observable.js"/>
 /// <reference path="modules/plugins/retro-highscore-namefield.js"/>
 /// <reference path="modules/plugins/state-machine.js"/>
+
 //#endregion PLUGINS
