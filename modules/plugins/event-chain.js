@@ -84,6 +84,10 @@ export class EventChain {
     this.nextStep();
   }
 
+  /**
+   * Do not call this as part of your event chain. Should be used to
+   * conditionally stop the event chain from continuing.
+   */
   stop() {
     this.stopped = true;
   }
