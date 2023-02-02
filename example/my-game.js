@@ -11,12 +11,13 @@ export class MyGame extends Game {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
+
     this.chain = new EventChain()
       .wait(5)
-      .every(1, () => console.log("Counting"))
-      .then(() => console.log("done"))
-      .repeat(3)
-      .then("Done repeating");
+      .waitUntil(() => Math.random() > 0.5)
+      .then(() => console.log("Doing something."))
+      .thenUntil(() => Math.random() > 0.5, () => console.log("Repeatable action."));
+    
     this.loadLevel(level);
   }
 
@@ -34,6 +35,7 @@ export class MyGame extends Game {
 
   update() {
     super.update();
+    this.chain.update();
     /** Extra update logic goes here. */
   }
 }

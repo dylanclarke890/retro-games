@@ -1,111 +1,104 @@
+import { Timer } from "../lib/timer.js";
+
 export class EventChain {
-  static actions = {
-    wait: (time) => {
-      let decrement = time;
-      console.log(decrement);
+  constructor() {
+    this.chain = [];
+    this.index = 0;
+    this.isNextStep = true;
+    this.timer = new Timer(0);
+  }
+
+  nextStep() {
+    this.index++;
+    this.isNextStep = true;
+  }
+
+  actions = {
+    wait: (secs) => {
+      this.timer.set(secs);
+      console.log(`Waiting ${secs} seconds.`);
+      return () => {
+        if (this.timer.delta() < 0) return;
+        this.nextStep();
+      };
+    },
+    waitUntil: (predicate) => {
+      console.log(`Waiting until ${predicate} is true.`);
+      return () => {
+        if (!predicate()) return false;
+        this.nextStep();
+        return true;
+      };
+    },
+    then: (action) => {
+      console.log(`Then doing ${action}.`);
+      return () => {
+        action();
+        this.nextStep();
+      };
+    },
+    thenUntil: (predicate, action) => {
+      console.log(`Then doing ${action} until ${predicate} is true.`);
+      return () => {
+        if (predicate()) {
+          this.nextStep();
+          return true;
+        }
+        action();
+        return false;
+      };
     },
   };
 
-  constructor(opts) {
-    this.steps ??= [];
-    opts ??= {};
-    Object.assign(this, opts);
-  }
-
   wait(duration) {
-    console.log(duration);
+    this.chain.push({ action: () => this.actions.wait(duration) });
     return this;
   }
 
   waitUntil(predicate) {
-    console.log(predicate);
-    return this;
-  }
-
-  orUntil(predicate) {
-    console.log(predicate);
-    return this;
-  }
-
-  waitForAnimation(animation, times) {
-    console.log(animation, times);
-    return this;
-  }
-
-  every(duration, action) {
-    console.log(duration, action);
-    return this;
-  }
-
-  during(action) {
-    console.log(action);
+    this.chain.push({ action: () => this.actions.waitUntil(predicate) });
     return this;
   }
 
   then(action) {
-    console.log(action);
+    this.chain.push({ action: () => this.actions.then(action) });
     return this;
   }
 
   thenUntil(predicate, action) {
-    console.log(predicate, action);
+    this.chain.push({ action: () => this.actions.thenUntil(predicate, action) });
     return this;
   }
 
-  repeat(times) {
-    console.log(times);
+  orUntil(predicate) {
+    console.log(`Or until ${predicate} is true.`);
+    return this;
+  }
+
+  every(duration, action) {
+    console.log(`Doing ${action} every ${duration} seconds.`);
+    return this;
+  }
+
+  during(action) {
+    console.log(`Doing ${action} at the same time.`);
+    return this;
+  }
+
+  repeat(amount) {
+    console.log(`Do that again ${amount} times.`);
     return this;
   }
 
   reset() {}
 
   update() {
-    if (!this.stepsCopy || !this.stepsCopy.length) this.stepsCopy = this.steps.slice(0);
-    if (this.steps && this.steps.length) this.steps[0]();
+    const link = this.chain[this.index];
+    if (!link) return;
+    if (this.isNextStep) {
+      link.handler = link.action();
+      this.isNextStep = false;
+    }
+    link.handler();
   }
 }
-
-EventChain.mixin("during", function (context, steps) {
-  return function (doThis) {
-    if (!steps) throw new Error("during only works with previous step!");
-    const func = steps[steps.length - 1];
-    steps[steps.length - 1] = function () {
-      doThis.call(context);
-      func();
-    };
-    return this;
-  };
-});
-
-EventChain.mixin("orUntil", function (context, steps) {
-  return function (predicate) {
-    if (!steps) throw new Error("orUntil only works with previous step!");
-    const func = steps[steps.length - 1];
-    steps[steps.length - 1] = function () {
-      if (predicate.call(context)) {
-        steps.shift();
-        return;
-      }
-      func();
-    };
-    return this;
-  };
-});
-
-EventChain.mixin("waitForAnimation", function (context, steps) {
-  return function (animation, times) {
-    // If we were not given an animation, then look in context for a currentAnim property.
-    if (!times) {
-      times = 1;
-      if (typeof animation === "number") {
-        times = animation;
-        animation = context.currentAnim;
-      }
-      if (animation == null) animation = context.currentAnim;
-    }
-    steps.push(function () {
-      if (animation.loopCount >= times) steps.shift();
-    });
-    return this;
-  };
-});

@@ -1,9 +1,7 @@
 import { Register } from "../modules/core/register.js";
 import { Entity } from "../modules/core/entity.js";
-import { mix } from "../modules/lib/mixin.js";
-import { FadeEntityMixin } from "../modules/plugins/fade-entity.js";
 
-class PongEntityBase extends mix(Entity).with(FadeEntityMixin) {
+class PongEntityBase extends Entity {
   constructor({ settings, ...rest }) {
     super({
       ...rest,

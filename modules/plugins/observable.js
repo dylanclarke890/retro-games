@@ -10,7 +10,6 @@ export const ObservablePlugin = {
     listeners.erase(handler);
   },
   trigger(eventName, data = {}) {
-    console.log("triggered", eventName);
     const listeners = this._listeners[eventName];
     if (!listeners) return;
     for (let i = 0; i < listeners.length; i++) listeners[i].apply(this, data);
