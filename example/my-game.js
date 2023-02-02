@@ -4,12 +4,19 @@ import { Game } from "../modules/core/game.js";
 import { GameRunner } from "../modules/core/runner.js";
 import { level } from "./level.js";
 
+import { EventChain } from "../modules/plugins/event-chain.js";
+
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
-
+    this.chain = new EventChain()
+      .wait(5)
+      .every(1, () => console.log("Counting"))
+      .then(() => console.log("done"))
+      .repeat(3)
+      .then("Done repeating");
     this.loadLevel(level);
   }
 
