@@ -14,7 +14,17 @@ export class MyGame extends Game {
 
     this.loadLevel(level);
 
-    this.chain = new EventChain().wait(3);
+    this.chain = new EventChain()
+      .wait(3)
+      .then(() => {})
+      .thenUntil(
+        () => true,
+        () => {}
+      )
+      .wait(5)
+      .orUntil(() => true)
+      .every(1, () => {})
+      .whilst(() => {});
   }
 
   draw() {
