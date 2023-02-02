@@ -12,17 +12,13 @@ export class MyGame extends Game {
     this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
 
-    this.chain = new EventChain()
-      .wait(5)
-      .waitUntil(() => Math.random() > 0.5)
-      .then(() => console.log("Doing something."))
-      .thenUntil(
-        () => Math.random() > 0.5,
-        () => console.log("Repeatable action.")
-      )
-      .repeat(1);
-    
     this.loadLevel(level);
+
+    this.chain = new EventChain()
+      .wait(1)
+      .repeat(2)
+      .then(() => console.log("Hi"))
+      .repeat();
   }
 
   draw() {

@@ -3,8 +3,7 @@ import { Timer } from "../lib/timer.js";
 export class EventChain {
   constructor() {
     this.chain = [];
-    this.chainCopy = [];
-    this.currentStep = 0;
+    this.index = 0;
     this.isNextStep = true;
     this.timer = new Timer(0);
   }
@@ -12,11 +11,10 @@ export class EventChain {
   createStep(action) {
     const step = { action, handler: null };
     this.chain.push(step);
-    this.chainCopy.push(step);
   }
 
   nextStep() {
-    this.currentStep++;
+    this.index++;
     this.isNextStep = true;
   }
 
@@ -56,11 +54,27 @@ export class EventChain {
       };
     },
     repeat: (amount) => {
-      console.log(`Do that again ${amount} times.`);
+      amount ??= 1;
+      this.repeatMap ??= new Map();
+      const repeatKey = this.index;
+
+      if (!this.repeatMap.has(repeatKey)) {
+        this.repeatMap.set(repeatKey, { original: amount, current: amount });
+        // Reset the counters of any repeat steps before this one.
+        for (const [key, { original }] of this.repeatMap.entries())
+          if (key < repeatKey) this.repeatMap.set(key, { original, current: original });
+      }
       return () => {
-        // Add all the previous steps excluding the current one (to avoid endless repeats) to the chain.
-        for (let i = 0; i < amount; i++)
-          this.chain.push(...this.chainCopy.slice(0, this.currentStep - 1));
+        const timesLeft = this.repeatMap.get(repeatKey);
+        if (timesLeft.current <= 0) {
+          this.nextStep();
+          return;
+        }
+        console.log(`Do that again ${timesLeft.current} more times.`);
+
+        timesLeft.current--;
+        this.repeatMap.set(repeatKey, timesLeft);
+        this.index = -1; // nextStep() will set back to 0.
         this.nextStep();
       };
     },
@@ -109,7 +123,7 @@ export class EventChain {
   reset() {}
 
   update() {
-    const link = this.chain[this.currentStep];
+    const link = this.chain[this.index];
     if (!link) return;
     if (this.isNextStep) {
       link.handler = link.action();
