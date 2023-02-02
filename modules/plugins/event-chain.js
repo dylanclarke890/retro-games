@@ -1,4 +1,5 @@
 import { Timer } from "../lib/timer.js";
+import { Guard } from "../lib/guard.js";
 
 export class EventChain {
   constructor() {
@@ -54,7 +55,6 @@ export class EventChain {
       };
     },
     repeat: (amount) => {
-      amount ??= 1;
       this.repeatMap ??= new Map();
       const repeatKey = this.index;
 
@@ -86,36 +86,44 @@ export class EventChain {
   }
 
   waitUntil(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
     this.createStep(() => this.actions.waitUntil(predicate));
     return this;
   }
 
   then(action) {
+    Guard.isTypeOf({ action }, "function");
     this.createStep(() => this.actions.then(action));
     return this;
   }
 
   thenUntil(predicate, action) {
+    Guard.isTypeOf({ action }, "function");
     this.createStep(() => this.actions.thenUntil(predicate, action));
     return this;
   }
 
   repeat(amount) {
+    amount ??= 1;
     this.createStep(() => this.actions.repeat(amount));
     return this;
   }
 
   orUntil(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
     console.log(`Or until ${predicate} is true.`);
     return this;
   }
 
   every(duration, action) {
+    Guard.isTypeOf({ action }, "function");
+    duration ??= 1;
     console.log(`Doing ${action} every ${duration} seconds.`);
     return this;
   }
 
   during(action) {
+    Guard.isTypeOf({ action }, "function");
     console.log(`Doing ${action} at the same time.`);
     return this;
   }
