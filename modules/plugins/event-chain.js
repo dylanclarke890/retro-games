@@ -9,16 +9,6 @@ export class EventChain {
     this.timer = new Timer(0);
   }
 
-  createStep(action) {
-    const step = { action, handler: null };
-    this.chain.push(step);
-  }
-
-  nextStep() {
-    this.index++;
-    this.isNextStep = true;
-  }
-
   actions = {
     wait: (secs) => {
       this.timer.set(secs);
@@ -74,11 +64,29 @@ export class EventChain {
 
         timesLeft.current--;
         this.repeatMap.set(repeatKey, timesLeft);
-        this.index = -1; // nextStep() will set back to 0.
-        this.nextStep();
+        this.reset();
       };
     },
   };
+
+  createStep(action) {
+    const step = { action, handler: null };
+    this.chain.push(step);
+  }
+
+  nextStep() {
+    this.index++;
+    this.isNextStep = true;
+  }
+
+  reset() {
+    this.index = -1;
+    this.nextStep();
+  }
+
+  stop() {
+    this.stopped = true;
+  }
 
   wait(duration) {
     this.createStep(() => this.actions.wait(duration));
@@ -128,11 +136,9 @@ export class EventChain {
     return this;
   }
 
-  reset() {}
-
   update() {
     const link = this.chain[this.index];
-    if (!link) return;
+    if (!link || this.stopped) return;
     if (this.isNextStep) {
       link.handler = link.action();
       this.isNextStep = false;
