@@ -1,4 +1,4 @@
-import { $new, $el, NativeExtensions } from "../lib/native-object-extensions.js";
+import { $new, $el } from "../lib/native-object-extensions.js";
 import { Guard } from "../lib/guard.js";
 
 import { GameImage } from "../core/image.js";
@@ -77,7 +77,7 @@ export class EditMap extends BackgroundMap {
   }
 
   beginEditing() {
-    this.oldData = NativeExtensions.copy(this.data);
+    this.oldData = Object.assign({}, this.data);
   }
 
   getOldTile(x, y) {

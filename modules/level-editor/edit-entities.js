@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { $el, $new, loadScript, NativeExtensions } from "../lib/native-object-extensions.js";
+import { $el, $new, loadScript } from "../lib/native-object-extensions.js";
 
 import { Register } from "../core/register.js";
 import { Game } from "../core/game.js";
@@ -212,7 +212,7 @@ export class EditEntities {
   cloneSelectedEntity() {
     if (!this.selectedEntity) return false;
     const className = this.selectedEntity.constructor.name;
-    const settings = NativeExtensions.copy(this.selectedEntity._additionalSettings);
+    const settings = Object.assign({}, this.selectedEntity._additionalSettings);
     if (settings.name) settings.name = settings.name + "_clone";
     const x = this.selectedEntity.pos.x + this.gridSize;
     const y = this.selectedEntity.pos.y;
@@ -378,7 +378,7 @@ export class EditEntities {
     else if (key === "y") this.selectedEntity.pos.y = Math.round(value);
     else {
       this.writeSettingAtPath(this.selectedEntity._additionalSettings, key, value);
-      NativeExtensions.extend(this.selectedEntity, this.selectedEntity._additionalSettings);
+      Object.assign(this.selectedEntity, this.selectedEntity._additionalSettings);
     }
 
     this.sort();
