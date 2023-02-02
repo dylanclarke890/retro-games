@@ -25,8 +25,8 @@ export class MyGame extends Game {
   }
 
   update() {
-    super.update();
     /** Extra update logic goes here. */
+    super.update();
   }
 }
 
