@@ -1,4 +1,4 @@
-import { $new, $el } from "../lib/native-object-extensions.js";
+import { $new, $el } from "../lib/dom-utils.js";
 import { Guard } from "../lib/guard.js";
 
 import { GameImage } from "../core/image.js";

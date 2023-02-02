@@ -1,6 +1,6 @@
 //#region slide
 
-import { $el } from "./native-object-extensions.js";
+import { $el } from "./dom-utils.js";
 
 export function slideUp(target, easing = "ease-in", duration = 500, cb = () => {}) {
   target.style.transitionProperty = "height, margin, padding";

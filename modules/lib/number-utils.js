@@ -22,3 +22,7 @@ export function toRad(value) {
 export function toDeg(value) {
   return (value * 180) / Math.PI;
 }
+
+export function boolToOnOff(bool) {
+  return bool ? "On" : "Off";
+}

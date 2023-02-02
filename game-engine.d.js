@@ -45,11 +45,11 @@
 // #region LIB
 /// <reference path="modules/lib/bezier.js"/>
 /// <reference path="modules/lib/cookie.js"/>
+/// <reference path="modules/lib/dom-utils.js"/>
 /// <reference path="modules/lib/event-chain.js"/>
 /// <reference path="modules/lib/guard.js"/>
 /// <reference path="modules/lib/inject.js"/>
 /// <reference path="modules/lib/mixin.js"/>
-/// <reference path="modules/lib/native-object-extensions.js"/>
 /// <reference path="modules/lib/number-utils.js"/>
 /// <reference path="modules/lib/polyfills.js"/>
 /// <reference path="modules/lib/string-utils.js"/>

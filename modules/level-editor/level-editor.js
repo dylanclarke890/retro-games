@@ -1,7 +1,7 @@
 import { raf, caf } from "../lib/polyfills.js";
 import { constrain } from "../lib/number-utils.js";
 import { formatAsJSON } from "../lib/string-utils.js";
-import { $el } from "../lib/native-object-extensions.js";
+import { $el } from "../lib/dom-utils.js";
 import { slideToggle, fadeOut } from "../lib/ui-effects.js";
 import { getCookie, setCookie } from "../lib/cookie.js";
 import { Guard } from "../lib/guard.js";

@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { $new, $el, getInnerHeight, getInnerWidth } from "../lib/native-object-extensions.js";
+import { $new, $el, getInnerHeight, getInnerWidth } from "../lib/dom-utils.js";
 import { slideUp, slideDown } from "../lib/ui-effects.js";
 
 export class SelectFileDropdown {

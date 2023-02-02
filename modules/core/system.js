@@ -1,6 +1,6 @@
 import { Guard } from "../lib/guard.js";
 import { uniqueId } from "../lib/string-utils.js";
-import { $el, $new } from "../lib/native-object-extensions.js";
+import { $el, $new } from "../lib/dom-utils.js";
 import { VendorAttributes } from "../lib/vendor-attributes.js";
 
 export class System {

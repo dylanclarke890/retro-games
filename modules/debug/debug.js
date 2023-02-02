@@ -1,6 +1,6 @@
 import { Guard } from "../lib/guard.js";
 import { plug } from "../lib/inject.js";
-import { $new, $el, boolToOnOff } from "../lib/native-object-extensions.js";
+import { $new, $el, boolToOnOff } from "../lib/dom-utils.js";
 import { dragElement } from "../lib/ui-effects.js";
 import { PerformanceStats } from "./performance-stats.js";
 

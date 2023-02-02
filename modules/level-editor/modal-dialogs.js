@@ -1,4 +1,4 @@
-import { $new } from "../lib/native-object-extensions.js";
+import { $new } from "../lib/dom-utils.js";
 import { Guard } from "../lib/guard.js";
 import { fadeOut, fadeIn } from "../lib/ui-effects.js";
 import { SelectFileDropdown } from "./select-file-dropdown.js";

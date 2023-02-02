@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { $el, $new, loadScript } from "../lib/native-object-extensions.js";
+import { $el, $new, loadScript } from "../lib/dom-utils.js";
 
 import { Register } from "../core/register.js";
 import { Game } from "../core/game.js";

@@ -25,10 +25,6 @@ export function getInnerWidth(element) {
   return element.clientWidth - padding;
 }
 
-export function boolToOnOff(bool) {
-  return bool ? "On" : "Off";
-}
-
 export function loadScript({ src, isES6Module, cb = () => {} } = {}) {
   if (isES6Module !== false) isES6Module = true;
   const script = document.createElement("script");

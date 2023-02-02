@@ -1,4 +1,4 @@
-import { $el } from "../lib/native-object-extensions.js";
+import { $el } from "../lib/dom-utils.js";
 import { caf, raf } from "../lib/polyfills.js";
 import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";

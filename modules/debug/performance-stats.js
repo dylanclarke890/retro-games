@@ -1,4 +1,4 @@
-import { $new } from "../lib/native-object-extensions.js";
+import { $new } from "../lib/dom-utils.js";
 
 class PanelColorScheme {
   constructor(bg, fg) {
