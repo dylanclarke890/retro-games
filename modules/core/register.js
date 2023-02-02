@@ -1,4 +1,4 @@
-import { NativeExtensions } from "../lib/native-object-extensions.js";
+import { uniqueId } from "../lib/string-utils.js";
 import { Guard } from "../lib/guard.js";
 
 /**
@@ -18,7 +18,7 @@ export class AssetToPreload {
   load(loadCallback) {
     switch (this.type) {
       case "font": {
-        const fontFace = new FontFace(NativeExtensions.uniqueId(), `url(${this.path})`);
+        const fontFace = new FontFace(uniqueId("font-"), `url(${this.path})`);
         document.fonts.add(fontFace);
         this.data = fontFace;
         this.data.load().then(

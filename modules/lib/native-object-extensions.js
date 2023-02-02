@@ -38,61 +38,6 @@ export function loadScript({ src, isES6Module, cb = () => {} } = {}) {
   document.body.appendChild(script);
 }
 
-export function JSONFormat(json, opts = {}) {
-  const p = [];
-  function push(m) {
-    return "\\" + p.push(m) + "\\";
-  }
-  function pop(_m, i) {
-    return p[i - 1];
-  }
-  function tabs(count) {
-    return Array.from({ length: count + 1 }).join(opts.indentWithTabs ? "\t" : "  ");
-  }
-  let out = "",
-    indent = 0;
-
-  // Extract backslashes and strings
-  json = json
-    .replace(/\\./g, push)
-    .replace(/(".*?"|'.*?')/g, push)
-    .replace(/\s+/, "");
-
-  // Indent and insert newlines
-  for (let i = 0; i < json.length; i++) {
-    const c = json.charAt(i);
-    switch (c) {
-      case "{":
-      case "[":
-        out += c + "\n" + tabs(++indent);
-        break;
-      case "}":
-      case "]":
-        out += "\n" + tabs(--indent) + c;
-        break;
-      case ",":
-        out += ",\n" + tabs(indent);
-        break;
-      case ":":
-        out += ": ";
-        break;
-      default:
-        out += c;
-        break;
-    }
-  }
-
-  // Strip whitespace from numeric arrays and put backslashes
-  // and strings back in
-  out = out
-    .replace(/\[[\d,\s]+?\]/g, function (m) {
-      return m.replace(/\s/g, "");
-    })
-    .replace(/\\(\d+)\\/g, pop);
-
-  return out;
-}
-
 Object.defineProperty(Array.prototype, "erase", {
   value: function (item) {
     for (let i = this.length; i--; )
@@ -109,32 +54,6 @@ Object.defineProperty(Array.prototype, "random", {
     return this[Math.floor(Math.random() * this.length)];
   },
 });
-
-Function.prototype.bind =
-  Function.prototype.bind ||
-  function (oThis) {
-    if (typeof this !== "function")
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-
-    let aArgs = Array.prototype.slice.call(arguments, 1),
-      fToBind = this;
-    class fNOP {
-      constructor() {}
-    }
-    class fBound {
-      constructor() {
-        return fToBind.apply(
-          this instanceof fNOP && oThis ? this : oThis,
-          aArgs.concat(Array.prototype.slice.call(arguments))
-        );
-      }
-    }
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
 
 export class NativeExtensions {
   static extend(/** @type {Object} */ target, /** @type {Object[]} */ ...sources) {

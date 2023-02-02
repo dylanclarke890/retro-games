@@ -1,5 +1,5 @@
 import { Guard } from "../lib/guard.js";
-import { NativeExtensions } from "../lib/native-object-extensions.js";
+import { uniqueId } from "../lib/string-utils.js";
 import { Register } from "./register.js";
 
 export class Font {
@@ -17,7 +17,7 @@ export class Font {
   constructor({ system, name, path } = {}) {
     Guard.againstNull({ system });
     this.system = system;
-    this.name = name ?? NativeExtensions.uniqueId();
+    this.name = name ?? uniqueId("font-");
     this.path = path;
     this.loaded = false;
     this.failed = false;

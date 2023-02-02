@@ -1,6 +1,7 @@
 import { raf, caf } from "../lib/polyfills.js";
 import { constrain } from "../lib/number-utils.js";
-import { $el, JSONFormat } from "../lib/native-object-extensions.js";
+import { formatAsJSON } from "../lib/string-utils.js";
+import { $el } from "../lib/native-object-extensions.js";
 import { slideToggle, fadeOut } from "../lib/ui-effects.js";
 import { getCookie, setCookie } from "../lib/cookie.js";
 import { Guard } from "../lib/guard.js";
@@ -458,7 +459,7 @@ export class LevelEditor {
     }
 
     let dataString = JSON.stringify(data);
-    if (this.config.project.prettyPrint) dataString = JSONFormat(dataString);
+    if (this.config.project.prettyPrint) dataString = formatAsJSON(dataString);
     const levelName = this.fileName.substring(0, this.fileName.lastIndexOf("."));
     dataString = `export const ${levelName} = /*JSON-BEGIN*/ ${dataString}; /*JSON-END*/`;
 

@@ -1,5 +1,6 @@
 import { Guard } from "../lib/guard.js";
-import { $el, $new, NativeExtensions } from "../lib/native-object-extensions.js";
+import { uniqueId } from "../lib/string-utils.js";
+import { $el, $new } from "../lib/native-object-extensions.js";
 import { VendorAttributes } from "../lib/vendor-attributes.js";
 
 export class System {
@@ -26,7 +27,7 @@ export class System {
       this.canvas = $new("canvas");
       insertElement = true;
     }
-    this.canvas.id = canvasId ?? NativeExtensions.uniqueId();
+    this.canvas.id = canvasId ?? uniqueId("canvas-");
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");
     if (insertElement) document.body.insertBefore(this.canvas, document.body.firstChild);
