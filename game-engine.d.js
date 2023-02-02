@@ -43,6 +43,7 @@
 //#endregion LEVEL-EDITOR
 
 // #region LIB
+/// <reference path="modules/lib/array-utils.js"/>
 /// <reference path="modules/lib/bezier.js"/>
 /// <reference path="modules/lib/cookie.js"/>
 /// <reference path="modules/lib/dom-utils.js"/>
