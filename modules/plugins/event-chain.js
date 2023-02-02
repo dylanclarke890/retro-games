@@ -6,22 +6,49 @@ export class EventChain {
     this.chain = [];
     this.index = 0;
     this.isNextStep = true;
-    this.timer = new Timer(0);
     this.stepMap = new Map();
   }
 
   actions = {
     wait: (secs) => {
-      this.timer.set(secs);
+      const key = this.index;
+      this.stepMap.get(key).timer.set(secs);
       console.log(`Waiting ${secs} seconds.`);
       return () => {
-        if (this.timer.delta() < 0) return;
+        const { timer, predicates, callbacks } = this.stepMap.get(key);
+        if (timer.delta() < 0 || predicates.some((check) => check())) return;
+        for (let i = 0; i < callbacks.length; i++) callbacks[i]();
         this.nextStep();
       };
     },
-    orUntil: (predicate) => {},
-    every: (duration, action) => {},
-    whilst: (action) => {},
+    orUntil: (predicate) => {
+      const waitLink = this.stepMap.get(this.chain.length - 1);
+      if (!waitLink || !waitLink.isWaitLink)
+        throw Error("Invalid event chain: orUntil must follow a wait-like link.");
+
+      console.log(`Or until ${predicate} is true.`);
+      waitLink.predicates.push(predicate);
+    },
+    every: (duration, action) => {
+      const waitLink = this.stepMap.get(this.chain.length - 1);
+      if (!waitLink || !waitLink.isWaitLink)
+        throw Error("Invalid event chain: every must follow a wait-like link.");
+
+      console.log(`Doing ${action} every ${duration} seconds.`);
+      const timer = new Timer(duration);
+      waitLink.callbacks.push(() => {
+        if (timer.delta() < 0) return;
+        action();
+        timer.set(duration);
+      });
+    },
+    whilst: (action) => {
+      const waitLink = this.stepMap.get(this.chain.length - 1);
+      if (!waitLink || !waitLink.isWaitLink)
+        throw Error("Invalid event chain: every must follow a wait-like link.");
+      console.log(`While doing ${action}.`);
+      waitLink.callbacks.push(action);
+    },
     waitUntil: (predicate) => {
       console.log(`Waiting until ${predicate} is true.`);
       return () => {
@@ -94,27 +121,33 @@ export class EventChain {
   }
 
   wait(duration) {
+    this.stepMap.set(this.chain.length - 1, {
+      timer: new Timer(),
+      predicates: [],
+      callbacks: [],
+      isWaitLink: true,
+    });
     this.createStep(() => this.actions.wait(duration));
     return this;
   }
 
   orUntil(predicate) {
     Guard.isTypeOf({ predicate }, "function");
-    console.log(`Or until ${predicate} is true.`);
+    this.actions.orUntil(predicate);
     return this;
   }
 
   every(duration, action) {
     Guard.isTypeOf({ action }, "function");
     duration ??= 1;
-    console.log(`Doing ${action} every ${duration} seconds.`);
+
+    this.actions.every(duration, action);
     return this;
   }
 
   whilst(action) {
     Guard.isTypeOf({ action }, "function");
-    this.createStep(() => this.actions.whilst(action));
-    console.log(`Doing ${action} while waiting.`);
+    this.actions.whilst(action);
     return this;
   }
 
