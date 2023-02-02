@@ -5,36 +5,35 @@ export class EventChain {
   constructor() {
     this.chain = [];
     this.index = 0;
-    this.isNextStep = true;
-    this.stepMap = new Map();
+    this.isNextLink = true;
+    this.linkMap = new Map();
   }
 
   actions = {
     wait: (secs) => {
       const key = this.index;
-      this.stepMap.get(key).timer.set(secs);
-      console.log(`Waiting ${secs} seconds.`);
+      this.linkMap.get(key).timer.set(secs);
+
       return () => {
-        const { timer, predicates, callbacks } = this.stepMap.get(key);
-        if (timer.delta() < 0 || predicates.some((check) => check())) return;
+        const { timer, predicates, callbacks } = this.linkMap.get(key);
+        if (timer.delta() > 0 || predicates.some((check) => check())) {
+          this.nextLink();
+          return;
+        }
+
         for (let i = 0; i < callbacks.length; i++) callbacks[i]();
-        this.nextStep();
       };
     },
     orUntil: (predicate) => {
-      const waitLink = this.stepMap.get(this.chain.length - 1);
+      const waitLink = this.linkMap.get(this.chain.length - 1);
       if (!waitLink || !waitLink.isWaitLink)
         throw Error("Invalid event chain: orUntil must follow a wait-like link.");
-
-      console.log(`Or until ${predicate} is true.`);
       waitLink.predicates.push(predicate);
     },
     every: (duration, action) => {
-      const waitLink = this.stepMap.get(this.chain.length - 1);
+      const waitLink = this.linkMap.get(this.chain.length - 1);
       if (!waitLink || !waitLink.isWaitLink)
         throw Error("Invalid event chain: every must follow a wait-like link.");
-
-      console.log(`Doing ${action} every ${duration} seconds.`);
       const timer = new Timer(duration);
       waitLink.callbacks.push(() => {
         if (timer.delta() < 0) return;
@@ -43,73 +42,66 @@ export class EventChain {
       });
     },
     whilst: (action) => {
-      const waitLink = this.stepMap.get(this.chain.length - 1);
+      const waitLink = this.linkMap.get(this.chain.length - 1);
       if (!waitLink || !waitLink.isWaitLink)
         throw Error("Invalid event chain: every must follow a wait-like link.");
-      console.log(`While doing ${action}.`);
       waitLink.callbacks.push(action);
     },
     waitUntil: (predicate) => {
-      console.log(`Waiting until ${predicate} is true.`);
       return () => {
-        if (!predicate()) return false;
-        this.nextStep();
-        return true;
+        if (!predicate()) return;
+        this.nextLink();
       };
     },
     then: (action) => {
-      console.log(`Then doing ${action}.`);
       return () => {
         action();
-        this.nextStep();
+        this.nextLink();
       };
     },
     thenUntil: (predicate, action) => {
-      console.log(`Then doing ${action} until ${predicate} is true.`);
       return () => {
         if (predicate()) {
-          this.nextStep();
-          return true;
+          this.nextLink();
+          return;
         }
         action();
-        return false;
       };
     },
     repeat: (amount) => {
       const stepKey = this.index;
-      if (!this.stepMap.has(stepKey)) {
-        this.stepMap.set(stepKey, { totalRepeats: amount, repeatsLeft: amount });
+      if (!this.linkMap.has(stepKey)) {
+        this.linkMap.set(stepKey, { totalRepeats: amount, repeatsLeft: amount });
         // Reset the counters of any repeat steps before this one.
-        for (const [key, { totalRepeats }] of this.stepMap.entries())
+        for (const [key, { totalRepeats }] of this.linkMap.entries())
           if (totalRepeats != null && key < stepKey)
-            this.stepMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
+            this.linkMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
       }
       return () => {
-        const { totalRepeats, repeatsLeft } = this.stepMap.get(stepKey);
+        const { totalRepeats, repeatsLeft } = this.linkMap.get(stepKey);
         if (repeatsLeft <= 0) {
-          this.nextStep();
+          this.nextLink();
           return;
         }
-        console.log(`Do that again ${repeatsLeft} more times.`);
-        this.stepMap.set(stepKey, { totalRepeats, repeatsLeft: repeatsLeft - 1 });
+        this.linkMap.set(stepKey, { totalRepeats, repeatsLeft: repeatsLeft - 1 });
         this.reset();
       };
     },
   };
 
-  createStep(action) {
-    const step = { action, handler: null };
-    this.chain.push(step);
+  createLink(action) {
+    const link = { action, handler: null };
+    this.chain.push(link);
   }
 
-  nextStep() {
+  nextLink() {
     this.index++;
-    this.isNextStep = true;
+    this.isNextLink = true;
   }
 
   reset() {
     this.index = -1;
-    this.nextStep();
+    this.nextLink();
   }
 
   /**
@@ -121,13 +113,13 @@ export class EventChain {
   }
 
   wait(duration) {
-    this.stepMap.set(this.chain.length - 1, {
+    this.linkMap.set(this.chain.length, {
       timer: new Timer(),
       predicates: [],
       callbacks: [],
       isWaitLink: true,
     });
-    this.createStep(() => this.actions.wait(duration));
+    this.createLink(() => this.actions.wait(duration));
     return this;
   }
 
@@ -140,7 +132,6 @@ export class EventChain {
   every(duration, action) {
     Guard.isTypeOf({ action }, "function");
     duration ??= 1;
-
     this.actions.every(duration, action);
     return this;
   }
@@ -153,34 +144,34 @@ export class EventChain {
 
   waitUntil(predicate) {
     Guard.isTypeOf({ predicate }, "function");
-    this.createStep(() => this.actions.waitUntil(predicate));
+    this.createLink(() => this.actions.waitUntil(predicate));
     return this;
   }
 
   then(action) {
     Guard.isTypeOf({ action }, "function");
-    this.createStep(() => this.actions.then(action));
+    this.createLink(() => this.actions.then(action));
     return this;
   }
 
   thenUntil(predicate, action) {
     Guard.isTypeOf({ action }, "function");
-    this.createStep(() => this.actions.thenUntil(predicate, action));
+    this.createLink(() => this.actions.thenUntil(predicate, action));
     return this;
   }
 
   repeat(amount) {
-    amount ??= 1;
-    this.createStep(() => this.actions.repeat(amount));
+    amount ??= Infinity;
+    this.createLink(() => this.actions.repeat(amount));
     return this;
   }
 
   update() {
     const link = this.chain[this.index];
     if (!link || this.stopped) return;
-    if (this.isNextStep) {
+    if (this.isNextLink) {
       link.handler = link.action();
-      this.isNextStep = false;
+      this.isNextLink = false;
     }
     link.handler();
   }
