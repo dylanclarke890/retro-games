@@ -9,7 +9,6 @@ export class MyGame extends Game {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
-
     this.loadLevel(level);
   }
 
