@@ -4,8 +4,6 @@ import { Game } from "../modules/core/game.js";
 import { GameRunner } from "../modules/core/runner.js";
 import { level } from "./level.js";
 
-import { EventChain } from "../modules/plugins/event-chain.js";
-
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
@@ -13,18 +11,6 @@ export class MyGame extends Game {
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
 
     this.loadLevel(level);
-
-    this.chain = new EventChain()
-      .wait(3)
-      .then(() => {})
-      .thenUntil(
-        () => true,
-        () => {}
-      )
-      .wait(5)
-      .orUntil(() => true)
-      .every(1, () => {})
-      .whilst(() => {});
   }
 
   draw() {
