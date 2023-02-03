@@ -1,6 +1,6 @@
 /**
- * Apply a series of mixins to a class. Applies mixins one at a time so take care
- * that subsequent mixins do not override.
+ * Apply a series of overrides/plugins to a class. Applies plugins one at a time so take care
+ * that subsequent plugins do not override. Overrides have access to the original method by calling this.parent().
  * @example
  * class Example {
  *   do() {
@@ -8,22 +8,26 @@
  *   }
  * }
  *
- * const overrides = {
- *  do() {
- *    this.parent();
- *    console.log("Injector also doing.");
- *  }
- * }
+ * const exampleOverrides = [
+ *   {
+ *     name: "do",
+ *     value: function () {
+ *       this.parent();
+ *       console.log("Plugin also doing");
+ *     },
+ *     isStatic: false,
+ *   },
+ * ];
  *
- * plug(overrides).into(Example);
+ * plugin(exampleOverrides).to(Example);
  *
  * // logs:
  * // Doing.
- * // Injector also doing.
+ * // Plugin also doing.
  * new Example().do();
  */
-export function plug(...overrides) {
-  return new Injector(...overrides);
+export function plugin(...plugins) {
+  return new Injector(...plugins);
 }
 
 class Injector {
@@ -31,33 +35,36 @@ class Injector {
     this.overrides = overrides;
   }
 
+  #applyPlugin(plugin, obj) {
+    const proto = obj.prototype ?? Object.getPrototypeOf(obj);
+    const construct = proto.constructor;
+    const tmpFnCache = {};
+    for (let i = 0; i < plugin.length; i++) {
+      const { name, value, isStatic } = plugin[i];
+      const target = isStatic ? construct : proto;
+
+      if (typeof value !== "function" || typeof target[name] !== "function") {
+        target[name] = value;
+        continue;
+      }
+
+      tmpFnCache[name] = target[name];
+      target[name] = (function (name, fn) {
+        return function () {
+          const tmp = this.parent;
+          this.parent = tmpFnCache[name];
+          const ret = fn.apply(this, arguments);
+          this.parent = tmp;
+          return ret;
+        };
+      })(name, value);
+    }
+  }
+
   /**
    * @param {*} obj class declaration or instance to apply overrides to.
    */
-  into(obj) {
-    const proto = obj.prototype ?? Object.getPrototypeOf(obj);
-    const tmpFnCache = {};
-    for (let i = 0; i < this.overrides.length; i++) {
-      const plugin = this.overrides[i];
-      for (let name in plugin) {
-        if (typeof plugin[name] !== "function" || typeof proto[name] !== "function") {
-          proto[name] = plugin[name];
-          continue;
-        }
-
-        tmpFnCache[name] = proto[name];
-        proto[name] = (function (name, fn) {
-          return function () {
-            const tmp = this.parent;
-            this.parent = tmpFnCache[name];
-
-            const ret = fn.apply(this, arguments);
-            this.parent = tmp;
-
-            return ret;
-          };
-        })(name, plugin[name]);
-      }
-    }
+  to(obj) {
+    for (let i = 0; i < this.overrides.length; i++) this.#applyPlugin(this.overrides[i], obj);
   }
 }

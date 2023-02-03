@@ -1,3 +1,4 @@
+import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
 
 export const systemOverrides = {
@@ -13,29 +14,23 @@ export const systemOverrides = {
   },
 
   run: function () {
-    var timestamp = performance.now();
+    const timestamp = performance.now();
 
     // Track the accumulated time that hasn't been simulated yet
     this._delta += timestamp - this._lastRun;
     this._lastRun = timestamp;
 
     // Simulate the total elapsed time in fixed-size chunks
-    var count = 0;
-    var timestep = 1000 / this.tickRate;
+    let count = 0;
+    const timestep = 1000 / this.tickRate;
     while (this._delta >= timestep) {
+      if (++count >= 240) throw new Error("FixedTick: something went wrong.");
+
       Timer.step();
       this.tick = this.clock.tick();
-
-      this.delegate.update();
-      this.input.clearPressed();
-
       this._delta -= timestep;
-
-      // Sanity check
-      if (++count >= 240) {
-        this.delegate.panic(); // fix things
-        break; // bail out
-      }
+      this.input.clearPressed();
+      this.delegate.update();
     }
 
     this.delegate.draw();
@@ -47,12 +42,9 @@ export const systemOverrides = {
   },
 
   setDelegate: function (object) {
-    if (typeof object.update !== "function") {
-      throw "System.setDelegate: No update() function in object";
-    }
-    if (typeof object.draw !== "function") {
-      throw "System.setDelegate: No draw() function in object";
-    }
+    Guard.isTypeOf({ update: object.update }, "function");
+    Guard.isTypeOf({ draw: object.draw }, "function");
+
     this.delegate = object;
     this.startRunLoop();
   },
