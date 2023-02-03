@@ -32,7 +32,7 @@ export const FixedTickPlugin = {
           if (++count >= 240) throw new Error("Error from fixed rate plugin.");
 
           Timer.step();
-          this.tick = this.clock.tick();
+          this.runner.system.tick = this.clock.tick();
 
           game.update();
           game.input.clearPressed();
