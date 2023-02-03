@@ -79,6 +79,7 @@
 /// <reference path="modules/plugins/edges.js"/>
 /// <reference path="modules/plugins/fade-entity.js"/>
 /// <reference path="modules/plugins/fixed-entity.js"/>
+/// <reference path="modules/plugins/fixed-tick.js"/>
 /// <reference path="modules/plugins/observable.js"/>
 /// <reference path="modules/plugins/retro-highscore-namefield.js"/>
 /// <reference path="modules/plugins/state-machine.js"/>
