@@ -1,4 +1,6 @@
-const systemOverrides = {
+import { Timer } from "../lib/timer.js";
+
+export const systemOverrides = {
   _delta: 0, // accumulates time for scheduling game updates
   _lastRun: 0, // timestamp run() was last called
   tickRate: 60,
@@ -21,11 +23,11 @@ const systemOverrides = {
     var count = 0;
     var timestep = 1000 / this.tickRate;
     while (this._delta >= timestep) {
-      ig.Timer.step();
+      Timer.step();
       this.tick = this.clock.tick();
 
       this.delegate.update();
-      ig.input.clearPressed();
+      this.input.clearPressed();
 
       this._delta -= timestep;
 
@@ -56,27 +58,16 @@ const systemOverrides = {
   },
 };
 
-const gameOverrides = {
-  run: function () {
-    throw "Game.run: Should never be called when using fixed tick plugin";
-  },
-
-  // "spiral of death" handler, called if are updates not terminating fast enough
-  panic: function () {
-    throw "Game panicked!";
-  },
-};
-
-const timerOverrides = {
+export const timerOverrides = {
   tick: function () {
-    var ms = 1000 / ig.system.tickRate;
+    var ms = 1000 / this.system.tickRate;
     var seconds = ms / 1000;
-    var delta = seconds * ig.Timer.timeScale;
+    var delta = seconds * Timer.timeScale;
     return this.pausedAt ? 0 : delta;
   },
   step: function () {
-    var ms = 1000 / ig.system.tickRate;
+    var ms = 1000 / this.system.tickRate;
     var seconds = ms / 1000;
-    ig.Timer.time += seconds * ig.Timer.timeScale;
+    Timer.time += seconds * Timer.timeScale;
   },
 };
