@@ -46,11 +46,6 @@ export class Game {
     this.#sortBy = this.#sortBy || Game.SORT.Z_INDEX;
   }
 
-  run() {
-    this.update();
-    this.draw();
-  }
-
   update() {
     this.input.clearPressed();
     if (this.#levelToLoad) {
