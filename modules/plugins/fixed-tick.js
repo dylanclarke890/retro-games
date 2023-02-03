@@ -7,7 +7,7 @@ export const systemOverrides = {
   tickRate: 60,
 
   startRunLoop: function () {
-    this.parent();
+    this.base();
 
     // forget about any time that elapsed while the run loop was stopped
     this._lastRun = performance.now();

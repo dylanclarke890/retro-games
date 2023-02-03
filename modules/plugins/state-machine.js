@@ -2,7 +2,7 @@ export const StateMachinePlugin = [
   {
     name: "ready",
     value: function () {
-      this.parent();
+      this.base();
       this.setState(this.stateMachine.initialState);
     },
   },
@@ -37,8 +37,8 @@ export const StateMachinePlugin = [
   {
     name: "update",
     value: function () {
-      if (this._currentUpdate) this._currentUpdate(this.parent);
-      else this.parent();
+      if (this._currentUpdate) this._currentUpdate(this.base);
+      else this.base();
     },
   },
 ];

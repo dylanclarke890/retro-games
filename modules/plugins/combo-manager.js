@@ -16,14 +16,14 @@ const inputOverrides = [
     name: "bind",
     value: function (key, action) {
       actions.push(action);
-      this.parent(key, action);
+      this.base(key, action);
     },
   },
   {
     name: "bindTouch",
     value: function (selector, action) {
       actions.push(action);
-      this.parent(selector, action);
+      this.base(selector, action);
     },
   },
 ];

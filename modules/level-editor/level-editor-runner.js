@@ -76,7 +76,7 @@ export class LevelEditorRunner {
         this.data = this.origData;
 
         // Nearest neighbor when zooming in
-        if (scale > 1) this.parent(scale);
+        if (scale > 1) this.base(scale);
         // Otherwise blur
         else {
           const scaled = $new("canvas");

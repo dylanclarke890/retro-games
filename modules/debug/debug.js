@@ -213,7 +213,7 @@ export class GameDebugger {
       {
         name: "update",
         value: function () {
-          this.parent();
+          this.base();
           gameDebugger.#updateSelectedEntity();
         },
       },
@@ -221,13 +221,13 @@ export class GameDebugger {
         name: "checkWith",
         value: function (other) {
           if (!this._debugCollisionWithEntity || !other._debugCollisionWithEntity) return;
-          this.parent(other);
+          this.base(other);
         },
       },
       {
         name: "draw",
         value: function () {
-          this.parent();
+          this.base();
           const { ctx, drawPosition, scale } = this.game.system;
           // Collision Boxes
           if (this._debugShowHitbox) {
@@ -305,14 +305,14 @@ export class GameDebugger {
       {
         name: "spawnEntity",
         value: function (type, x, y, settings) {
-          this.parent(type, x, y, settings);
+          this.base(type, x, y, settings);
           gameDebugger.#updateActiveEntityList();
         },
       },
       {
         name: "removeEntity",
         value: function (entity) {
-          this.parent(entity);
+          this.base(entity);
           gameDebugger.#updateActiveEntityList();
         },
       },
@@ -328,7 +328,7 @@ export class GameDebugger {
       {
         name: "main",
         value: function (timestamp) {
-          this.parent(timestamp);
+          this.base(timestamp);
           gameDebugger.stats.update();
         },
       },

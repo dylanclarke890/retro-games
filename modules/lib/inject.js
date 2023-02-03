@@ -1,6 +1,6 @@
 /**
  * Apply a series of overrides/plugins to a class. Applies plugins one at a time so take care
- * that subsequent plugins do not override. Overrides have access to the original method by calling this.parent().
+ * that subsequent plugins do not override. Overrides have access to the original method by calling this.base().
  * @example
  * class Example {
  *   do() {
@@ -12,7 +12,7 @@
  *   {
  *     name: "do",
  *     value: function () {
- *       this.parent();
+ *       this.base();
  *       console.log("Plugin also doing");
  *     },
  *     isStatic: false,
@@ -51,10 +51,10 @@ class Injector {
       tmpFnCache[name] = target[name];
       target[name] = (function (name, fn) {
         return function () {
-          const tmp = this.parent;
-          this.parent = tmpFnCache[name];
+          const tmp = this.base;
+          this.base = tmpFnCache[name];
           const ret = fn.apply(this, arguments);
-          this.parent = tmp;
+          this.base = tmp;
           return ret;
         };
       })(name, value);
