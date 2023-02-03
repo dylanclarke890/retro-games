@@ -1,9 +1,10 @@
 export function removeItem(array, item) {
-  for (let i = array.length; i > 0; i--)
+  for (let i = array.length; i >= 0; i--) {
     if (array[i] === item) {
       array.splice(i, 1);
       break;
     }
+  }
   return array;
 }
 

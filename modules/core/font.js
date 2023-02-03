@@ -32,10 +32,7 @@ export class Font {
       document.fonts.add(fontFace);
       this.data = fontFace;
       this.data.load().then(
-        (data) => {
-          console.log(data);
-          this.onload();
-        },
+        () => this.onload(),
         (err) => this.onerror(err)
       );
     } else if (this.loaded) this.loadCallback(this.path, true);
