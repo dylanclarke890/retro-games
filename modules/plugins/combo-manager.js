@@ -1,4 +1,4 @@
-import { plug } from "../lib/inject.js";
+import { plugin } from "../lib/inject.js";
 import { Timer } from "../lib/timer.js";
 import { uniqueId } from "../lib/string-utils.js";
 import { Guard } from "../lib/guard.js";
@@ -11,21 +11,27 @@ const actions = [];
  * Intercept calls to input.bind and input.bindTouch so we know what actions to look for
  * in the ComboManager.
  */
-const inputOverrides = {
-  bind(key, action) {
-    actions.push(action);
-    this.parent(key, action);
+const inputOverrides = [
+  {
+    name: "bind",
+    value: function (key, action) {
+      actions.push(action);
+      this.parent(key, action);
+    },
   },
-  bindTouch(selector, action) {
-    actions.push(action);
-    this.parent(selector, action);
+  {
+    name: "bindTouch",
+    value: function (selector, action) {
+      actions.push(action);
+      this.parent(selector, action);
+    },
   },
-};
+];
 
 export class ComboManager {
   constructor(input, opts) {
     Guard.againstNull({ input });
-    plug(inputOverrides).into(input);
+    plugin(inputOverrides).to(input);
     this.input = input;
     this.timer = new Timer();
     this.actions = actions;
