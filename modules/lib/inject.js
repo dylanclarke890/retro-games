@@ -31,8 +31,9 @@ export function plugin(...plugins) {
 }
 
 class Injector {
+  #overrides;
   constructor(...overrides) {
-    this.overrides = overrides;
+    this.#overrides = overrides;
   }
 
   #applyPlugin(plugin, obj) {
@@ -65,6 +66,6 @@ class Injector {
    * @param {*} obj class declaration or instance to apply overrides to.
    */
   to(obj) {
-    for (let i = 0; i < this.overrides.length; i++) this.#applyPlugin(this.overrides[i], obj);
+    for (let i = 0; i < this.#overrides.length; i++) this.#applyPlugin(this.#overrides[i], obj);
   }
 }

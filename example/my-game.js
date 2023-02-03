@@ -4,6 +4,14 @@ import { Game } from "../modules/core/game.js";
 import { GameRunner } from "../modules/core/runner.js";
 import { level } from "./level.js";
 
+import { Timer } from "../modules/lib/timer.js";
+import { plugin } from "../modules/lib/inject.js";
+import { GameLoop } from "../modules/core/loop.js";
+import { FixedTickPlugin } from "../modules/plugins/fixed-tick.js";
+
+plugin(FixedTickPlugin.timer).to(Timer);
+plugin(FixedTickPlugin.loop).to(GameLoop);
+
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
