@@ -1,10 +1,10 @@
 import { Register } from "../modules/core/register.js";
 import { Entity } from "../modules/core/entity.js";
 
-// import { ObservablePlugin } from "../modules/plugins/observable.js";
-// import { plugin } from "../modules/lib/inject.js";
+import { ObservablePlugin } from "../modules/plugins/observable.js";
+import { plugin } from "../modules/lib/inject.js";
 
-// plugin(ObservablePlugin).to(Entity);
+plugin(ObservablePlugin).to(Entity);
 
 class PongEntityBase extends Entity {
   constructor({ settings, ...rest }) {
