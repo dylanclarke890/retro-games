@@ -2,10 +2,10 @@ import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
 
 export class GameAnimationSheet {
-  height = 0;
-  image = null;
-  system = null;
-  width = 0;
+  height;
+  image;
+  system;
+  width;
 
   constructor({ path, size = {}, system, mediaFactory }) {
     Guard.againstNull({ system });
@@ -18,29 +18,33 @@ export class GameAnimationSheet {
 }
 
 export class GameAnimation {
-  #frame = 0;
-  #frameTime = 0;
-  #loopCount = 0;
-  #sequence = [];
-  #sheet = null;
-  #stop = false;
-  #tile = 0;
-  #timer = null;
+  #frame;
+  #frameTime;
+  #loopCount;
+  #sequence;
+  #sheet;
+  #stop;
+  #tile;
+  #timer;
 
-  alpha = 1;
-  angle = 0;
-  flip = { x: false, y: false };
-  pivot = { x: 0, y: 0 };
+  alpha;
+  angle;
+  flip;
+  pivot;
 
   constructor(sheet, frameTime, sequence, stop) {
     Guard.againstNull({ sheet });
-    this.#sheet = sheet;
-    this.pivot = { x: sheet.width / 2, y: sheet.height / 2 };
     this.#timer = new Timer();
+    this.#sheet = sheet;
     this.#frameTime = frameTime;
     this.#sequence = sequence;
     this.#stop = !!stop;
     this.#tile = this.#sequence[0];
+
+    this.angle = 0;
+    this.alpha = 1;
+    this.pivot = { x: sheet.width / 2, y: sheet.height / 2 };
+    this.flip = { x: false, y: false };
   }
 
   draw(targetX, targetY) {
