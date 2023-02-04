@@ -130,93 +130,6 @@ export class CanvasInput {
   }
 
   /**
-   * Get/set the font weight.
-   * @param {string} data Font weight.
-   * @return {this | string} CanvasInput or current font weight.
-   */
-  fontWeight(data) {
-    if (data != null) {
-      this._fontWeight = data;
-      return this.render();
-    } else return this._fontWeight;
-  }
-  // setup the prototype
-  /**
-   * Get/set the font style.
-   * @param {string} data Font style.
-   * @return {this | string}      CanvasInput or current font style.
-   */
-  fontStyle(data) {
-    if (data != null) {
-      this._fontStyle = data;
-
-      return this.render();
-    } else {
-      return this._fontStyle;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font shadow color.
-   * @param {string} data Font shadow color.
-   * @return {this | string}      CanvasInput or current font shadow color.
-   */
-  fontShadowColor(data) {
-    if (data != null) {
-      this._fontShadowColor = data;
-
-      return this.render();
-    } else {
-      return this._fontShadowColor;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font shadow blur.
-   * @param {string} data Font shadow blur.
-   * @return {this | string}      CanvasInput or current font shadow blur.
-   */
-  fontShadowBlur(data) {
-    if (data != null) {
-      this._fontShadowBlur = data;
-
-      return this.render();
-    } else {
-      return this._fontShadowBlur;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font shadow x-offset.
-   * @param {string} data Font shadow x-offset.
-   * @return {this | string}      CanvasInput or current font shadow x-offset.
-   */
-  fontShadowOffsetX(data) {
-    if (data != null) {
-      this._fontShadowOffsetX = data;
-
-      return this.render();
-    } else {
-      return this._fontShadowOffsetX;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font shadow y-offset.
-   * @param {string} data Font shadow y-offset.
-   * @return {this | string}      CanvasInput or current font shadow y-offset.
-   */
-  fontShadowOffsetY(data) {
-    if (data != null) {
-      this._fontShadowOffsetY = data;
-
-      return this.render();
-    } else {
-      return this._fontShadowOffsetY;
-    }
-  }
-  // setup the prototype
-  /**
    * Get/set the width of the text box.
    * @param {number} data Width in pixels.
    * @return {this | string}      CanvasInput or current width.
@@ -233,7 +146,7 @@ export class CanvasInput {
       return this._width;
     }
   }
-  // setup the prototype
+
   /**
    * Get/set the height of the text box.
    * @param {number} data Height in pixels.
@@ -245,92 +158,26 @@ export class CanvasInput {
       this._calculate();
       this._updateCanvasWH();
       this._updateHiddenInput();
-
       return this.render();
     } else {
       return this._height;
     }
   }
-  // setup the prototype
+
   /**
    * Get/set the padding of the text box.
    * @param {number} data Padding in pixels.
-   * @return {this | string}      CanvasInput or current padding.
+   * @return {this | string} CanvasInput or current padding.
    */
   padding(data) {
     if (data != null) {
       this._padding = data;
       this._calculate();
       this._updateCanvasWH();
-
       return this.render();
-    } else {
-      return this._padding;
-    }
+    } else return this._padding;
   }
-  // setup the prototype
-  /**
-   * Get/set the border width.
-   * @param {number} data Border width.
-   * @return {this | string}      CanvasInput or current border width.
-   */
-  borderWidth(data) {
-    if (data != null) {
-      this._borderWidth = data;
-      this._calculate();
-      this._updateCanvasWH();
 
-      return this.render();
-    } else {
-      return this._borderWidth;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the border color.
-   * @param {string} data Border color.
-   * @return {this | string}      CanvasInput or current border color.
-   */
-  borderColor(data) {
-    if (data != null) {
-      this._borderColor = data;
-
-      return this.render();
-    } else {
-      return this._borderColor;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the border radius.
-   * @param {number} data Border radius.
-   * @return {this | string}      CanvasInput or current border radius.
-   */
-  borderRadius(data) {
-    if (data != null) {
-      this._borderRadius = data;
-
-      return this.render();
-    } else {
-      return this._borderRadius;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the background color.
-   * @param {number} data Background color.
-   * @return {this | string}      CanvasInput or current background color.
-   */
-  backgroundColor(data) {
-    if (data != null) {
-      this._backgroundColor = data;
-
-      return this.render();
-    } else {
-      return this._backgroundColor;
-    }
-  }
-  // setup the prototype
   /**
    * Get/set the background gradient.
    * @param {number} data Background gradient.
@@ -395,51 +242,7 @@ export class CanvasInput {
       return this._boxShadow;
     }
   }
-  // setup the prototype
-  /**
-   * Get/set the inner shadow.
-   * @param {string} data In the format of a CSS box shadow (1px 1px 1px rgba(0, 0, 0.5)).
-   * @return {this | string}          CanvasInput or current inner shadow.
-   */
-  innerShadow(data) {
-    if (data != null) {
-      this._innerShadow = data;
 
-      return this.render();
-    } else {
-      return this._innerShadow;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the text selection color.
-   * @param {string} data Color.
-   * @return {this | string}      CanvasInput or current selection color.
-   */
-  selectionColor(data) {
-    if (data != null) {
-      this._selectionColor = data;
-
-      return this.render();
-    } else {
-      return this._selectionColor;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the place holder text.
-   * @param {string} data Place holder text.
-   * @return {this | string}      CanvasInput or current place holder text.
-   */
-  placeHolder(data) {
-    if (data != null) {
-      this._placeHolder = data;
-
-      return this.render();
-    } else {
-      return this._placeHolder;
-    }
-  }
   // setup the prototype
   /**
    * Get/set the current text box value.
@@ -461,7 +264,7 @@ export class CanvasInput {
       return this._value === this._placeHolder ? "" : this._value;
     }
   }
-  // setup the prototype
+
   /**
    * Set or fire the onsubmit event.
    * @param {Function} fn Custom callback.
@@ -475,7 +278,7 @@ export class CanvasInput {
       this._onsubmit();
     }
   }
-  // setup the prototype
+
   /**
    * Set or fire the onkeydown event.
    * @param {Function} fn Custom callback.
@@ -489,7 +292,7 @@ export class CanvasInput {
       this._onkeydown();
     }
   }
-  // setup the prototype
+
   /**
    * Set or fire the onkeyup event.
    * @param {Function} fn Custom callback.
@@ -503,7 +306,7 @@ export class CanvasInput {
       this._onkeyup();
     }
   }
-  // setup the prototype
+
   /**
    * Place focus on the CanvasInput box, placing the cursor
    * either at the end of the text or where the user clicked.
@@ -566,14 +369,14 @@ export class CanvasInput {
 
     return this.render();
   }
-  // setup the prototype
+
   /**
    * Removes focus from the CanvasInput box.
    * @param {Object} _this Reference to this.
    * @return {CanvasInput}
    */
-  blur(_this) {
-    this._onblur(this);
+  blur() {
+    this._onblur();
 
     if (this._cursorInterval) {
       clearInterval(this._cursorInterval);
@@ -590,11 +393,10 @@ export class CanvasInput {
 
     return this.render();
   }
-  // setup the prototype
+
   /**
    * Fired with the keydown event to draw the typed characters.
-   * @param {Event}       e    The keydown event.
-   * @param {CanvasInput} this
+   * @param {Event} e The keydown event.
    * @return {CanvasInput}
    */
   keydown(e) {
@@ -643,12 +445,11 @@ export class CanvasInput {
 
     return this.render();
   }
-  // setup the prototype
+
   /**
    * Fired with the click event on the canvas, and puts focus on/off
    * based on where the user clicks.
-   * @param {Event}       e    The click event.
-   * @param {CanvasInput} this
+   * @param {Event} e The click event.
    * @return {CanvasInput}
    */
   click(e) {
@@ -672,11 +473,10 @@ export class CanvasInput {
       return this.blur();
     }
   }
-  // setup the prototype
+
   /**
    * Fired with the mousemove event to update the default cursor.
-   * @param {Event}       e    The mousemove event.
-   * @param {CanvasInput} this
+   * @param {Event} e The mousemove event.
    * @return {CanvasInput}
    */
   mousemove(e) {
@@ -712,11 +512,10 @@ export class CanvasInput {
       }
     }
   }
-  // setup the prototype
+
   /**
    * Fired with the mousedown event to start a selection drag.
-   * @param {Event} e    The mousedown event.
-   * @param {CanvasInput} this
+   * @param {Event} e The mousedown event.
    */
   mousedown(e) {
     var mouse = this._mousePos(e),
@@ -732,11 +531,10 @@ export class CanvasInput {
       this._selectionStart = this._clickPos(x, y);
     }
   }
-  // setup the prototype
+
   /**
    * Fired with the mouseup event to end a selection drag.
    * @param {Event} e    The mouseup event.
-   * @param {CanvasInput} this
    */
   mouseup(e) {
     var mouse = this._mousePos(e),
@@ -753,9 +551,9 @@ export class CanvasInput {
       delete this._selectionStart;
     }
 
-    this.click(e, this);
+    this.click(e);
   }
-  // setup the prototype
+
   /**
    * Select a range of text in the input.
    * @param {Array} range (optional) Leave blank to select all. Format: [start, end]
@@ -774,7 +572,7 @@ export class CanvasInput {
 
     return this;
   }
-  // setup the prototype
+
   /**
    * Helper method to get the off-DOM canvas.
    * @return {Object} Reference to the canvas.
@@ -782,7 +580,7 @@ export class CanvasInput {
   renderCanvas() {
     return this._renderCanvas;
   }
-  // setup the prototype
+
   /**
    * Clears and redraws the CanvasInput on an off-DOM canvas,
    * and if a main canvas is provided, draws it all onto that.
@@ -940,31 +738,24 @@ export class CanvasInput {
       return this;
     });
   }
-  // setup the prototype
+
   /**
    * Destroy this input and stop rendering it.
    */
   destroy() {
     // pull from the inputs array
-    var index = inputs.indexOf(this);
-    if (index != -1) {
-      inputs.splice(index, 1);
-    }
-
+    const index = inputs.indexOf(this);
+    if (index !== -1) inputs.splice(index, 1);
     // remove focus
-    if (this._hasFocus) {
-      this.blur();
-    }
-
+    if (this._hasFocus) this.blur();
     // remove the hidden input box
     document.body.removeChild(this._hiddenInput);
-
     // remove off-DOM canvas
     this._renderCanvas = null;
     this._shadowCanvas = null;
     this._renderCtx = null;
   }
-  // setup the prototype
+
   /**
    * Draw the text box area with either an image or background color.
    * @param {Function} fn Callback.
@@ -1002,7 +793,7 @@ export class CanvasInput {
       };
     }
   }
-  // setup the prototype
+
   /**
    * Deletes selected text in selection range and repositions cursor.
    * @return {Boolean} true if text removed.
@@ -1023,7 +814,7 @@ export class CanvasInput {
 
     return false;
   }
-  // setup the prototype
+
   /**
    * Clip the text string to only return what fits in the visible text box.
    * @param {string} value The text to clip.
@@ -1038,7 +829,7 @@ export class CanvasInput {
 
     return text + "";
   }
-  // setup the prototype
+
   /**
    * Gets the pixel with of passed text.
    * @param {string} text The text to measure.
@@ -1053,7 +844,7 @@ export class CanvasInput {
 
     return ctx.measureText(text).width;
   }
-  // setup the prototype
+
   /**
    * Recalculate the outer with and height of the text box.
    */
@@ -1062,7 +853,7 @@ export class CanvasInput {
     this.outerW = this._width + this._padding * 2 + this._borderWidth * 2 + this.shadowW;
     this.outerH = this._height + this._padding * 2 + this._borderWidth * 2 + this.shadowH;
   }
-  // setup the prototype
+
   /**
    * Update the width and height of the off-DOM canvas when attributes are changed.
    */
@@ -1081,7 +872,7 @@ export class CanvasInput {
       this._ctx.clearRect(this._x, this._y, oldW, oldH);
     }
   }
-  // setup the prototype
+
   /**
    * Update the size and position of the hidden input (better UX on mobile).
    */
@@ -1093,7 +884,7 @@ export class CanvasInput {
     this._hiddenInput.style.width = this._width + this._padding * 2 + "px";
     this._hiddenInput.style.height = this._height + this._padding * 2 + "px";
   }
-  // setup the prototype
+
   /**
    * Creates the path for a rectangle with rounded corners.
    * Must call ctx.fill() after calling this to draw the rectangle.
@@ -1122,7 +913,7 @@ export class CanvasInput {
 
     ctx.closePath();
   }
-  // setup the prototype
+
   /**
    * Checks if a coordinate point is over the input box.
    * @param {number} x x-coordinate position.
@@ -1137,7 +928,7 @@ export class CanvasInput {
 
     return xLeft && xRight && yTop && yBottom;
   }
-  // setup the prototype
+
   /**
    * Use the mouse's x & y coordinates to determine
    * the position clicked in the text.
@@ -1145,13 +936,11 @@ export class CanvasInput {
    * @param {number} y Y-coordinate.
    * @return {number}   Cursor position.
    */
-  _clickPos(x, y) {
+  _clickPos(x) {
     var value = this._value;
 
     // don't count placeholder text in this
-    if (this._value === this._placeHolder) {
-      value = "";
-    }
+    if (this._value === this._placeHolder) value = "";
 
     // determine where the click was made along the string
     var text = this._clipText(value),
@@ -1171,7 +960,7 @@ export class CanvasInput {
 
     return pos;
   }
-  // setup the prototype
+
   /**
    * Calculate the mouse position based on the event callback and the elements on the page.
    * @param {Event} e
