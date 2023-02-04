@@ -41,14 +41,16 @@ class Injector {
     const construct = proto.constructor;
     const tmpFnCache = {};
     for (let i = 0; i < plugin.length; i++) {
-      const { name, value, isStatic } = plugin[i];
+      const { name, value, isStatic, overrideBase } = plugin[i];
       const target = isStatic ? construct : proto;
 
-      if (typeof value !== "function" || typeof target[name] !== "function") {
+      if (overrideBase || typeof value !== "function" || typeof target[name] !== "function") {
         target[name] = value;
         continue;
       }
 
+      /* If we get this far both objects have a method with the same name 
+         and we need access to the original method on the target object. */
       tmpFnCache[name] = target[name];
       target[name] = (function (name, fn) {
         return function () {
