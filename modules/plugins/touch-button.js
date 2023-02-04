@@ -120,10 +120,10 @@ class TouchButton {
   }
 }
 
-class TouchButtonCollection = ig.Class.extend({
-  buttons: [],
+class TouchButtonCollection {
+  buttons = [];
 
-  init(buttons) {
+  constructor(buttons) {
     this.buttons = buttons;
 
     document.addEventListener("touchstart", this.touchStart.bind(this), false);
@@ -132,7 +132,7 @@ class TouchButtonCollection = ig.Class.extend({
     document.addEventListener("MSPointerDown", this.touchStartMS.bind(this), false);
     document.addEventListener("MSPointerUp", this.touchEndMS.bind(this), false);
     document.body.style.msTouchAction = "none";
-  },
+  }
 
   touchStart(ev) {
     ev.preventDefault();
@@ -140,7 +140,7 @@ class TouchButtonCollection = ig.Class.extend({
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].touchStart(ev);
     }
-  },
+  }
 
   touchEnd(ev) {
     ev.preventDefault();
@@ -148,7 +148,7 @@ class TouchButtonCollection = ig.Class.extend({
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].touchEnd(ev);
     }
-  },
+  }
 
   touchStartMS(ev) {
     ev.preventDefault();
@@ -156,7 +156,7 @@ class TouchButtonCollection = ig.Class.extend({
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].touchStartMS(ev);
     }
-  },
+  }
 
   touchEndMS(ev) {
     ev.preventDefault();
@@ -164,7 +164,7 @@ class TouchButtonCollection = ig.Class.extend({
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].touchEndMS(ev);
     }
-  },
+  }
 
   align() {
     var w = ig.system.width || window.innerWidth;
@@ -173,11 +173,11 @@ class TouchButtonCollection = ig.Class.extend({
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].align(w, h);
     }
-  },
+  }
 
   draw() {
     for (var i = 0; i < this.buttons.length; i++) {
       this.buttons[i].draw();
     }
-  },
-});
+  }
+}
