@@ -74,9 +74,9 @@ export class CanvasInput {
 
     // setup main canvas events
     if (this._canvas) {
-      this._canvas.addEventListener("mousemove", (e) => this.mousemove(e, this), false);
-      this._canvas.addEventListener("mousedown", (e) => this.mousedown(e, this), false);
-      this._canvas.addEventListener("mouseup", (e) => this.mouseup(e, this), false);
+      this._canvas.addEventListener("mousemove", (e) => this.mousemove(e), false);
+      this._canvas.addEventListener("mousedown", (e) => this.mousedown(e), false);
+      this._canvas.addEventListener("mouseup", (e) => this.mouseup(e), false);
     }
 
     // setup a global mouseup to blur the input outside of the canvas
@@ -107,7 +107,7 @@ export class CanvasInput {
         window.focus(); // hack to fix touch event bug in iOS Safari
         this._hiddenInput.focus();
         // continue with the keydown event
-        this.keydown(e, this);
+        this.keydown(e);
       }
     });
 
@@ -119,7 +119,7 @@ export class CanvasInput {
       // update selection to hidden input's selection in case user did keyboard-based selection
       this._selection = [this._hiddenInput.selectionStart, this._hiddenInput.selectionEnd];
       this.render();
-      if (this._hasFocus) this._onkeyup(e, this);
+      if (this._hasFocus) this._onkeyup(e);
     });
 
     // add this to the buffer
@@ -130,158 +130,24 @@ export class CanvasInput {
   }
 
   /**
-   * Get/set the main canvas.
-   * @param  {Object} data Canvas reference.
-   * @return {this | CanvasRenderingContext2D} CanvasInput or current canvas.
-   */
-  canvas(data) {
-    if (data) {
-      this._canvas = data;
-      this._ctx = this._canvas.getContext("2d");
-      return this.render();
-    } else return this._canvas;
-  }
-
-  /**
-   * Get/set the x-position.
-   * @param  {Number} data The pixel position along the x-coordinate.
-   * @return {this | number}      CanvasInput or current x-value.
-   */
-  x(data) {
-    if (data) {
-      this._x = data;
-      this._updateHiddenInput();
-      return this.render();
-    } else return this._x;
-  }
-
-  /**
-   * Get/set the y-position.
-   * @param  {Number} data The pixel position along the y-coordinate.
-   * @return {this | number} CanvasInput or current y-value.
-   */
-  y(data) {
-    if (data) {
-      this._y = data;
-      this._updateHiddenInput();
-      return this.render();
-    } else return this._y;
-  }
-
-  /**
-   * Get/set the extra x-position (generally used when no canvas is specified).
-   * @param  {Number} data The pixel position along the x-coordinate.
-   * @return {this | number} CanvasInput or current x-value.
-   */
-  extraX(data) {
-    if (data) {
-      this._extraX = data;
-      this._updateHiddenInput();
-
-      return this.render();
-    } else {
-      return this._extraX;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the extra y-position (generally used when no canvas is specified).
-   * @param  {Number} data The pixel position along the y-coordinate.
-   * @return {Mixed}      CanvasInput or current y-value.
-   */
-  extraY(data) {
-    if (typeof data !== "undefined") {
-      this._extraY = data;
-      this._updateHiddenInput();
-
-      return this.render();
-    } else {
-      return this._extraY;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font size.
-   * @param  {Number} data Font size.
-   * @return {Mixed}      CanvasInput or current font size.
-   */
-  fontSize(data) {
-    if (typeof data !== "undefined") {
-      this._fontSize = data;
-
-      return this.render();
-    } else {
-      return this._fontSize;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font family.
-   * @param  {String} data Font family.
-   * @return {Mixed}      CanvasInput or current font family.
-   */
-  fontFamily(data) {
-    if (typeof data !== "undefined") {
-      this._fontFamily = data;
-
-      return this.render();
-    } else {
-      return this._fontFamily;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the font color.
-   * @param  {String} data Font color.
-   * @return {Mixed}      CanvasInput or current font color.
-   */
-  fontColor(data) {
-    if (typeof data !== "undefined") {
-      this._fontColor = data;
-
-      return this.render();
-    } else {
-      return this._fontColor;
-    }
-  }
-  // setup the prototype
-  /**
-   * Get/set the place holder font color.
-   * @param  {String} data Font color.
-   * @return {Mixed}      CanvasInput or current place holder font color.
-   */
-  placeHolderColor(data) {
-    if (typeof data !== "undefined") {
-      this._placeHolderColor = data;
-
-      return this.render();
-    } else {
-      return this._placeHolderColor;
-    }
-  }
-  // setup the prototype
-  /**
    * Get/set the font weight.
-   * @param  {String} data Font weight.
-   * @return {Mixed}      CanvasInput or current font weight.
+   * @param {string} data Font weight.
+   * @return {this | string} CanvasInput or current font weight.
    */
   fontWeight(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontWeight = data;
-
       return this.render();
-    } else {
-      return this._fontWeight;
-    }
+    } else return this._fontWeight;
   }
   // setup the prototype
   /**
    * Get/set the font style.
-   * @param  {String} data Font style.
-   * @return {Mixed}      CanvasInput or current font style.
+   * @param {string} data Font style.
+   * @return {this | string}      CanvasInput or current font style.
    */
   fontStyle(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontStyle = data;
 
       return this.render();
@@ -292,11 +158,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the font shadow color.
-   * @param  {String} data Font shadow color.
-   * @return {Mixed}      CanvasInput or current font shadow color.
+   * @param {string} data Font shadow color.
+   * @return {this | string}      CanvasInput or current font shadow color.
    */
   fontShadowColor(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontShadowColor = data;
 
       return this.render();
@@ -307,11 +173,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the font shadow blur.
-   * @param  {String} data Font shadow blur.
-   * @return {Mixed}      CanvasInput or current font shadow blur.
+   * @param {string} data Font shadow blur.
+   * @return {this | string}      CanvasInput or current font shadow blur.
    */
   fontShadowBlur(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontShadowBlur = data;
 
       return this.render();
@@ -322,11 +188,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the font shadow x-offset.
-   * @param  {String} data Font shadow x-offset.
-   * @return {Mixed}      CanvasInput or current font shadow x-offset.
+   * @param {string} data Font shadow x-offset.
+   * @return {this | string}      CanvasInput or current font shadow x-offset.
    */
   fontShadowOffsetX(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontShadowOffsetX = data;
 
       return this.render();
@@ -337,11 +203,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the font shadow y-offset.
-   * @param  {String} data Font shadow y-offset.
-   * @return {Mixed}      CanvasInput or current font shadow y-offset.
+   * @param {string} data Font shadow y-offset.
+   * @return {this | string}      CanvasInput or current font shadow y-offset.
    */
   fontShadowOffsetY(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._fontShadowOffsetY = data;
 
       return this.render();
@@ -352,11 +218,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the width of the text box.
-   * @param  {Number} data Width in pixels.
-   * @return {Mixed}      CanvasInput or current width.
+   * @param {number} data Width in pixels.
+   * @return {this | string}      CanvasInput or current width.
    */
   width(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._width = data;
       this._calculate();
       this._updateCanvasWH();
@@ -370,11 +236,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the height of the text box.
-   * @param  {Number} data Height in pixels.
-   * @return {Mixed}      CanvasInput or current height.
+   * @param {number} data Height in pixels.
+   * @return {this | string}      CanvasInput or current height.
    */
   height(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._height = data;
       this._calculate();
       this._updateCanvasWH();
@@ -388,11 +254,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the padding of the text box.
-   * @param  {Number} data Padding in pixels.
-   * @return {Mixed}      CanvasInput or current padding.
+   * @param {number} data Padding in pixels.
+   * @return {this | string}      CanvasInput or current padding.
    */
   padding(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._padding = data;
       this._calculate();
       this._updateCanvasWH();
@@ -405,11 +271,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the border width.
-   * @param  {Number} data Border width.
-   * @return {Mixed}      CanvasInput or current border width.
+   * @param {number} data Border width.
+   * @return {this | string}      CanvasInput or current border width.
    */
   borderWidth(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._borderWidth = data;
       this._calculate();
       this._updateCanvasWH();
@@ -422,11 +288,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the border color.
-   * @param  {String} data Border color.
-   * @return {Mixed}      CanvasInput or current border color.
+   * @param {string} data Border color.
+   * @return {this | string}      CanvasInput or current border color.
    */
   borderColor(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._borderColor = data;
 
       return this.render();
@@ -437,11 +303,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the border radius.
-   * @param  {Number} data Border radius.
-   * @return {Mixed}      CanvasInput or current border radius.
+   * @param {number} data Border radius.
+   * @return {this | string}      CanvasInput or current border radius.
    */
   borderRadius(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._borderRadius = data;
 
       return this.render();
@@ -452,11 +318,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the background color.
-   * @param  {Number} data Background color.
-   * @return {Mixed}      CanvasInput or current background color.
+   * @param {number} data Background color.
+   * @return {this | string}      CanvasInput or current background color.
    */
   backgroundColor(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._backgroundColor = data;
 
       return this.render();
@@ -467,11 +333,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the background gradient.
-   * @param  {Number} data Background gradient.
-   * @return {Mixed}      CanvasInput or current background gradient.
+   * @param {number} data Background gradient.
+   * @return {this | string}      CanvasInput or current background gradient.
    */
   backgroundGradient(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._backgroundColor = this._renderCtx.createLinearGradient(0, 0, 0, this.outerH);
       this._backgroundColor.addColorStop(0, data[0]);
       this._backgroundColor.addColorStop(1, data[1]);
@@ -484,12 +350,12 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the box shadow.
-   * @param  {String} data     Box shadow in CSS format (1px 1px 1px rgba(0, 0, 0.5)).
-   * @param  {Boolean} doReturn (optional) True to prevent a premature render.
-   * @return {Mixed}          CanvasInput or current box shadow.
+   * @param {string} data     Box shadow in CSS format (1px 1px 1px rgba(0, 0, 0.5)).
+   * @param {Boolean} doReturn (optional) True to prevent a premature render.
+   * @return {this | string}          CanvasInput or current box shadow.
    */
   boxShadow(data, doReturn) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       // parse box shadow
       var boxShadow = data.split("px ");
       this._boxShadow = {
@@ -532,11 +398,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the inner shadow.
-   * @param  {String} data In the format of a CSS box shadow (1px 1px 1px rgba(0, 0, 0.5)).
-   * @return {Mixed}          CanvasInput or current inner shadow.
+   * @param {string} data In the format of a CSS box shadow (1px 1px 1px rgba(0, 0, 0.5)).
+   * @return {this | string}          CanvasInput or current inner shadow.
    */
   innerShadow(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._innerShadow = data;
 
       return this.render();
@@ -547,11 +413,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the text selection color.
-   * @param  {String} data Color.
-   * @return {Mixed}      CanvasInput or current selection color.
+   * @param {string} data Color.
+   * @return {this | string}      CanvasInput or current selection color.
    */
   selectionColor(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._selectionColor = data;
 
       return this.render();
@@ -562,11 +428,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the place holder text.
-   * @param  {String} data Place holder text.
-   * @return {Mixed}      CanvasInput or current place holder text.
+   * @param {string} data Place holder text.
+   * @return {this | string}      CanvasInput or current place holder text.
    */
   placeHolder(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._placeHolder = data;
 
       return this.render();
@@ -577,11 +443,11 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Get/set the current text box value.
-   * @param  {String} data Text value.
-   * @return {Mixed}      CanvasInput or current text value.
+   * @param {string} data Text value.
+   * @return {this | string}      CanvasInput or current text value.
    */
   value(data) {
-    if (typeof data !== "undefined") {
+    if (data != null) {
       this._value = data + "";
       this._hiddenInput.value = data + "";
 
@@ -598,7 +464,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Set or fire the onsubmit event.
-   * @param  {Function} fn Custom callback.
+   * @param {Function} fn Custom callback.
    */
   onsubmit(fn) {
     if (typeof fn !== "undefined") {
@@ -612,7 +478,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Set or fire the onkeydown event.
-   * @param  {Function} fn Custom callback.
+   * @param {Function} fn Custom callback.
    */
   onkeydown(fn) {
     if (typeof fn !== "undefined") {
@@ -626,7 +492,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Set or fire the onkeyup event.
-   * @param  {Function} fn Custom callback.
+   * @param {Function} fn Custom callback.
    */
   onkeyup(fn) {
     if (typeof fn !== "undefined") {
@@ -641,7 +507,7 @@ export class CanvasInput {
   /**
    * Place focus on the CanvasInput box, placing the cursor
    * either at the end of the text or where the user clicked.
-   * @param  {Number} pos (optional) The position to place the cursor.
+   * @param {number} pos (optional) The position to place the cursor.
    * @return {CanvasInput}
    */
   focus(pos) {
@@ -703,7 +569,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Removes focus from the CanvasInput box.
-   * @param  {Object} _this Reference to this.
+   * @param {Object} _this Reference to this.
    * @return {CanvasInput}
    */
   blur(_this) {
@@ -727,8 +593,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Fired with the keydown event to draw the typed characters.
-   * @param  {Event}       e    The keydown event.
-   * @param  {CanvasInput} this
+   * @param {Event}       e    The keydown event.
+   * @param {CanvasInput} this
    * @return {CanvasInput}
    */
   keydown(e) {
@@ -781,8 +647,8 @@ export class CanvasInput {
   /**
    * Fired with the click event on the canvas, and puts focus on/off
    * based on where the user clicks.
-   * @param  {Event}       e    The click event.
-   * @param  {CanvasInput} this
+   * @param {Event}       e    The click event.
+   * @param {CanvasInput} this
    * @return {CanvasInput}
    */
   click(e) {
@@ -809,8 +675,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Fired with the mousemove event to update the default cursor.
-   * @param  {Event}       e    The mousemove event.
-   * @param  {CanvasInput} this
+   * @param {Event}       e    The mousemove event.
+   * @param {CanvasInput} this
    * @return {CanvasInput}
    */
   mousemove(e) {
@@ -849,8 +715,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Fired with the mousedown event to start a selection drag.
-   * @param  {Event} e    The mousedown event.
-   * @param  {CanvasInput} this
+   * @param {Event} e    The mousedown event.
+   * @param {CanvasInput} this
    */
   mousedown(e) {
     var mouse = this._mousePos(e),
@@ -869,8 +735,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Fired with the mouseup event to end a selection drag.
-   * @param  {Event} e    The mouseup event.
-   * @param  {CanvasInput} this
+   * @param {Event} e    The mouseup event.
+   * @param {CanvasInput} this
    */
   mouseup(e) {
     var mouse = this._mousePos(e),
@@ -892,7 +758,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Select a range of text in the input.
-   * @param  {Array} range (optional) Leave blank to select all. Format: [start, end]
+   * @param {Array} range (optional) Leave blank to select all. Format: [start, end]
    * @return {CanvasInput}
    */
   selectText(range) {
@@ -1101,7 +967,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Draw the text box area with either an image or background color.
-   * @param  {Function} fn Callback.
+   * @param {Function} fn Callback.
    */
   _drawTextBox(fn) {
     var ctx = this._renderCtx,
@@ -1160,8 +1026,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Clip the text string to only return what fits in the visible text box.
-   * @param  {String} value The text to clip.
-   * @return {String} The clipped text.
+   * @param {string} value The text to clip.
+   * @return {string} The clipped text.
    */
   _clipText(value) {
     value = typeof value === "undefined" ? this._value : value;
@@ -1175,8 +1041,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Gets the pixel with of passed text.
-   * @param  {String} text The text to measure.
-   * @return {Number}      The measured width.
+   * @param {string} text The text to measure.
+   * @return {number}      The measured width.
    */
   _textWidth(text) {
     var ctx = this._renderCtx;
@@ -1231,12 +1097,12 @@ export class CanvasInput {
   /**
    * Creates the path for a rectangle with rounded corners.
    * Must call ctx.fill() after calling this to draw the rectangle.
-   * @param  {Object} ctx Canvas context.
-   * @param  {Number} x   x-coordinate to draw from.
-   * @param  {Number} y   y-coordinate to draw from.
-   * @param  {Number} w   Width of rectangle.
-   * @param  {Number} h   Height of rectangle.
-   * @param  {Number} r   Border radius.
+   * @param {Object} ctx Canvas context.
+   * @param {number} x   x-coordinate to draw from.
+   * @param {number} y   y-coordinate to draw from.
+   * @param {number} w   Width of rectangle.
+   * @param {number} h   Height of rectangle.
+   * @param {number} r   Border radius.
    */
   _roundedRect(ctx, x, y, w, h, r) {
     if (w < 2 * r) r = w / 2;
@@ -1259,8 +1125,8 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Checks if a coordinate point is over the input box.
-   * @param  {Number} x x-coordinate position.
-   * @param  {Number} y y-coordinate position.
+   * @param {number} x x-coordinate position.
+   * @param {number} y y-coordinate position.
    * @return {Boolean}   True if it is over the input box.
    */
   _overInput(x, y) {
@@ -1275,9 +1141,9 @@ export class CanvasInput {
   /**
    * Use the mouse's x & y coordinates to determine
    * the position clicked in the text.
-   * @param  {Number} x X-coordinate.
-   * @param  {Number} y Y-coordinate.
-   * @return {Number}   Cursor position.
+   * @param {number} x X-coordinate.
+   * @param {number} y Y-coordinate.
+   * @return {number}   Cursor position.
    */
   _clickPos(x, y) {
     var value = this._value;
@@ -1308,7 +1174,7 @@ export class CanvasInput {
   // setup the prototype
   /**
    * Calculate the mouse position based on the event callback and the elements on the page.
-   * @param  {Event} e
+   * @param {Event} e
    * @return {Object}   x & y values
    */
   _mousePos(e) {
