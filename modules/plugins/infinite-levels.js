@@ -135,7 +135,7 @@ export class InfiniteLevel {
       for (let i = 0; i < this.game.entities.length; i++) {
         const entity = this.game.entities[i];
         entity.pos.x -= firstMap.tilesize;
-        
+
         // remove entities that are no longer visible
         if (
           (this.options.checkX && entity.pos.x + entity.size.x - this.game.screen.actual.x < 0) ||
@@ -155,8 +155,7 @@ export class InfiniteLevel {
   }
 
   extendMap(map, level) {
-    var layer = this.getLayer(map.name, level);
-
+    let layer = this.getLayer(map.name, level);
     if (!layer) {
       layer = {
         data: this.getEmptyMapData(level.layer[0].data.length, level.layer[0].data[0].length),
@@ -164,21 +163,14 @@ export class InfiniteLevel {
       };
     }
 
-    var data = map.data;
-    for (var j = 0; j < data.length; j++) {
-      data[j].push.apply(data[j], layer.data[j]);
-    }
-
+    const data = map.data;
+    for (let j = 0; j < data.length; j++) data[j].push.apply(data[j], layer.data[j]);
     map.width += layer.width;
   }
 
   getLayer(layerName, level) {
-    for (var i = 0; i < level.layer.length; i++) {
-      if (layerName === level.layer[i].name) {
-        return level.layer[i];
-      }
-    }
-
+    for (let i = 0; i < level.layer.length; i++)
+      if (layerName === level.layer[i].name) return level.layer[i];
     return false;
   }
 }
