@@ -82,7 +82,6 @@ export class RetroHighscoreNameField extends Entity {
     if (input.pressed("prev_char") && this.highlightedChar > 0) this.highlightedChar--;
     else if (input.pressed("next_char") && this.highlightedChar < this.numberOfChars - 1)
       this.highlightedChar++;
-    console.log(this.highlightedChar);
     const current = this.highlightedChar;
     // Switch between symbols
     if (input.pressed("prev_symbol") && this.name[current].symbol > 0) this.name[current].symbol--;

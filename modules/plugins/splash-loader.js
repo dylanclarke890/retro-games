@@ -70,7 +70,6 @@ export class SplashLoaderMixin extends GameLoader {
   }
 
   launchGame() {
-    console.log("Launched");
     this.game = new this.gameClass({
       system: this.runner.system,
       fonts: this.runner.fonts,
