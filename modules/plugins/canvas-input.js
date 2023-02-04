@@ -7,7 +7,7 @@ export class CanvasInput {
   constructor(opts) {
     // setup the defaults
     this._canvas = opts.canvas || null;
-    this._ctx = this._canvas ? self._canvas.getContext("2d") : null;
+    this._ctx = this._canvas ? this._canvas.getContext("2d") : null;
     this._x = opts.x || 0;
     this._y = opts.y || 0;
     this._extraX = opts.extraX || 0;
@@ -74,9 +74,9 @@ export class CanvasInput {
 
     // setup main canvas events
     if (this._canvas) {
-      this._canvas.addEventListener("mousemove", (e) => this.mousemove(e, self));
-      this._canvas.addEventListener("mousedown", (e) => this.mousedown(e, self));
-      self._canvas.addEventListener("mouseup", (e) => this.mouseup(e, self));
+      this._canvas.addEventListener("mousemove", (e) => this.mousemove(e, this), false);
+      this._canvas.addEventListener("mousedown", (e) => this.mousedown(e, this), false);
+      this._canvas.addEventListener("mouseup", (e) => this.mouseup(e, this), false);
     }
 
     // setup a global mouseup to blur the input outside of the canvas
@@ -87,129 +87,100 @@ export class CanvasInput {
     window.addEventListener("touchend", autoBlur, true);
 
     // create the hidden input element
-    self._hiddenInput = document.createElement("input");
-    self._hiddenInput.type = "text";
-    self._hiddenInput.style.position = "absolute";
-    self._hiddenInput.style.opacity = 0;
-    self._hiddenInput.style.pointerEvents = "none";
-    self._hiddenInput.style.zIndex = 0;
+    this._hiddenInput = document.createElement("input");
+    this._hiddenInput.type = "text";
+    this._hiddenInput.style.position = "absolute";
+    this._hiddenInput.style.opacity = 0;
+    this._hiddenInput.style.pointerEvents = "none";
+    this._hiddenInput.style.zIndex = 0;
     // hide native blue text cursor on iOS
-    self._hiddenInput.style.transform = "scale(0)";
+    this._hiddenInput.style.transform = "scale(0)";
 
-    self._updateHiddenInput();
-    if (self._maxlength) {
-      self._hiddenInput.maxLength = self._maxlength;
-    }
-    document.body.appendChild(self._hiddenInput);
-    self._hiddenInput.value = self._value;
+    this._updateHiddenInput();
+    if (this._maxlength) this._hiddenInput.maxLength = this._maxlength;
+    document.body.appendChild(this._hiddenInput);
+    this._hiddenInput.value = this._value;
 
     // setup the keydown listener
-    self._hiddenInput.addEventListener("keydown", function (e) {
-      e = e || window.event;
-
-      if (self._hasFocus) {
-        // hack to fix touch event bug in iOS Safari
-        window.focus();
-        self._hiddenInput.focus();
-
+    this._hiddenInput.addEventListener("keydown", (e) => {
+      if (this._hasFocus) {
+        window.focus(); // hack to fix touch event bug in iOS Safari
+        this._hiddenInput.focus();
         // continue with the keydown event
-        self.keydown(e, self);
+        this.keydown(e, this);
       }
     });
 
     // setup the keyup listener
-    self._hiddenInput.addEventListener("keyup", function (e) {
-      e = e || window.event;
-
+    this._hiddenInput.addEventListener("keyup", (e) => {
       // update the canvas input state information from the hidden input
-      self._value = self._hiddenInput.value;
-      self._cursorPos = self._hiddenInput.selectionStart;
+      this._value = this._hiddenInput.value;
+      this._cursorPos = this._hiddenInput.selectionStart;
       // update selection to hidden input's selection in case user did keyboard-based selection
-      self._selection = [self._hiddenInput.selectionStart, self._hiddenInput.selectionEnd];
-      self.render();
-
-      if (self._hasFocus) {
-        self._onkeyup(e, self);
-      }
+      this._selection = [this._hiddenInput.selectionStart, this._hiddenInput.selectionEnd];
+      this.render();
+      if (this._hasFocus) this._onkeyup(e, this);
     });
 
     // add this to the buffer
-    inputs.push(self);
-    self._inputsIndex = inputs.length - 1;
+    inputs.push(this);
+    this._inputsIndex = inputs.length - 1;
 
-    // draw the text box
-    self.render();
+    this.render();
   }
-  // setup the prototype
+
   /**
    * Get/set the main canvas.
    * @param  {Object} data Canvas reference.
-   * @return {Mixed}      CanvasInput or current canvas.
+   * @return {this | CanvasRenderingContext2D} CanvasInput or current canvas.
    */
   canvas(data) {
-    var self = this;
-
-    if (typeof data !== "undefined") {
-      self._canvas = data;
-      self._ctx = self._canvas.getContext("2d");
-
-      return self.render();
-    } else {
-      return self._canvas;
-    }
+    if (data) {
+      this._canvas = data;
+      this._ctx = this._canvas.getContext("2d");
+      return this.render();
+    } else return this._canvas;
   }
-  // setup the prototype
+
   /**
    * Get/set the x-position.
    * @param  {Number} data The pixel position along the x-coordinate.
-   * @return {Mixed}      CanvasInput or current x-value.
+   * @return {this | number}      CanvasInput or current x-value.
    */
   x(data) {
-    var self = this;
-
-    if (typeof data !== "undefined") {
-      self._x = data;
-      self._updateHiddenInput();
-
-      return self.render();
-    } else {
-      return self._x;
-    }
+    if (data) {
+      this._x = data;
+      this._updateHiddenInput();
+      return this.render();
+    } else return this._x;
   }
-  // setup the prototype
+
   /**
    * Get/set the y-position.
    * @param  {Number} data The pixel position along the y-coordinate.
-   * @return {Mixed}      CanvasInput or current y-value.
+   * @return {this | number} CanvasInput or current y-value.
    */
   y(data) {
-    var self = this;
-
-    if (typeof data !== "undefined") {
-      self._y = data;
-      self._updateHiddenInput();
-
-      return self.render();
-    } else {
-      return self._y;
-    }
+    if (data) {
+      this._y = data;
+      this._updateHiddenInput();
+      return this.render();
+    } else return this._y;
   }
-  // setup the prototype
+
   /**
    * Get/set the extra x-position (generally used when no canvas is specified).
    * @param  {Number} data The pixel position along the x-coordinate.
-   * @return {Mixed}      CanvasInput or current x-value.
+   * @return {this | number} CanvasInput or current x-value.
    */
   extraX(data) {
-    var self = this;
+    if (data) {
+      this._extraX = data;
+      this._updateHiddenInput();
 
-    if (typeof data !== "undefined") {
-      self._extraX = data;
-      self._updateHiddenInput();
-
-      return self.render();
+      return this.render();
     } else {
-      return self._extraX;
+      return this._extraX;
     }
   }
   // setup the prototype
@@ -219,15 +190,13 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current y-value.
    */
   extraY(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._extraY = data;
-      self._updateHiddenInput();
+      this._extraY = data;
+      this._updateHiddenInput();
 
-      return self.render();
+      return this.render();
     } else {
-      return self._extraY;
+      return this._extraY;
     }
   }
   // setup the prototype
@@ -237,14 +206,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font size.
    */
   fontSize(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontSize = data;
+      this._fontSize = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontSize;
+      return this._fontSize;
     }
   }
   // setup the prototype
@@ -254,14 +221,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font family.
    */
   fontFamily(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontFamily = data;
+      this._fontFamily = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontFamily;
+      return this._fontFamily;
     }
   }
   // setup the prototype
@@ -271,14 +236,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font color.
    */
   fontColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontColor = data;
+      this._fontColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontColor;
+      return this._fontColor;
     }
   }
   // setup the prototype
@@ -288,14 +251,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current place holder font color.
    */
   placeHolderColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._placeHolderColor = data;
+      this._placeHolderColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._placeHolderColor;
+      return this._placeHolderColor;
     }
   }
   // setup the prototype
@@ -305,14 +266,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font weight.
    */
   fontWeight(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontWeight = data;
+      this._fontWeight = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontWeight;
+      return this._fontWeight;
     }
   }
   // setup the prototype
@@ -322,14 +281,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font style.
    */
   fontStyle(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontStyle = data;
+      this._fontStyle = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontStyle;
+      return this._fontStyle;
     }
   }
   // setup the prototype
@@ -339,14 +296,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font shadow color.
    */
   fontShadowColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontShadowColor = data;
+      this._fontShadowColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontShadowColor;
+      return this._fontShadowColor;
     }
   }
   // setup the prototype
@@ -356,14 +311,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font shadow blur.
    */
   fontShadowBlur(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontShadowBlur = data;
+      this._fontShadowBlur = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontShadowBlur;
+      return this._fontShadowBlur;
     }
   }
   // setup the prototype
@@ -373,14 +326,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font shadow x-offset.
    */
   fontShadowOffsetX(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontShadowOffsetX = data;
+      this._fontShadowOffsetX = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontShadowOffsetX;
+      return this._fontShadowOffsetX;
     }
   }
   // setup the prototype
@@ -390,14 +341,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current font shadow y-offset.
    */
   fontShadowOffsetY(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._fontShadowOffsetY = data;
+      this._fontShadowOffsetY = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._fontShadowOffsetY;
+      return this._fontShadowOffsetY;
     }
   }
   // setup the prototype
@@ -407,17 +356,15 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current width.
    */
   width(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._width = data;
-      self._calculate();
-      self._updateCanvasWH();
-      self._updateHiddenInput();
+      this._width = data;
+      this._calculate();
+      this._updateCanvasWH();
+      this._updateHiddenInput();
 
-      return self.render();
+      return this.render();
     } else {
-      return self._width;
+      return this._width;
     }
   }
   // setup the prototype
@@ -427,17 +374,15 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current height.
    */
   height(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._height = data;
-      self._calculate();
-      self._updateCanvasWH();
-      self._updateHiddenInput();
+      this._height = data;
+      this._calculate();
+      this._updateCanvasWH();
+      this._updateHiddenInput();
 
-      return self.render();
+      return this.render();
     } else {
-      return self._height;
+      return this._height;
     }
   }
   // setup the prototype
@@ -447,16 +392,14 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current padding.
    */
   padding(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._padding = data;
-      self._calculate();
-      self._updateCanvasWH();
+      this._padding = data;
+      this._calculate();
+      this._updateCanvasWH();
 
-      return self.render();
+      return this.render();
     } else {
-      return self._padding;
+      return this._padding;
     }
   }
   // setup the prototype
@@ -466,16 +409,14 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current border width.
    */
   borderWidth(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._borderWidth = data;
-      self._calculate();
-      self._updateCanvasWH();
+      this._borderWidth = data;
+      this._calculate();
+      this._updateCanvasWH();
 
-      return self.render();
+      return this.render();
     } else {
-      return self._borderWidth;
+      return this._borderWidth;
     }
   }
   // setup the prototype
@@ -485,14 +426,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current border color.
    */
   borderColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._borderColor = data;
+      this._borderColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._borderColor;
+      return this._borderColor;
     }
   }
   // setup the prototype
@@ -502,14 +441,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current border radius.
    */
   borderRadius(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._borderRadius = data;
+      this._borderRadius = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._borderRadius;
+      return this._borderRadius;
     }
   }
   // setup the prototype
@@ -519,14 +456,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current background color.
    */
   backgroundColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._backgroundColor = data;
+      this._backgroundColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._backgroundColor;
+      return this._backgroundColor;
     }
   }
   // setup the prototype
@@ -536,16 +471,14 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current background gradient.
    */
   backgroundGradient(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._backgroundColor = self._renderCtx.createLinearGradient(0, 0, 0, self.outerH);
-      self._backgroundColor.addColorStop(0, data[0]);
-      self._backgroundColor.addColorStop(1, data[1]);
+      this._backgroundColor = this._renderCtx.createLinearGradient(0, 0, 0, this.outerH);
+      this._backgroundColor.addColorStop(0, data[0]);
+      this._backgroundColor.addColorStop(1, data[1]);
 
-      return self.render();
+      return this.render();
     } else {
-      return self._backgroundColor;
+      return this._backgroundColor;
     }
   }
   // setup the prototype
@@ -556,46 +489,44 @@ export class CanvasInput {
    * @return {Mixed}          CanvasInput or current box shadow.
    */
   boxShadow(data, doReturn) {
-    var self = this;
-
     if (typeof data !== "undefined") {
       // parse box shadow
       var boxShadow = data.split("px ");
-      self._boxShadow = {
-        x: self._boxShadow === "none" ? 0 : parseInt(boxShadow[0], 10),
-        y: self._boxShadow === "none" ? 0 : parseInt(boxShadow[1], 10),
-        blur: self._boxShadow === "none" ? 0 : parseInt(boxShadow[2], 10),
-        color: self._boxShadow === "none" ? "" : boxShadow[3],
+      this._boxShadow = {
+        x: this._boxShadow === "none" ? 0 : parseInt(boxShadow[0], 10),
+        y: this._boxShadow === "none" ? 0 : parseInt(boxShadow[1], 10),
+        blur: this._boxShadow === "none" ? 0 : parseInt(boxShadow[2], 10),
+        color: this._boxShadow === "none" ? "" : boxShadow[3],
       };
 
       // take into account the shadow and its direction
-      if (self._boxShadow.x < 0) {
-        self.shadowL = Math.abs(self._boxShadow.x) + self._boxShadow.blur;
-        self.shadowR = self._boxShadow.blur + self._boxShadow.x;
+      if (this._boxShadow.x < 0) {
+        this.shadowL = Math.abs(this._boxShadow.x) + this._boxShadow.blur;
+        this.shadowR = this._boxShadow.blur + this._boxShadow.x;
       } else {
-        self.shadowL = Math.abs(self._boxShadow.blur - self._boxShadow.x);
-        self.shadowR = self._boxShadow.blur + self._boxShadow.x;
+        this.shadowL = Math.abs(this._boxShadow.blur - this._boxShadow.x);
+        this.shadowR = this._boxShadow.blur + this._boxShadow.x;
       }
-      if (self._boxShadow.y < 0) {
-        self.shadowT = Math.abs(self._boxShadow.y) + self._boxShadow.blur;
-        self.shadowB = self._boxShadow.blur + self._boxShadow.y;
+      if (this._boxShadow.y < 0) {
+        this.shadowT = Math.abs(this._boxShadow.y) + this._boxShadow.blur;
+        this.shadowB = this._boxShadow.blur + this._boxShadow.y;
       } else {
-        self.shadowT = Math.abs(self._boxShadow.blur - self._boxShadow.y);
-        self.shadowB = self._boxShadow.blur + self._boxShadow.y;
+        this.shadowT = Math.abs(this._boxShadow.blur - this._boxShadow.y);
+        this.shadowB = this._boxShadow.blur + this._boxShadow.y;
       }
 
-      self.shadowW = self.shadowL + self.shadowR;
-      self.shadowH = self.shadowT + self.shadowB;
+      this.shadowW = this.shadowL + this.shadowR;
+      this.shadowH = this.shadowT + this.shadowB;
 
-      self._calculate();
+      this._calculate();
 
       if (!doReturn) {
-        self._updateCanvasWH();
+        this._updateCanvasWH();
 
-        return self.render();
+        return this.render();
       }
     } else {
-      return self._boxShadow;
+      return this._boxShadow;
     }
   }
   // setup the prototype
@@ -605,14 +536,12 @@ export class CanvasInput {
    * @return {Mixed}          CanvasInput or current inner shadow.
    */
   innerShadow(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._innerShadow = data;
+      this._innerShadow = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._innerShadow;
+      return this._innerShadow;
     }
   }
   // setup the prototype
@@ -622,14 +551,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current selection color.
    */
   selectionColor(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._selectionColor = data;
+      this._selectionColor = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._selectionColor;
+      return this._selectionColor;
     }
   }
   // setup the prototype
@@ -639,14 +566,12 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current place holder text.
    */
   placeHolder(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._placeHolder = data;
+      this._placeHolder = data;
 
-      return self.render();
+      return this.render();
     } else {
-      return self._placeHolder;
+      return this._placeHolder;
     }
   }
   // setup the prototype
@@ -656,20 +581,18 @@ export class CanvasInput {
    * @return {Mixed}      CanvasInput or current text value.
    */
   value(data) {
-    var self = this;
-
     if (typeof data !== "undefined") {
-      self._value = data + "";
-      self._hiddenInput.value = data + "";
+      this._value = data + "";
+      this._hiddenInput.value = data + "";
 
       // update the cursor position
-      self._cursorPos = self._clipText().length;
+      this._cursorPos = this._clipText().length;
 
-      self.render();
+      this.render();
 
-      return self;
+      return this;
     } else {
-      return self._value === self._placeHolder ? "" : self._value;
+      return this._value === this._placeHolder ? "" : this._value;
     }
   }
   // setup the prototype
@@ -678,14 +601,12 @@ export class CanvasInput {
    * @param  {Function} fn Custom callback.
    */
   onsubmit(fn) {
-    var self = this;
-
     if (typeof fn !== "undefined") {
-      self._onsubmit = fn;
+      this._onsubmit = fn;
 
-      return self;
+      return this;
     } else {
-      self._onsubmit();
+      this._onsubmit();
     }
   }
   // setup the prototype
@@ -694,14 +615,12 @@ export class CanvasInput {
    * @param  {Function} fn Custom callback.
    */
   onkeydown(fn) {
-    var self = this;
-
     if (typeof fn !== "undefined") {
-      self._onkeydown = fn;
+      this._onkeydown = fn;
 
-      return self;
+      return this;
     } else {
-      self._onkeydown();
+      this._onkeydown();
     }
   }
   // setup the prototype
@@ -710,14 +629,12 @@ export class CanvasInput {
    * @param  {Function} fn Custom callback.
    */
   onkeyup(fn) {
-    var self = this;
-
     if (typeof fn !== "undefined") {
-      self._onkeyup = fn;
+      this._onkeyup = fn;
 
-      return self;
+      return this;
     } else {
-      self._onkeyup();
+      this._onkeyup();
     }
   }
   // setup the prototype
@@ -728,11 +645,9 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   focus(pos) {
-    var self = this;
-
     // only fire the focus event when going from unfocussed
-    if (!self._hasFocus) {
-      self._onfocus(self);
+    if (!this._hasFocus) {
+      this._onfocus(this);
 
       // remove focus from all other inputs
       for (var i = 0; i < inputs.length; i++) {
@@ -743,47 +658,47 @@ export class CanvasInput {
     }
 
     // remove selection
-    if (!self._selectionUpdated) {
-      self._selection = [0, 0];
+    if (!this._selectionUpdated) {
+      this._selection = [0, 0];
     } else {
-      delete self._selectionUpdated;
+      delete this._selectionUpdated;
     }
 
     // if this is readonly, don't allow it to get focus
-    self._hasFocus = true;
-    if (self._readonly) {
-      self._hiddenInput.readOnly = true;
+    this._hasFocus = true;
+    if (this._readonly) {
+      this._hiddenInput.readOnly = true;
     } else {
-      self._hiddenInput.readOnly = false;
+      this._hiddenInput.readOnly = false;
 
       // update the cursor position
-      self._cursorPos = typeof pos === "number" ? pos : self._clipText().length;
+      this._cursorPos = typeof pos === "number" ? pos : this._clipText().length;
 
       // clear the place holder
-      if (self._placeHolder === self._value) {
-        self._value = "";
-        self._hiddenInput.value = "";
+      if (this._placeHolder === this._value) {
+        this._value = "";
+        this._hiddenInput.value = "";
       }
 
-      self._cursor = true;
+      this._cursor = true;
 
       // setup cursor interval
-      if (self._cursorInterval) {
-        clearInterval(self._cursorInterval);
+      if (this._cursorInterval) {
+        clearInterval(this._cursorInterval);
       }
-      self._cursorInterval = setInterval(function () {
-        self._cursor = !self._cursor;
-        self.render();
+      this._cursorInterval = setInterval(function () {
+        this._cursor = !this._cursor;
+        this.render();
       }, 500);
     }
 
     // move the real focus to the hidden input
-    var hasSelection = self._selection[0] > 0 || self._selection[1] > 0;
-    self._hiddenInput.focus();
-    self._hiddenInput.selectionStart = hasSelection ? self._selection[0] : self._cursorPos;
-    self._hiddenInput.selectionEnd = hasSelection ? self._selection[1] : self._cursorPos;
+    var hasSelection = this._selection[0] > 0 || this._selection[1] > 0;
+    this._hiddenInput.focus();
+    this._hiddenInput.selectionStart = hasSelection ? this._selection[0] : this._cursorPos;
+    this._hiddenInput.selectionEnd = hasSelection ? this._selection[1] : this._cursorPos;
 
-    return self.render();
+    return this.render();
   }
   // setup the prototype
   /**
@@ -792,65 +707,63 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   blur(_this) {
-    var self = _this || this;
+    this._onblur(this);
 
-    self._onblur(self);
-
-    if (self._cursorInterval) {
-      clearInterval(self._cursorInterval);
+    if (this._cursorInterval) {
+      clearInterval(this._cursorInterval);
     }
-    self._hasFocus = false;
-    self._cursor = false;
-    self._selection = [0, 0];
-    self._hiddenInput.blur();
+    this._hasFocus = false;
+    this._cursor = false;
+    this._selection = [0, 0];
+    this._hiddenInput.blur();
 
     // fill the place holder
-    if (self._value === "") {
-      self._value = self._placeHolder;
+    if (this._value === "") {
+      this._value = this._placeHolder;
     }
 
-    return self.render();
+    return this.render();
   }
   // setup the prototype
   /**
    * Fired with the keydown event to draw the typed characters.
    * @param  {Event}       e    The keydown event.
-   * @param  {CanvasInput} self
+   * @param  {CanvasInput} this
    * @return {CanvasInput}
    */
-  keydown(e, self) {
+  keydown(e) {
     var keyCode = e.which;
 
     // make sure the correct text field is being updated
-    if (self._readonly || !self._hasFocus) {
+    if (this._readonly || !this._hasFocus) {
       return;
     }
 
     // fire custom user event
-    self._onkeydown(e, self);
+    this._onkeydown(e, this);
 
     // add support for Ctrl/Cmd+A selection
     if (keyCode === 65 && (e.ctrlKey || e.metaKey)) {
-      self.selectText();
+      this.selectText();
       e.preventDefault();
-      return self.render();
+      return this.render();
     }
 
     // block keys that shouldn't be processed
     if (keyCode === 17 || e.metaKey || e.ctrlKey) {
-      return self;
+      return this;
     }
 
     if (keyCode === 13) {
       // enter key
       e.preventDefault();
-      self._onsubmit(e, self);
+      this._onsubmit(e, this);
     } else if (keyCode === 9) {
       // tab key
       e.preventDefault();
       if (inputs.length > 1) {
-        var next = inputs[self._inputsIndex + 1] ? self._inputsIndex + 1 : 0;
-        self.blur();
+        var next = inputs[this._inputsIndex + 1] ? this._inputsIndex + 1 : 0;
+        this.blur();
         setTimeout(function () {
           inputs[next].focus();
         }, 10);
@@ -858,78 +771,78 @@ export class CanvasInput {
     }
 
     // update the canvas input state information from the hidden input
-    self._value = self._hiddenInput.value;
-    self._cursorPos = self._hiddenInput.selectionStart;
-    self._selection = [0, 0];
+    this._value = this._hiddenInput.value;
+    this._cursorPos = this._hiddenInput.selectionStart;
+    this._selection = [0, 0];
 
-    return self.render();
+    return this.render();
   }
   // setup the prototype
   /**
    * Fired with the click event on the canvas, and puts focus on/off
    * based on where the user clicks.
    * @param  {Event}       e    The click event.
-   * @param  {CanvasInput} self
+   * @param  {CanvasInput} this
    * @return {CanvasInput}
    */
-  click(e, self) {
-    var mouse = self._mousePos(e),
+  click(e) {
+    var mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y;
 
-    if (self._endSelection) {
-      delete self._endSelection;
-      delete self._selectionUpdated;
+    if (this._endSelection) {
+      delete this._endSelection;
+      delete this._selectionUpdated;
       return;
     }
 
-    if ((self._canvas && self._overInput(x, y)) || !self._canvas) {
-      if (self._mouseDown) {
-        self._mouseDown = false;
-        self.click(e, self);
-        return self.focus(self._clickPos(x, y));
+    if ((this._canvas && this._overInput(x, y)) || !this._canvas) {
+      if (this._mouseDown) {
+        this._mouseDown = false;
+        this.click(e, this);
+        return this.focus(this._clickPos(x, y));
       }
     } else {
-      return self.blur();
+      return this.blur();
     }
   }
   // setup the prototype
   /**
    * Fired with the mousemove event to update the default cursor.
    * @param  {Event}       e    The mousemove event.
-   * @param  {CanvasInput} self
+   * @param  {CanvasInput} this
    * @return {CanvasInput}
    */
-  mousemove(e, self) {
-    var mouse = self._mousePos(e),
+  mousemove(e) {
+    var mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y,
-      isOver = self._overInput(x, y);
+      isOver = this._overInput(x, y);
 
-    if (isOver && self._canvas) {
-      self._canvas.style.cursor = "text";
-      self._wasOver = true;
-    } else if (self._wasOver && self._canvas) {
-      self._canvas.style.cursor = "default";
-      self._wasOver = false;
+    if (isOver && this._canvas) {
+      this._canvas.style.cursor = "text";
+      this._wasOver = true;
+    } else if (this._wasOver && this._canvas) {
+      this._canvas.style.cursor = "default";
+      this._wasOver = false;
     }
 
-    if (self._hasFocus && self._selectionStart >= 0) {
-      var curPos = self._clickPos(x, y),
-        start = Math.min(self._selectionStart, curPos),
-        end = Math.max(self._selectionStart, curPos);
+    if (this._hasFocus && this._selectionStart >= 0) {
+      var curPos = this._clickPos(x, y),
+        start = Math.min(this._selectionStart, curPos),
+        end = Math.max(this._selectionStart, curPos);
 
       if (!isOver) {
-        self._selectionUpdated = true;
-        self._endSelection = true;
-        delete self._selectionStart;
-        self.render();
+        this._selectionUpdated = true;
+        this._endSelection = true;
+        delete this._selectionStart;
+        this.render();
         return;
       }
 
-      if (self._selection[0] !== start || self._selection[1] !== end) {
-        self._selection = [start, end];
-        self.render();
+      if (this._selection[0] !== start || this._selection[1] !== end) {
+        this._selection = [start, end];
+        this.render();
       }
     }
   }
@@ -937,44 +850,44 @@ export class CanvasInput {
   /**
    * Fired with the mousedown event to start a selection drag.
    * @param  {Event} e    The mousedown event.
-   * @param  {CanvasInput} self
+   * @param  {CanvasInput} this
    */
-  mousedown(e, self) {
-    var mouse = self._mousePos(e),
+  mousedown(e) {
+    var mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y,
-      isOver = self._overInput(x, y);
+      isOver = this._overInput(x, y);
 
     // setup the 'click' event
-    self._mouseDown = isOver;
+    this._mouseDown = isOver;
 
     // start the selection drag if inside the input
-    if (self._hasFocus && isOver) {
-      self._selectionStart = self._clickPos(x, y);
+    if (this._hasFocus && isOver) {
+      this._selectionStart = this._clickPos(x, y);
     }
   }
   // setup the prototype
   /**
    * Fired with the mouseup event to end a selection drag.
    * @param  {Event} e    The mouseup event.
-   * @param  {CanvasInput} self
+   * @param  {CanvasInput} this
    */
-  mouseup(e, self) {
-    var mouse = self._mousePos(e),
+  mouseup(e) {
+    var mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y;
 
     // update selection if a drag has happened
-    var isSelection = self._clickPos(x, y) !== self._selectionStart;
-    if (self._hasFocus && self._selectionStart >= 0 && self._overInput(x, y) && isSelection) {
-      self._selectionUpdated = true;
-      delete self._selectionStart;
-      self.render();
+    var isSelection = this._clickPos(x, y) !== this._selectionStart;
+    if (this._hasFocus && this._selectionStart >= 0 && this._overInput(x, y) && isSelection) {
+      this._selectionUpdated = true;
+      delete this._selectionStart;
+      this.render();
     } else {
-      delete self._selectionStart;
+      delete this._selectionStart;
     }
 
-    self.click(e, self);
+    this.click(e, this);
   }
   // setup the prototype
   /**
@@ -983,18 +896,17 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   selectText(range) {
-    var self = this;
-    range = range || [0, self._value.length];
+    range = range || [0, this._value.length];
 
     // select the range of text specified (or all if none specified)
     setTimeout(function () {
-      self._selection = [range[0], range[1]];
-      self._hiddenInput.selectionStart = range[0];
-      self._hiddenInput.selectionEnd = range[1];
-      self.render();
+      this._selection = [range[0], range[1]];
+      this._hiddenInput.selectionStart = range[0];
+      this._hiddenInput.selectionEnd = range[1];
+      this.render();
     }, 1);
 
-    return self;
+    return this;
   }
   // setup the prototype
   /**
@@ -1011,14 +923,13 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   render() {
-    var self = this,
-      ctx = self._renderCtx,
-      w = self.outerW,
-      h = self.outerH,
-      br = self._borderRadius,
-      bw = self._borderWidth,
-      sw = self.shadowW,
-      sh = self.shadowH;
+    var ctx = this._renderCtx,
+      w = this.outerW,
+      h = this.outerH,
+      br = this._borderRadius,
+      bw = this._borderWidth,
+      sw = this.shadowW,
+      sh = this.shadowH;
 
     if (!ctx) {
       return;
@@ -1028,15 +939,15 @@ export class CanvasInput {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // setup the box shadow
-    ctx.shadowOffsetX = self._boxShadow.x;
-    ctx.shadowOffsetY = self._boxShadow.y;
-    ctx.shadowBlur = self._boxShadow.blur;
-    ctx.shadowColor = self._boxShadow.color;
+    ctx.shadowOffsetX = this._boxShadow.x;
+    ctx.shadowOffsetY = this._boxShadow.y;
+    ctx.shadowBlur = this._boxShadow.blur;
+    ctx.shadowColor = this._boxShadow.color;
 
     // draw the border
-    if (self._borderWidth > 0) {
-      ctx.fillStyle = self._borderColor;
-      self._roundedRect(ctx, self.shadowL, self.shadowT, w - sw, h - sh, br);
+    if (this._borderWidth > 0) {
+      ctx.fillStyle = this._borderColor;
+      this._roundedRect(ctx, this.shadowL, this.shadowT, w - sw, h - sh, br);
       ctx.fill();
 
       ctx.shadowOffsetX = 0;
@@ -1045,63 +956,63 @@ export class CanvasInput {
     }
 
     // draw the text box background
-    self._drawTextBox(function () {
+    this._drawTextBox(function () {
       // make sure all shadows are reset
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
       ctx.shadowBlur = 0;
 
       // clip the text so that it fits within the box
-      var text = self._clipText();
+      var text = this._clipText();
 
       // draw the selection
-      var paddingBorder = self._padding + self._borderWidth + self.shadowT;
-      if (self._selection[1] > 0) {
-        var selectOffset = self._textWidth(text.substring(0, self._selection[0])),
-          selectWidth = self._textWidth(text.substring(self._selection[0], self._selection[1]));
+      var paddingBorder = this._padding + this._borderWidth + this.shadowT;
+      if (this._selection[1] > 0) {
+        var selectOffset = this._textWidth(text.substring(0, this._selection[0])),
+          selectWidth = this._textWidth(text.substring(this._selection[0], this._selection[1]));
 
-        ctx.fillStyle = self._selectionColor;
-        ctx.fillRect(paddingBorder + selectOffset, paddingBorder, selectWidth, self._height);
+        ctx.fillStyle = this._selectionColor;
+        ctx.fillRect(paddingBorder + selectOffset, paddingBorder, selectWidth, this._height);
       }
 
       // draw the cursor
-      if (self._cursor) {
-        var cursorOffset = self._textWidth(text.substring(0, self._cursorPos));
-        ctx.fillStyle = self._fontColor;
-        ctx.fillRect(paddingBorder + cursorOffset, paddingBorder, 1, self._height);
+      if (this._cursor) {
+        var cursorOffset = this._textWidth(text.substring(0, this._cursorPos));
+        ctx.fillStyle = this._fontColor;
+        ctx.fillRect(paddingBorder + cursorOffset, paddingBorder, 1, this._height);
       }
 
       // draw the text
-      var textX = self._padding + self._borderWidth + self.shadowL,
-        textY = Math.round(paddingBorder + self._height / 2);
+      var textX = this._padding + this._borderWidth + this.shadowL,
+        textY = Math.round(paddingBorder + this._height / 2);
 
       // only remove the placeholder text if they have typed something
-      text = text === "" && self._placeHolder ? self._placeHolder : text;
+      text = text === "" && this._placeHolder ? this._placeHolder : text;
 
       ctx.fillStyle =
-        self._value !== "" && self._value !== self._placeHolder
-          ? self._fontColor
-          : self._placeHolderColor;
+        this._value !== "" && this._value !== this._placeHolder
+          ? this._fontColor
+          : this._placeHolderColor;
       ctx.font =
-        self._fontStyle + " " + self._fontWeight + " " + self._fontSize + "px " + self._fontFamily;
-      ctx.shadowColor = self._fontShadowColor;
-      ctx.shadowBlur = self._fontShadowBlur;
-      ctx.shadowOffsetX = self._fontShadowOffsetX;
-      ctx.shadowOffsetY = self._fontShadowOffsetY;
+        this._fontStyle + " " + this._fontWeight + " " + this._fontSize + "px " + this._fontFamily;
+      ctx.shadowColor = this._fontShadowColor;
+      ctx.shadowBlur = this._fontShadowBlur;
+      ctx.shadowOffsetX = this._fontShadowOffsetX;
+      ctx.shadowOffsetY = this._fontShadowOffsetY;
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
       ctx.fillText(text, textX, textY);
 
       // parse inner shadow
-      var innerShadow = self._innerShadow.split("px "),
-        isOffsetX = self._innerShadow === "none" ? 0 : parseInt(innerShadow[0], 10),
-        isOffsetY = self._innerShadow === "none" ? 0 : parseInt(innerShadow[1], 10),
-        isBlur = self._innerShadow === "none" ? 0 : parseInt(innerShadow[2], 10),
-        isColor = self._innerShadow === "none" ? "" : innerShadow[3];
+      var innerShadow = this._innerShadow.split("px "),
+        isOffsetX = this._innerShadow === "none" ? 0 : parseInt(innerShadow[0], 10),
+        isOffsetY = this._innerShadow === "none" ? 0 : parseInt(innerShadow[1], 10),
+        isBlur = this._innerShadow === "none" ? 0 : parseInt(innerShadow[2], 10),
+        isColor = this._innerShadow === "none" ? "" : innerShadow[3];
 
       // draw the inner-shadow (damn you canvas, this should be easier than this...)
       if (isBlur > 0) {
-        var shadowCtx = self._shadowCtx,
+        var shadowCtx = this._shadowCtx,
           scw = shadowCtx.canvas.width,
           sch = shadowCtx.canvas.height;
 
@@ -1130,10 +1041,10 @@ export class CanvasInput {
         shadowCtx.fillRect(-100, -1 * h, 100, 3 * h);
 
         // create a clipping mask on the main canvas
-        self._roundedRect(
+        this._roundedRect(
           ctx,
-          bw + self.shadowL,
-          bw + self.shadowT,
+          bw + this.shadowL,
+          bw + this.shadowT,
           w - bw * 2 - sw,
           h - bw * 2 - sh,
           br
@@ -1142,25 +1053,25 @@ export class CanvasInput {
 
         // draw the inner-shadow from the off-DOM canvas
         ctx.drawImage(
-          self._shadowCanvas,
+          this._shadowCanvas,
           0,
           0,
           scw,
           sch,
-          bw + self.shadowL,
-          bw + self.shadowT,
+          bw + this.shadowL,
+          bw + this.shadowT,
           scw,
           sch
         );
       }
 
       // draw to the visible canvas
-      if (self._ctx) {
-        self._ctx.clearRect(self._x, self._y, ctx.canvas.width, ctx.canvas.height);
-        self._ctx.drawImage(self._renderCanvas, self._x, self._y);
+      if (this._ctx) {
+        this._ctx.clearRect(this._x, this._y, ctx.canvas.width, ctx.canvas.height);
+        this._ctx.drawImage(this._renderCanvas, this._x, this._y);
       }
 
-      return self;
+      return this;
     });
   }
   // setup the prototype
@@ -1168,26 +1079,24 @@ export class CanvasInput {
    * Destroy this input and stop rendering it.
    */
   destroy() {
-    var self = this;
-
     // pull from the inputs array
-    var index = inputs.indexOf(self);
+    var index = inputs.indexOf(this);
     if (index != -1) {
       inputs.splice(index, 1);
     }
 
     // remove focus
-    if (self._hasFocus) {
-      self.blur();
+    if (this._hasFocus) {
+      this.blur();
     }
 
     // remove the hidden input box
-    document.body.removeChild(self._hiddenInput);
+    document.body.removeChild(this._hiddenInput);
 
     // remove off-DOM canvas
-    self._renderCanvas = null;
-    self._shadowCanvas = null;
-    self._renderCtx = null;
+    this._renderCanvas = null;
+    this._shadowCanvas = null;
+    this._renderCtx = null;
   }
   // setup the prototype
   /**
@@ -1195,22 +1104,21 @@ export class CanvasInput {
    * @param  {Function} fn Callback.
    */
   _drawTextBox(fn) {
-    var self = this,
-      ctx = self._renderCtx,
-      w = self.outerW,
-      h = self.outerH,
-      br = self._borderRadius,
-      bw = self._borderWidth,
-      sw = self.shadowW,
-      sh = self.shadowH;
+    var ctx = this._renderCtx,
+      w = this.outerW,
+      h = this.outerH,
+      br = this._borderRadius,
+      bw = this._borderWidth,
+      sw = this.shadowW,
+      sh = this.shadowH;
 
     // only draw the background shape if no image is being used
-    if (self._backgroundImage === "") {
-      ctx.fillStyle = self._backgroundColor;
-      self._roundedRect(
+    if (this._backgroundImage === "") {
+      ctx.fillStyle = this._backgroundColor;
+      this._roundedRect(
         ctx,
-        bw + self.shadowL,
-        bw + self.shadowT,
+        bw + this.shadowL,
+        bw + this.shadowT,
         w - bw * 2 - sw,
         h - bw * 2 - sh,
         br
@@ -1220,9 +1128,9 @@ export class CanvasInput {
       fn();
     } else {
       var img = new Image();
-      img.src = self._backgroundImage;
+      img.src = this._backgroundImage;
       img.onload = function () {
-        ctx.drawImage(img, 0, 0, img.width, img.height, bw + self.shadowL, bw + self.shadowT, w, h);
+        ctx.drawImage(img, 0, 0, img.width, img.height, bw + this.shadowL, bw + this.shadowT, w, h);
 
         fn();
       };
@@ -1234,17 +1142,15 @@ export class CanvasInput {
    * @return {Boolean} true if text removed.
    */
   _clearSelection() {
-    var self = this;
-
-    if (self._selection[1] > 0) {
+    if (this._selection[1] > 0) {
       // clear the selected contents
-      var start = self._selection[0],
-        end = self._selection[1];
+      var start = this._selection[0],
+        end = this._selection[1];
 
-      self._value = self._value.substr(0, start) + self._value.substr(end);
-      self._cursorPos = start;
-      self._cursorPos = self._cursorPos < 0 ? 0 : self._cursorPos;
-      self._selection = [0, 0];
+      this._value = this._value.substr(0, start) + this._value.substr(end);
+      this._cursorPos = start;
+      this._cursorPos = this._cursorPos < 0 ? 0 : this._cursorPos;
+      this._selection = [0, 0];
 
       return true;
     }
@@ -1258,11 +1164,10 @@ export class CanvasInput {
    * @return {String} The clipped text.
    */
   _clipText(value) {
-    var self = this;
-    value = typeof value === "undefined" ? self._value : value;
+    value = typeof value === "undefined" ? this._value : value;
 
-    var textWidth = self._textWidth(value),
-      fillPer = textWidth / (self._width - self._padding),
+    var textWidth = this._textWidth(value),
+      fillPer = textWidth / (this._width - this._padding),
       text = fillPer > 1 ? value.substr(-1 * Math.floor(value.length / fillPer)) : value;
 
     return text + "";
@@ -1274,11 +1179,10 @@ export class CanvasInput {
    * @return {Number}      The measured width.
    */
   _textWidth(text) {
-    var self = this,
-      ctx = self._renderCtx;
+    var ctx = this._renderCtx;
 
     ctx.font =
-      self._fontStyle + " " + self._fontWeight + " " + self._fontSize + "px " + self._fontFamily;
+      this._fontStyle + " " + this._fontWeight + " " + this._fontSize + "px " + this._fontFamily;
     ctx.textAlign = "left";
 
     return ctx.measureText(text).width;
@@ -1288,30 +1192,27 @@ export class CanvasInput {
    * Recalculate the outer with and height of the text box.
    */
   _calculate() {
-    var self = this;
-
     // calculate the full width and height with padding, borders and shadows
-    self.outerW = self._width + self._padding * 2 + self._borderWidth * 2 + self.shadowW;
-    self.outerH = self._height + self._padding * 2 + self._borderWidth * 2 + self.shadowH;
+    this.outerW = this._width + this._padding * 2 + this._borderWidth * 2 + this.shadowW;
+    this.outerH = this._height + this._padding * 2 + this._borderWidth * 2 + this.shadowH;
   }
   // setup the prototype
   /**
    * Update the width and height of the off-DOM canvas when attributes are changed.
    */
   _updateCanvasWH() {
-    var self = this,
-      oldW = self._renderCanvas.width,
-      oldH = self._renderCanvas.height;
+    var oldW = this._renderCanvas.width,
+      oldH = this._renderCanvas.height;
 
     // update off-DOM canvas
-    self._renderCanvas.setAttribute("width", self.outerW);
-    self._renderCanvas.setAttribute("height", self.outerH);
-    self._shadowCanvas.setAttribute("width", self._width + self._padding * 2);
-    self._shadowCanvas.setAttribute("height", self._height + self._padding * 2);
+    this._renderCanvas.setAttribute("width", this.outerW);
+    this._renderCanvas.setAttribute("height", this.outerH);
+    this._shadowCanvas.setAttribute("width", this._width + this._padding * 2);
+    this._shadowCanvas.setAttribute("height", this._height + this._padding * 2);
 
     // clear the main canvas
-    if (self._ctx) {
-      self._ctx.clearRect(self._x, self._y, oldW, oldH);
+    if (this._ctx) {
+      this._ctx.clearRect(this._x, this._y, oldW, oldH);
     }
   }
   // setup the prototype
@@ -1319,14 +1220,12 @@ export class CanvasInput {
    * Update the size and position of the hidden input (better UX on mobile).
    */
   _updateHiddenInput() {
-    var self = this;
-
-    self._hiddenInput.style.left =
-      self._x + self._extraX + (self._canvas ? self._canvas.offsetLeft : 0) + "px";
-    self._hiddenInput.style.top =
-      self._y + self._extraY + (self._canvas ? self._canvas.offsetTop : 0) + "px";
-    self._hiddenInput.style.width = self._width + self._padding * 2 + "px";
-    self._hiddenInput.style.height = self._height + self._padding * 2 + "px";
+    this._hiddenInput.style.left =
+      this._x + this._extraX + (this._canvas ? this._canvas.offsetLeft : 0) + "px";
+    this._hiddenInput.style.top =
+      this._y + this._extraY + (this._canvas ? this._canvas.offsetTop : 0) + "px";
+    this._hiddenInput.style.width = this._width + this._padding * 2 + "px";
+    this._hiddenInput.style.height = this._height + this._padding * 2 + "px";
   }
   // setup the prototype
   /**
@@ -1365,11 +1264,10 @@ export class CanvasInput {
    * @return {Boolean}   True if it is over the input box.
    */
   _overInput(x, y) {
-    var self = this,
-      xLeft = x >= self._x + self._extraX,
-      xRight = x <= self._x + self._extraX + self._width + self._padding * 2,
-      yTop = y >= self._y + self._extraY,
-      yBottom = y <= self._y + self._extraY + self._height + self._padding * 2;
+    var xLeft = x >= this._x + this._extraX,
+      xRight = x <= this._x + this._extraX + this._width + this._padding * 2,
+      yTop = y >= this._y + this._extraY,
+      yBottom = y <= this._y + this._extraY + this._height + this._padding * 2;
 
     return xLeft && xRight && yTop && yBottom;
   }
@@ -1382,24 +1280,23 @@ export class CanvasInput {
    * @return {Number}   Cursor position.
    */
   _clickPos(x, y) {
-    var self = this,
-      value = self._value;
+    var value = this._value;
 
     // don't count placeholder text in this
-    if (self._value === self._placeHolder) {
+    if (this._value === this._placeHolder) {
       value = "";
     }
 
     // determine where the click was made along the string
-    var text = self._clipText(value),
+    var text = this._clipText(value),
       totalW = 0,
       pos = text.length;
 
-    if (x - (self._x + self._extraX) < self._textWidth(text)) {
+    if (x - (this._x + this._extraX) < this._textWidth(text)) {
       // loop through each character to identify the position
       for (var i = 0; i < text.length; i++) {
-        totalW += self._textWidth(text[i]);
-        if (totalW >= x - (self._x + self._extraX)) {
+        totalW += this._textWidth(text[i]);
+        if (totalW >= x - (this._x + this._extraX)) {
           pos = i;
           break;
         }
