@@ -1,0 +1,207 @@
+var nextLevelIndex = function (numLevels) {
+  return Math.floor(Math.random() * numLevels);
+};
+
+ig.InfiniteLevel = ig.Class.extend({
+  levels: null,
+  options: {
+    start: null,
+    checkX: true,
+    checkY: true,
+    nextLevelFunc: nextLevelIndex,
+  },
+
+  init: function (levels, options) {
+    this.levels = levels;
+
+    if (options) {
+      // check if the user passed in the start level as the second param
+      if (options.entities && options.layer) {
+        this.options.start = options;
+      } else {
+        this.options.start = options.start || null;
+        if (options.checkX === true || options.checkX === false)
+          this.options.checkX = options.checkX;
+        if (options.checkY === true || options.checkY === false)
+          this.options.checkY = options.checkY;
+        if (typeof options.nextLevelFunc === "function")
+          this.options.nextLevelFunc = options.nextLevelFunc;
+      }
+    }
+
+    var allLevels = this.levels;
+    if (this.options.start != null) {
+      allLevels = allLevels.concat([this.options.start]);
+    }
+
+    // get all layer names
+    var layerNames = [];
+    for (var i = 0; i < allLevels.length; i++) {
+      var level = allLevels[i];
+      for (var j = 0; j < level.layer.length; j++) {
+        var layer = level.layer[j];
+        if (layerNames.indexOf(layer.name) === -1) {
+          layerNames.push(layer.name);
+        }
+      }
+    }
+
+    // copy level data to a new variable so the level is refreshed on restart
+    var firstLevel = this.options.start || this.getNextLevel();
+    var LevelGameData = JSON.parse(JSON.stringify(firstLevel));
+    ig.game.loadLevel(LevelGameData);
+
+    for (var i = 0; i < layerNames.length; i++) {
+      var map = this.getMap(layerNames[i]);
+      if (map === false) {
+        // make a new copy of the map
+        var existingMap = ig.game.backgroundMaps[0],
+          data = this.getEmptyMapData(existingMap.height, existingMap.width);
+
+        var backgroundMap = new ig.BackgroundMap(
+          existingMap.tilesize,
+          data,
+          existingMap.tilesetName
+        );
+        backgroundMap.anims = {};
+        backgroundMap.repeat = false;
+        backgroundMap.distance = existingMap.distance;
+        backgroundMap.foreground = false;
+        backgroundMap.preRender = false;
+        backgroundMap.name = layerNames[i];
+        ig.game.backgroundMaps.push(backgroundMap);
+      }
+    }
+
+    ig.game.collisionMap.name = "collision";
+  },
+
+  getMap: function (layerName) {
+    for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
+      if (layerName === ig.game.backgroundMaps[i].name) {
+        return ig.game.backgroundMaps[i];
+      } else if (layerName === "collision") {
+        return ig.game.collisionMap;
+      }
+    }
+
+    return false;
+  },
+
+  getEmptyMapData: function (height, width) {
+    var data = [];
+
+    // clear out the data
+    for (var j = 0; j < height; j++) {
+      var row = [];
+      for (var k = 0; k < width; k++) {
+        row.push(0);
+      }
+
+      data.push(row);
+    }
+
+    return data;
+  },
+
+  update: function () {
+    // load a new set piece if necessary
+    if (
+      ig.game.backgroundMaps[0].width * ig.game.backgroundMaps[0].tilesize - ig.game.screen.x <=
+      ig.system.width
+    ) {
+      var nextLevel = this.getNextLevel();
+
+      // spawn entites
+      for (var i = 0; i < nextLevel.entities.length; i++) {
+        var entity = nextLevel.entities[i];
+        ig.game.spawnEntity(
+          entity.type,
+          entity.x + ig.game.backgroundMaps[0].width * ig.game.backgroundMaps[0].tilesize,
+          entity.y,
+          entity.settings
+        );
+      }
+
+      // add the tiles to the level
+      for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
+        this.extendMap(ig.game.backgroundMaps[i], nextLevel);
+      }
+
+      // if there is a collision map, add the collision map tiles
+      if (ig.game.collisionMap.data) {
+        this.extendMap(ig.game.collisionMap, nextLevel);
+      }
+    }
+
+    // remove tiles that are no longer visible
+    if (ig.game.screen.x >= ig.game.backgroundMaps[0].tilesize) {
+      for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
+        var data = ig.game.backgroundMaps[i].data;
+        for (var j = 0; j < data.length; j++) {
+          data[j].shift();
+        }
+
+        ig.game.backgroundMaps[i].width--;
+      }
+
+      // if theere is a collisionMap remove the tiles that are no longer visible
+      if (ig.game.collisionMap.data) {
+        for (var i = 0; i < ig.game.collisionMap.data.length; i++) {
+          ig.game.collisionMap.data[i].shift();
+        }
+
+        ig.game.collisionMap.width--;
+      }
+
+      for (var i = 0; i < ig.game.entities.length; i++) {
+        ig.game.entities[i].pos.x -= ig.game.backgroundMaps[0].tilesize;
+      }
+
+      ig.game.screen.x -= ig.game.backgroundMaps[0].tilesize;
+    }
+
+    // remove entities that are no longer visible
+    for (var i = 0; i < ig.game.entities.length; i++) {
+      var entity = ig.game.entities[i];
+      if (
+        (this.options.checkX && entity.pos.x + entity.size.x - ig.game.screen.x < 0) ||
+        (this.options.checkY && entity.pos.y > ig.game.screen.y + ig.system.height)
+      ) {
+        entity.kill();
+      }
+    }
+  },
+
+  getNextLevel: function () {
+    return this.levels[this.options.nextLevelFunc(this.levels.length)];
+  },
+
+  extendMap: function (map, level) {
+    var layer = this.getLayer(map.name, level);
+
+    if (!layer) {
+      layer = {
+        data: this.getEmptyMapData(level.layer[0].data.length, level.layer[0].data[0].length),
+        width: level.layer[0].data[0].length,
+      };
+    }
+
+    var data = map.data;
+    for (var j = 0; j < data.length; j++) {
+      data[j].push.apply(data[j], layer.data[j]);
+    }
+
+    map.width += layer.width;
+  },
+
+  getLayer: function (layerName, level) {
+    for (var i = 0; i < level.layer.length; i++) {
+      if (layerName === level.layer[i].name) {
+        return level.layer[i];
+      }
+    }
+
+    return false;
+  },
+});
