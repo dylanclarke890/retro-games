@@ -4,12 +4,12 @@ import { Register } from "./register.js";
 
 export class GameLoader {
   #assetsToPreload = [];
-  #debugMode = false;
-  #done = false;
   #progressPercent = 0;
   #status = 0;
   #unloaded = [];
 
+  debugMode = false;
+  done = false;
   gameClass = null;
   intervalId = 0;
   runner = null;
@@ -20,7 +20,7 @@ export class GameLoader {
 
     this.runner = runner;
     this.gameClass = gameClass;
-    this.#debugMode = debugMode;
+    this.debugMode = debugMode;
     this.#assetsToPreload = Register.getAssetsToPreload();
     for (let i = 0; i < this.#assetsToPreload.length; i++)
       this.#unloaded.push(this.#assetsToPreload[i].path);
@@ -38,12 +38,12 @@ export class GameLoader {
   }
 
   end() {
-    if (this.#done) return;
-    this.#done = true;
+    if (this.done) return;
+    this.done = true;
     clearInterval(this.intervalId);
     this.runner.setGame(this.gameClass);
     Register.clearPreloadCache();
-    if (this.#debugMode) this.runner.launchDebugger();
+    if (this.debugMode) this.runner.launchDebugger();
   }
 
   #drawLoadingScreen() {

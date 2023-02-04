@@ -1,12 +1,11 @@
 import { GameLoader } from "../core/loader.js";
+import { Register } from "../core/register.js";
 import { map } from "../lib/number-utils.js";
 
 export class SplashLoaderMixin extends GameLoader {
   endTime = 0;
-  fadeToWhiteTime = 200;
-  fadeToGameTime = 800;
-  logoWidth = 340;
-  logoHeight = 120;
+  fadeToWhiteTime = 5000;
+  fadeToGameTime = 5000;
 
   static PATHS_IMPACT = [
     "bp",
@@ -252,90 +251,46 @@ export class SplashLoaderMixin extends GameLoader {
   ];
 
   end() {
-    super.end();
-    this.endTime = Date.now();
-    // This is a bit of a hack - set this class instead of this.game as the delegate.
-    // The delegate will be set back to this.game after the screen fade is complete.
-    this.system.setDelegate(this);
+    if (this.done) return;
+    this.done = true;
+    clearInterval(this.intervalId);
+    this.runner.setGame(this.gameClass);
+    Register.clearPreloadCache();
+
+    this.endTime = performance.now();
+    const runner = this.runner;
+    runner.game = this;
+    runner.loop.start();
+    this.game = new this.gameClass({
+      system: runner.system,
+      fonts: runner.fonts,
+      mediaFactory: runner.mediaFactory,
+      ...runner.customGameOptions,
+    });
   }
 
-  // Proxy for game.run to show the screen fade after everything is loaded
-  run() {
+  update() {
     const t = performance.now() - this.endTime;
     let alpha = 1;
     if (t < this.fadeToWhiteTime) {
       this.draw(); // Draw the logo -> fade to white
-      alpha = t.map(0, this.fadeToWhiteTime, 0, 1);
+      alpha = map(t, 0, this.fadeToWhiteTime, 0, 1);
     } else if (t < this.fadeToGameTime) {
-      this.game.run(); // Draw the game -> fade from white
+      this.game.update(); // Draw the game -> fade from white
+      this.game.draw();
       alpha = map(t, this.fadeToWhiteTime, this.fadeToGameTime, 1, 0);
     } else {
-      this.system.setDelegate(this.game); // All done! Dismiss the preloader completely, set the delegate to actual game
-      return;
+      this.runner.game = this.game;
+      if (this.debugMode) this.runner.launchDebugger();
+      return; // All done! Dismiss the preloader completely, set to actual game.
     }
 
-    const { ctx, realHeight, realWidth } = this.system;
+    const { ctx, realHeight, realWidth } = this.runner.system;
 
     // Draw the white rect over the whole screen
-    ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
     ctx.fillRect(0, 0, realWidth, realHeight);
   }
 
-  draw() {
-    // Some damping for the status bar
-    this._drawStatus += (this.status - this._drawStatus) / 5;
-
-    const ctx = this.system.ctx;
-    const w = this.system.realWidth;
-    const h = this.system.realHeight;
-    const scale = w / this.logoWidth / 3; // Logo size should be 1/3 of the screen width
-    const center = (w - this.logoWidth * scale) / 2;
-
-    // Clear
-    ctx.fillStyle = "rgba(0,0,0,0.8)";
-    ctx.fillRect(0, 0, w, h);
-
-    // URL
-    // ctx.fillStyle = "rgb(128,128,128)";
-    // ctx.textAlign = "right";
-    // ctx.font = "10px Arial";
-    // ctx.fillText("http://impactjs.com", w - 10, h - 10);
-    // ctx.textAlign = "left";
-
-    ctx.save();
-
-    ctx.translate(center, h / 2.5);
-    ctx.scale(scale, scale);
-
-    // Loading bar ('visually' centered for the Impact logo)
-    ctx.lineWidth = "3";
-    ctx.strokeStyle = "rgb(255,255,255)";
-    ctx.strokeRect(25, this.logoHeight + 40, 300, 20);
-
-    ctx.fillStyle = "rgb(255,255,255)";
-    ctx.fillRect(30, this.logoHeight + 45, 290 * this._drawStatus, 10);
-
-    // Draw 'Impact' text
-    this.drawPaths("rgb(255,255,255)", SplashLoaderMixin.PATHS_IMPACT);
-
-    // Some quick and dirty hackery to make the comet's tail wiggle
-    const comet = SplashLoaderMixin.PATHS_COMET;
-    comet[5][0] = 3 - Math.random() * this._drawStatus * 7;
-    comet[5][1] = 3 - Math.random() * this._drawStatus * 10;
-    comet[7][0] = 29.5 - Math.random() * this._drawStatus * 10;
-    comet[7][1] = 40.4 - Math.random() * this._drawStatus * 10;
-    comet[9][0] = 16.1 - Math.random() * this._drawStatus * 10;
-    comet[9][1] = 36.1 - Math.random() * this._drawStatus * 5;
-    ctx.translate(-Math.random() * this._drawStatus * 7, -Math.random() * this._drawStatus * 5);
-
-    this.drawPaths("rgb(243,120,31)", comet); // Draw the comet
-    ctx.restore();
-  }
-
-  drawPaths(color, paths) {
-    const ctx = this.system.context;
-    ctx.fillStyle = color;
-    for (let i = 0; i < paths.length; i += 2)
-      ctx[SplashLoaderMixin.OPS[paths[i]]].apply(ctx, paths[i + 1]);
-  }
+  draw() {}
 }

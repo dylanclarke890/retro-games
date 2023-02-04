@@ -4,6 +4,8 @@ import { Game } from "../modules/core/game.js";
 import { GameRunner } from "../modules/core/runner.js";
 import { level } from "./level.js";
 
+import { SplashLoaderMixin } from "../modules/plugins/splash-loader.js";
+
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
@@ -41,4 +43,5 @@ new GameRunner({
     standard: "assets/fonts/arcade-classic.TTF",
     freedom: "assets/fonts/freedom.ttf",
   },
+  loaderClass: SplashLoaderMixin,
 });
