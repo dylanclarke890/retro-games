@@ -10,7 +10,6 @@ export class GameLoop {
   stopped;
 
   #lastFrame;
-  #stats;
   targetFps;
   #fpsInterval;
 
@@ -43,7 +42,6 @@ export class GameLoop {
 
     this.runner.game.update();
     this.runner.game.draw();
-    if (this.#stats) this.#stats.update();
   }
 
   stop() {

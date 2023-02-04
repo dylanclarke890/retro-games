@@ -3,294 +3,88 @@ import { Register } from "../core/register.js";
 import { map } from "../lib/number-utils.js";
 
 export class SplashLoaderMixin extends GameLoader {
-  endTime = 0;
-  fadeToWhiteTime = 5000;
-  fadeToGameTime = 5000;
-
-  static PATHS_IMPACT = [
-    "bp",
-    [],
-    "m",
-    [128.8, 98.7],
-    "l",
-    [114.3, 98.7],
-    "l",
-    [114.3, 26.3],
-    "l",
-    [128.8, 26.3],
-    "l",
-    [128.8, 98.7],
-    "cp",
-    [],
-    "f",
-    [],
-    "bp",
-    [],
-    "m",
-    [159.2, 70.1],
-    "l",
-    [163.6, 26.3],
-    "l",
-    [184.6, 26.3],
-    "l",
-    [184.6, 98.7],
-    "l",
-    [170.3, 98.7],
-    "l",
-    [170.3, 51.2],
-    "l",
-    [164.8, 98.7],
-    "l",
-    [151.2, 98.7],
-    "l",
-    [145.7, 50.7],
-    "l",
-    [145.7, 98.7],
-    "l",
-    [134.1, 98.7],
-    "l",
-    [134.1, 26.3],
-    "l",
-    [155.0, 26.3],
-    "l",
-    [159.2, 70.1],
-    "cp",
-    [],
-    "f",
-    [],
-    "bp",
-    [],
-    "m",
-    [204.3, 98.7],
-    "l",
-    [189.8, 98.7],
-    "l",
-    [189.8, 26.3],
-    "l",
-    [211.0, 26.3],
-    "bc",
-    [220.0, 26.3, 224.5, 30.7, 224.5, 39.7],
-    "l",
-    [224.5, 60.1],
-    "bc",
-    [224.5, 69.1, 220.0, 73.6, 211.0, 73.6],
-    "l",
-    [204.3, 73.6],
-    "l",
-    [204.3, 98.7],
-    "cp",
-    [],
-    "m",
-    [207.4, 38.7],
-    "l",
-    [204.3, 38.7],
-    "l",
-    [204.3, 61.2],
-    "l",
-    [207.4, 61.2],
-    "bc",
-    [209.1, 61.2, 210.0, 60.3, 210.0, 58.6],
-    "l",
-    [210.0, 41.3],
-    "bc",
-    [210.0, 39.5, 209.1, 38.7, 207.4, 38.7],
-    "cp",
-    [],
-    "f",
-    [],
-    "bp",
-    [],
-    "m",
-    [262.7, 98.7],
-    "l",
-    [248.3, 98.7],
-    "l",
-    [247.1, 88.2],
-    "l",
-    [238.0, 88.2],
-    "l",
-    [237.0, 98.7],
-    "l",
-    [223.8, 98.7],
-    "l",
-    [233.4, 26.3],
-    "l",
-    [253.1, 26.3],
-    "l",
-    [262.7, 98.7],
-    "cp",
-    [],
-    "m",
-    [239.4, 75.5],
-    "l",
-    [245.9, 75.5],
-    "l",
-    [242.6, 43.9],
-    "l",
-    [239.4, 75.5],
-    "cp",
-    [],
-    "f",
-    [],
-    "bp",
-    [],
-    "m",
-    [300.9, 66.7],
-    "l",
-    [300.9, 85.9],
-    "bc",
-    [300.9, 94.9, 296.4, 99.4, 287.4, 99.4],
-    "l",
-    [278.5, 99.4],
-    "bc",
-    [269.5, 99.4, 265.1, 94.9, 265.1, 85.9],
-    "l",
-    [265.1, 39.1],
-    "bc",
-    [265.1, 30.1, 269.5, 25.6, 278.5, 25.6],
-    "l",
-    [287.2, 25.6],
-    "bc",
-    [296.2, 25.6, 300.7, 30.1, 300.7, 39.1],
-    "l",
-    [300.7, 56.1],
-    "l",
-    [286.4, 56.1],
-    "l",
-    [286.4, 40.7],
-    "bc",
-    [286.4, 38.9, 285.6, 38.1, 283.8, 38.1],
-    "l",
-    [282.1, 38.1],
-    "bc",
-    [280.4, 38.1, 279.5, 38.9, 279.5, 40.7],
-    "l",
-    [279.5, 84.3],
-    "bc",
-    [279.5, 86.1, 280.4, 86.9, 282.1, 86.9],
-    "l",
-    [284.0, 86.9],
-    "bc",
-    [285.8, 86.9, 286.6, 86.1, 286.6, 84.3],
-    "l",
-    [286.6, 66.7],
-    "l",
-    [300.9, 66.7],
-    "cp",
-    [],
-    "f",
-    [],
-    "bp",
-    [],
-    "m",
-    [312.5, 98.7],
-    "l",
-    [312.5, 39.2],
-    "l",
-    [303.7, 39.2],
-    "l",
-    [303.7, 26.3],
-    "l",
-    [335.8, 26.3],
-    "l",
-    [335.8, 39.2],
-    "l",
-    [327.0, 39.2],
-    "l",
-    [327.0, 98.7],
-    "l",
-    [312.5, 98.7],
-    "cp",
-    [],
-    "f",
-    [],
-  ];
-
-  static OPS = {
-    bp: "beginPath",
-    cp: "closePath",
-    f: "fill",
-    m: "moveTo",
-    l: "lineTo",
-    bc: "bezierCurveTo",
+  states = {
+    fadeToWhite: {
+      length: 1000,
+      next: "solid",
+      onChange: () => {},
+      alpha: (t) => map(t, 0, 1000, 0, 1),
+      draw: true,
+    },
+    solid: {
+      length: 500,
+      next: "fadeToGame",
+      onChange: () => this.launchGame(),
+      alpha: () => 1,
+      drawLogo: true,
+    },
+    fadeToGame: {
+      length: 2000,
+      next: "none",
+      onChange: () => {},
+      alpha: (t) => map(t, 0, 1000, 1, 0),
+      drawLogo: false,
+    },
   };
-
-  static PATHS_COMET = [
-    "bp",
-    [],
-    "m",
-    [85.1, 58.3],
-    "l",
-    [0.0, 0.0],
-    "l",
-    [29.5, 40.4],
-    "l",
-    [16.1, 36.1],
-    "l",
-    [54.6, 91.6],
-    "bc",
-    [65.2, 106.1, 83.4, 106.7, 93.8, 95.7],
-    "bc",
-    [103.9, 84.9, 98.6, 67.6, 85.1, 58.3],
-    "cp",
-    [],
-    "m",
-    [76.0, 94.3],
-    "bc",
-    [68.5, 94.3, 62.5, 88.2, 62.5, 80.8],
-    "bc",
-    [62.5, 73.3, 68.5, 67.2, 76.0, 67.2],
-    "bc",
-    [83.5, 67.2, 89.6, 73.3, 89.6, 80.8],
-    "bc",
-    [89.6, 88.2, 83.5, 94.3, 76.0, 94.3],
-    "cp",
-    [],
-    "f",
-    [],
-  ];
+  currentState = this.states.fadeToWhite;
+  timeInCurrentState = 0;
 
   end() {
     if (this.done) return;
     this.done = true;
     clearInterval(this.intervalId);
-    this.runner.setGame(this.gameClass);
     Register.clearPreloadCache();
-
-    this.endTime = performance.now();
     const runner = this.runner;
     runner.game = this;
     runner.loop.start();
-    this.game = new this.gameClass({
-      system: runner.system,
-      fonts: runner.fonts,
-      mediaFactory: runner.mediaFactory,
-      ...runner.customGameOptions,
-    });
+    this.timeInCurrentState = performance.now();
   }
 
   update() {
-    const t = performance.now() - this.endTime;
-    let alpha = 1;
-    if (t < this.fadeToWhiteTime) {
-      this.draw(); // Draw the logo -> fade to white
-      alpha = map(t, 0, this.fadeToWhiteTime, 0, 1);
-    } else if (t < this.fadeToGameTime) {
-      this.game.update(); // Draw the game -> fade from white
-      this.game.draw();
-      alpha = map(t, this.fadeToWhiteTime, this.fadeToGameTime, 1, 0);
-    } else {
-      this.runner.game = this.game;
-      if (this.debugMode) this.runner.launchDebugger();
-      return; // All done! Dismiss the preloader completely, set to actual game.
+    const elapsed = performance.now() - this.timeInCurrentState;
+    if (this.currentState.length < elapsed) {
+      const prevState = this.currentState;
+      prevState.onChange();
+
+      if (prevState.next === "none") {
+        this.runner.game = this.game;
+        if (this.debugMode) this.runner.launchDebugger();
+        return; // All done! Dismiss the preloader completely, set to actual game.
+      }
+
+      this.timeInCurrentState = performance.now();
+      this.currentState = this.states[prevState.next];
     }
 
+    const alpha = this.currentState.alpha(elapsed);
+    if (this.currentState.draw) this.draw();
+
     const { ctx, realHeight, realWidth } = this.runner.system;
+
+    ctx.fillStyle = "grey";
+    ctx.fillRect(0, 0, realWidth, realHeight);
 
     // Draw the white rect over the whole screen
     ctx.fillStyle = `rgba(255,255,255,${alpha})`;
     ctx.fillRect(0, 0, realWidth, realHeight);
   }
 
-  draw() {}
+  launchGame() {
+    console.log("Launched");
+    this.game = new this.gameClass({
+      system: this.runner.system,
+      fonts: this.runner.fonts,
+      mediaFactory: this.runner.mediaFactory,
+      ...this.runner.customGameOptions,
+    });
+  }
+
+  draw() {
+    const { ctx, realHeight, realWidth } = this.runner.system;
+
+    ctx.font = "70px Arial";
+    ctx.fillStyle = "purple";
+    const textWidth = ctx.measureText("Dylan's Game Engine").width;
+    ctx.fillText("Dylan's Game Engine", realWidth / 2 - textWidth / 2, realHeight / 2);
+  }
 }

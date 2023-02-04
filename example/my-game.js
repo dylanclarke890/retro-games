@@ -18,7 +18,7 @@ export class MyGame extends Game {
     super.draw();
     /** Extra draw logic goes here. */
     const { offsetWidth } = this.system.canvas;
-    this.fonts.freedom.write("It Works!", offsetWidth / 2, 150, {
+    this.fonts.standard.write("It Works!", offsetWidth / 2, 150, {
       align: Font.ALIGN.CENTER,
       alpha: 1,
       color: "green",
@@ -38,7 +38,7 @@ new GameRunner({
   fps: 60,
   width: 768,
   height: 624,
-  debugMode: true,
+  // debugMode: true,
   fonts: {
     standard: "assets/fonts/arcade-classic.TTF",
     freedom: "assets/fonts/freedom.ttf",
