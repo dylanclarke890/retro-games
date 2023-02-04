@@ -103,7 +103,7 @@ export class EventChain {
     this.#isNextLink = true;
   }
 
-  /** 
+  /**
    * Immediately sets the event chain back to it's first link. Execution of the event chain will then
    * continue as normal. */
   reset() {
