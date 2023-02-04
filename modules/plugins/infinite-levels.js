@@ -1,6 +1,5 @@
-var nextLevelIndex = function (numLevels) {
-  return Math.floor(Math.random() * numLevels);
-};
+import { BackgroundMap } from "../core/map.js";
+import { Guard } from "../lib/guard.js";
 
 export class InfiniteLevel {
   levels = null;
@@ -8,72 +7,72 @@ export class InfiniteLevel {
     start: null,
     checkX: true,
     checkY: true,
-    nextLevelFunc: nextLevelIndex,
+    nextLevelFunc: null,
   };
 
-  constructor(levels, options) {
+  constructor(game, levels, options) {
+    Guard.againstNull({ game });
+    Guard.againstNull({ levels });
+
+    this.game = game;
     this.levels = levels;
 
     if (options) {
       // check if the user passed in the start level as the second param
-      if (options.entities && options.layer) {
-        this.options.start = options;
-      } else {
-        this.options.start = options.start || null;
+      if (options.entities && options.layer) this.options.start = options;
+      else {
+        this.options.start = options.start;
         if (options.checkX === true || options.checkX === false)
           this.options.checkX = options.checkX;
         if (options.checkY === true || options.checkY === false)
           this.options.checkY = options.checkY;
-        if (typeof options.nextLevelFunc === "function")
-          this.options.nextLevelFunc = options.nextLevelFunc;
+        this.options.nextLevelFunc =
+          typeof options.nextLevelFunc === "function"
+            ? options.nextLevelFunc
+            : (numLevels) => Math.floor(Math.random() * numLevels);
       }
     }
 
-    var allLevels = this.levels;
-    if (this.options.start != null) {
-      allLevels = allLevels.concat([this.options.start]);
-    }
+    const allLevels = this.options.start ? allLevels.concat([this.options.start]) : this.levels;
 
     // get all layer names
-    var layerNames = [];
-    for (var i = 0; i < allLevels.length; i++) {
-      var level = allLevels[i];
-      for (var j = 0; j < level.layer.length; j++) {
-        var layer = level.layer[j];
-        if (layerNames.indexOf(layer.name) === -1) {
-          layerNames.push(layer.name);
-        }
+    const layerNames = [];
+    for (let i = 0; i < allLevels.length; i++) {
+      const level = allLevels[i];
+      for (let j = 0; j < level.layer.length; j++) {
+        const layer = level.layer[j];
+        if (layerNames.indexOf(layer.name) === -1) layerNames.push(layer.name);
       }
     }
 
     // copy level data to a new variable so the level is refreshed on restart
-    var firstLevel = this.options.start || this.getNextLevel();
-    var LevelGameData = JSON.parse(JSON.stringify(firstLevel));
-    ig.game.loadLevel(LevelGameData);
+    const firstLevel = this.options.start || this.getNextLevel();
+    const levelData = JSON.parse(JSON.stringify(firstLevel));
+    this.game.loadLevel(levelData);
 
-    for (var i = 0; i < layerNames.length; i++) {
-      var map = this.getMap(layerNames[i]);
+    for (let i = 0; i < layerNames.length; i++) {
+      let map = this.getMap(layerNames[i]);
       if (map === false) {
-        // make a new copy of the map
-        var existingMap = ig.game.backgroundMaps[0],
+        // make a new copy of thex map
+        const existingMap = this.game.backgroundMaps[0],
           data = this.getEmptyMapData(existingMap.height, existingMap.width);
 
-        var backgroundMap = new ig.BackgroundMap(
-          existingMap.tilesize,
+        const backgroundMap = new BackgroundMap({
+          name: layerNames[i],
+          tilesize: existingMap.tilesize,
+          tileset: existingMap.tilesetName,
+          distance: existingMap.distance,
           data,
-          existingMap.tilesetName
-        );
-        backgroundMap.anims = {};
-        backgroundMap.repeat = false;
-        backgroundMap.distance = existingMap.distance;
-        backgroundMap.foreground = false;
-        backgroundMap.preRender = false;
-        backgroundMap.name = layerNames[i];
-        ig.game.backgroundMaps.push(backgroundMap);
+          foreground: false,
+          repeat: false,
+          preRender: false,
+          anims: {},
+        });
+        this.game.backgroundMaps.push(backgroundMap);
       }
     }
 
-    ig.game.collisionMap.name = "collision";
+    this.game.collisionMap.name = "collision";
   }
 
   getMap(layerName) {
