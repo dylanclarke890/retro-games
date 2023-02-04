@@ -365,7 +365,7 @@ export class CanvasInput {
       if (inputs.length > 1) {
         const next = inputs[this.#inputsIndex + 1] ? this.#inputsIndex + 1 : 0;
         this.blur();
-        setTimeout(function () {
+        setTimeout(() => {
           inputs[next].focus();
         }, 10);
       }
@@ -489,7 +489,7 @@ export class CanvasInput {
     range = range || [0, this._value.length];
 
     // select the range of text specified (or all if none specified)
-    setTimeout(function () {
+    setTimeout(() => {
       this._selection = [range[0], range[1]];
       this._hiddenInput.selectionStart = range[0];
       this._hiddenInput.selectionEnd = range[1];
