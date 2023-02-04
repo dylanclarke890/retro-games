@@ -1,4 +1,4 @@
-class TouchButton {
+export class TouchButton {
   action = "undefined";
   image = null;
   tile = 0;
@@ -10,12 +10,13 @@ class TouchButton {
   touchId = 0;
   anchor = null;
 
-  constructor(action, anchor, width, height, image, tile) {
+  constructor(input, system, action, anchor, width, height, image, tile) {
+    this.input = input;
+    this.system = system;
     this.action = action;
     this.anchor = anchor;
     this.size = { x: width, y: height };
-
-    this.image = image || null;
+    this.image = image;
     this.tile = tile || 0;
   }
 
@@ -26,8 +27,8 @@ class TouchButton {
     if ("top" in this.anchor) this.pos.y = this.anchor.top;
     else if ("bottom" in this.anchor) this.pos.y = h - this.anchor.bottom - this.size.y;
 
-    var internalWidth = parseInt(ig.system.canvas.offsetWidth) || ig.system.realWidth;
-    var s = ig.system.scale * (internalWidth / ig.system.realWidth);
+    const internalWidth = parseInt(this.system.canvas.offsetWidth) || this.system.realWidth;
+    const s = this.system.scale * (internalWidth / this.system.realWidth);
     this.area = {
       x1: this.pos.x * s,
       y1: this.pos.y * s,
@@ -37,53 +38,30 @@ class TouchButton {
   }
 
   touchStart(ev) {
-    if (this.pressed) {
-      return;
-    }
+    if (this.pressed) return;
 
-    var pos = { left: 0, top: 0 };
-    if (ig.system.canvas.getBoundingClientRect) {
-      pos = ig.system.canvas.getBoundingClientRect();
-    }
-
-    for (var i = 0; i < ev.touches.length; i++) {
-      var touch = ev.touches[i];
-      if (this.checkStart(touch.identifier, touch.clientX - pos.left, touch.clientY - pos.top)) {
-        return;
-      }
+    const pos = this.system.canvas.getBoundingClientRect();
+    for (let i = 0; i < ev.touches.length; i++) {
+      const { identifier, clientX, clientY } = ev.touches[i];
+      if (this.checkStart(identifier, clientX - pos.left, clientY - pos.top)) return;
     }
   }
 
   touchEnd(ev) {
-    if (!this.pressed) {
-      return;
-    }
+    if (!this.pressed) return;
 
-    for (var i = 0; i < ev.changedTouches.length; i++) {
-      if (this.checkEnd(ev.changedTouches[i].identifier)) {
-        return;
-      }
-    }
+    for (let i = 0; i < ev.changedTouches.length; i++)
+      if (this.checkEnd(ev.changedTouches[i].identifier)) return;
   }
 
   touchStartMS(ev) {
-    if (this.pressed) {
-      return;
-    }
-
-    var pos = { left: 0, top: 0 };
-    if (ig.system.canvas.getBoundingClientRect) {
-      pos = ig.system.canvas.getBoundingClientRect();
-    }
-
+    if (this.pressed) return;
+    const pos = this.system.canvas.getBoundingClientRect();
     this.checkStart(ev.pointerId, ev.clientX - pos.left, ev.clientY - pos.top);
   }
 
   touchEndMS(ev) {
-    if (!this.pressed) {
-      return;
-    }
-
+    if (!this.pressed) return;
     this.checkEnd(ev.pointerId);
   }
 
@@ -91,11 +69,10 @@ class TouchButton {
     if (x > this.area.x1 && x < this.area.x2 && y > this.area.y1 && y < this.area.y2) {
       this.pressed = true;
       this.touchId = id;
-
-      ig.input.actions[this.action] = true;
-      if (!ig.input.locks[this.action]) {
-        ig.input.presses[this.action] = true;
-        ig.input.locks[this.action] = true;
+      this.input.actions[this.action] = true;
+      if (!this.input.locks[this.action]) {
+        this.input.presses[this.action] = true;
+        this.input.locks[this.action] = true;
       }
       return true;
     }
