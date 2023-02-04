@@ -126,13 +126,12 @@ export class CanvasInput {
    * @return {this | number} CanvasInput or current width.
    */
   width(data) {
-    if (data != null) {
-      this._width = data;
-      this.#calculateSize();
-      this._updateCanvasWH();
-      this._updateHiddenInput();
-      return this.render();
-    } else return this._width;
+    if (data == null) return this._width;
+    this._width = data;
+    this.#calculateSize();
+    this._updateCanvasWH();
+    this._updateHiddenInput();
+    return this.render();
   }
 
   /**
@@ -141,13 +140,12 @@ export class CanvasInput {
    * @return {this | number} CanvasInput or current height.
    */
   height(data) {
-    if (data != null) {
-      this._height = data;
-      this.#calculateSize();
-      this._updateCanvasWH();
-      this._updateHiddenInput();
-      return this.render();
-    } else return this._height;
+    if (data == null) return this._height;
+    this._height = data;
+    this.#calculateSize();
+    this._updateCanvasWH();
+    this._updateHiddenInput();
+    return this.render();
   }
 
   /**
@@ -156,12 +154,11 @@ export class CanvasInput {
    * @return {this | number} CanvasInput or current padding.
    */
   padding(data) {
-    if (data != null) {
-      this._padding = data;
-      this.#calculateSize();
-      this._updateCanvasWH();
-      return this.render();
-    } else return this._padding;
+    if (data == null) return this._padding;
+    this._padding = data;
+    this.#calculateSize();
+    this._updateCanvasWH();
+    return this.render();
   }
 
   /**
@@ -170,12 +167,11 @@ export class CanvasInput {
    * @return {this | number} CanvasInput or current background gradient.
    */
   backgroundGradient(data) {
-    if (data != null) {
-      this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
-      this._backgroundColor.addColorStop(0, data[0]);
-      this._backgroundColor.addColorStop(1, data[1]);
-      return this.render();
-    } else return this._backgroundColor;
+    if (data == null) return this._backgroundColor;
+    this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
+    this._backgroundColor.addColorStop(0, data[0]);
+    this._backgroundColor.addColorStop(1, data[1]);
+    return this.render();
   }
 
   /**
@@ -185,42 +181,44 @@ export class CanvasInput {
    * @return {this | string} CanvasInput or current box shadow.
    */
   boxShadow(data, doReturn) {
-    if (data != null) {
-      // parse box shadow
-      var boxShadow = data.split("px ");
-      this._boxShadow = {
-        x: this._boxShadow === "none" ? 0 : parseInt(boxShadow[0], 10),
-        y: this._boxShadow === "none" ? 0 : parseInt(boxShadow[1], 10),
-        blur: this._boxShadow === "none" ? 0 : parseInt(boxShadow[2], 10),
-        color: this._boxShadow === "none" ? "" : boxShadow[3],
-      };
+    if (data == null) return this._boxShadow;
 
-      // take into account the shadow and its direction
-      if (this._boxShadow.x < 0) {
-        this.shadowL = Math.abs(this._boxShadow.x) + this._boxShadow.blur;
-        this.shadowR = this._boxShadow.blur + this._boxShadow.x;
-      } else {
-        this.shadowL = Math.abs(this._boxShadow.blur - this._boxShadow.x);
-        this.shadowR = this._boxShadow.blur + this._boxShadow.x;
-      }
-      if (this._boxShadow.y < 0) {
-        this.shadowT = Math.abs(this._boxShadow.y) + this._boxShadow.blur;
-        this.shadowB = this._boxShadow.blur + this._boxShadow.y;
-      } else {
-        this.shadowT = Math.abs(this._boxShadow.blur - this._boxShadow.y);
-        this.shadowB = this._boxShadow.blur + this._boxShadow.y;
-      }
+    const boxShadow = data.split("px "); // parse box shadow
+    this._boxShadow = {
+      x: this._boxShadow === "none" ? 0 : parseInt(boxShadow[0], 10),
+      y: this._boxShadow === "none" ? 0 : parseInt(boxShadow[1], 10),
+      blur: this._boxShadow === "none" ? 0 : parseInt(boxShadow[2], 10),
+      color: this._boxShadow === "none" ? "" : boxShadow[3],
+    };
 
-      this.shadowW = this.shadowL + this.shadowR;
-      this.shadowH = this.shadowT + this.shadowB;
+    // take into account the shadow and its direction
+    if (this._boxShadow.x < 0) {
+      this.shadowL = Math.abs(this._boxShadow.x) + this._boxShadow.blur;
+      this.shadowR = this._boxShadow.blur + this._boxShadow.x;
+    } else {
+      this.shadowL = Math.abs(this._boxShadow.blur - this._boxShadow.x);
+      this.shadowR = this._boxShadow.blur + this._boxShadow.x;
+    }
 
-      this.#calculateSize();
+    if (this._boxShadow.y < 0) {
+      this.shadowT = Math.abs(this._boxShadow.y) + this._boxShadow.blur;
+      this.shadowB = this._boxShadow.blur + this._boxShadow.y;
+    } else {
+      this.shadowT = Math.abs(this._boxShadow.blur - this._boxShadow.y);
+      this.shadowB = this._boxShadow.blur + this._boxShadow.y;
+    }
 
-      if (!doReturn) {
-        this._updateCanvasWH();
-        return this.render();
-      }
-    } else return this._boxShadow;
+    this.shadowW = this.shadowL + this.shadowR;
+    this.shadowH = this.shadowT + this.shadowB;
+
+    this.#calculateSize();
+
+    if (!doReturn) {
+      this._updateCanvasWH();
+      return this.render();
+    }
+
+    return this;
   }
 
   /**
@@ -229,17 +227,13 @@ export class CanvasInput {
    * @return {this | string} CanvasInput or current text value.
    */
   value(data) {
-    if (data != null) {
-      this._value = data + "";
-      this._hiddenInput.value = data + "";
+    if (data == null) return this._value === this._placeHolder ? "" : this._value;
 
-      // update the cursor position
-      this._cursorPos = this._clipText().length;
-
-      this.render();
-
-      return this;
-    } else return this._value === this._placeHolder ? "" : this._value;
+    this._value = data + "";
+    this._hiddenInput.value = data + "";
+    this._cursorPos = this._clipText().length; // update the cursor position
+    this.render();
+    return this;
   }
 
   /**
@@ -247,13 +241,9 @@ export class CanvasInput {
    * @param {Function} fn Custom callback.
    */
   onsubmit(fn) {
-    if (typeof fn !== "undefined") {
-      this._onsubmit = fn;
-
-      return this;
-    } else {
-      this._onsubmit();
-    }
+    if (fn == null) this._onsubmit();
+    this._onsubmit = fn;
+    return this;
   }
 
   /**
@@ -261,13 +251,9 @@ export class CanvasInput {
    * @param {Function} fn Custom callback.
    */
   onkeydown(fn) {
-    if (typeof fn !== "undefined") {
-      this._onkeydown = fn;
-
-      return this;
-    } else {
-      this._onkeydown();
-    }
+    if (fn == null) this._onkeydown();
+    this._onsubmit = fn;
+    return this;
   }
 
   /**
@@ -275,13 +261,9 @@ export class CanvasInput {
    * @param {Function} fn Custom callback.
    */
   onkeyup(fn) {
-    if (typeof fn !== "undefined") {
-      this._onkeyup = fn;
-
-      return this;
-    } else {
-      this._onkeyup();
-    }
+    if (fn == null) this._onkeyup();
+    this._onkeyup = fn;
+    return this;
   }
 
   /**
@@ -294,29 +276,18 @@ export class CanvasInput {
     // only fire the focus event when going from unfocussed
     if (!this._hasFocus) {
       this._onfocus(this);
-
       // remove focus from all other inputs
-      for (var i = 0; i < inputs.length; i++) {
-        if (inputs[i]._hasFocus) {
-          inputs[i].blur();
-        }
-      }
+      for (let i = 0; i < inputs.length; i++) inputs[i].blur();
     }
 
-    // remove selection
-    if (!this._selectionUpdated) {
-      this._selection = [0, 0];
-    } else {
-      delete this._selectionUpdated;
-    }
+    if (!this._selectionUpdated) this._selection = [0, 0]; // remove selection
+    else delete this._selectionUpdated;
 
     // if this is readonly, don't allow it to get focus
     this._hasFocus = true;
-    if (this._readonly) {
-      this._hiddenInput.readOnly = true;
-    } else {
+    if (this._readonly) this._hiddenInput.readOnly = true;
+    else {
       this._hiddenInput.readOnly = false;
-
       // update the cursor position
       this._cursorPos = typeof pos === "number" ? pos : this._clipText().length;
 
@@ -329,17 +300,15 @@ export class CanvasInput {
       this._cursor = true;
 
       // setup cursor interval
-      if (this._cursorInterval) {
-        clearInterval(this._cursorInterval);
-      }
-      this._cursorInterval = setInterval(function () {
+      if (this._cursorInterval) clearInterval(this._cursorInterval);
+      this._cursorInterval = setInterval(() => {
         this._cursor = !this._cursor;
         this.render();
       }, 500);
     }
 
     // move the real focus to the hidden input
-    var hasSelection = this._selection[0] > 0 || this._selection[1] > 0;
+    const hasSelection = this._selection[0] > 0 || this._selection[1] > 0;
     this._hiddenInput.focus();
     this._hiddenInput.selectionStart = hasSelection ? this._selection[0] : this._cursorPos;
     this._hiddenInput.selectionEnd = hasSelection ? this._selection[1] : this._cursorPos;
@@ -352,21 +321,15 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   blur() {
+    if (!this._hasFocus) return;
     this._onblur();
-
-    if (this._cursorInterval) {
-      clearInterval(this._cursorInterval);
-    }
+    if (this._cursorInterval) clearInterval(this._cursorInterval);
     this._hasFocus = false;
     this._cursor = false;
     this._selection = [0, 0];
     this._hiddenInput.blur();
-
     // fill the place holder
-    if (this._value === "") {
-      this._value = this._placeHolder;
-    }
-
+    if (this._value === "") this._value = this._placeHolder;
     return this.render();
   }
 
@@ -376,15 +339,11 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   keydown(e) {
-    var keyCode = e.which;
-
+    const keyCode = e.which;
     // make sure the correct text field is being updated
-    if (this._readonly || !this._hasFocus) {
-      return;
-    }
-
+    if (this._readonly || !this._hasFocus) return;
     // fire custom user event
-    this._onkeydown(e, this);
+    this._onkeydown(e);
 
     // add support for Ctrl/Cmd+A selection
     if (keyCode === 65 && (e.ctrlKey || e.metaKey)) {
@@ -394,19 +353,17 @@ export class CanvasInput {
     }
 
     // block keys that shouldn't be processed
-    if (keyCode === 17 || e.metaKey || e.ctrlKey) {
-      return this;
-    }
+    if (keyCode === 17 || e.metaKey || e.ctrlKey) return this;
 
     if (keyCode === 13) {
       // enter key
       e.preventDefault();
-      this._onsubmit(e, this);
+      this._onsubmit(e);
     } else if (keyCode === 9) {
       // tab key
       e.preventDefault();
       if (inputs.length > 1) {
-        var next = inputs[this.#inputsIndex + 1] ? this.#inputsIndex + 1 : 0;
+        const next = inputs[this.#inputsIndex + 1] ? this.#inputsIndex + 1 : 0;
         this.blur();
         setTimeout(function () {
           inputs[next].focus();
@@ -429,7 +386,7 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   click(e) {
-    var mouse = this._mousePos(e),
+    const mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y;
 
@@ -442,12 +399,10 @@ export class CanvasInput {
     if ((this._canvas && this._overInput(x, y)) || !this._canvas) {
       if (this._mouseDown) {
         this._mouseDown = false;
-        this.click(e, this);
+        this.click(e);
         return this.focus(this._clickPos(x, y));
       }
-    } else {
-      return this.blur();
-    }
+    } else return this.blur();
   }
 
   /**
@@ -456,7 +411,7 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   mousemove(e) {
-    var mouse = this._mousePos(e),
+    const mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y,
       isOver = this._overInput(x, y);
@@ -470,7 +425,7 @@ export class CanvasInput {
     }
 
     if (this._hasFocus && this._selectionStart >= 0) {
-      var curPos = this._clickPos(x, y),
+      const curPos = this._clickPos(x, y),
         start = Math.min(this._selectionStart, curPos),
         end = Math.max(this._selectionStart, curPos);
 
@@ -494,38 +449,33 @@ export class CanvasInput {
    * @param {Event} e The mousedown event.
    */
   mousedown(e) {
-    var mouse = this._mousePos(e),
+    const mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y,
       isOver = this._overInput(x, y);
 
     // setup the 'click' event
     this._mouseDown = isOver;
-
     // start the selection drag if inside the input
-    if (this._hasFocus && isOver) {
-      this._selectionStart = this._clickPos(x, y);
-    }
+    if (this._hasFocus && isOver) this._selectionStart = this._clickPos(x, y);
   }
 
   /**
    * Fired with the mouseup event to end a selection drag.
-   * @param {Event} e    The mouseup event.
+   * @param {Event} e The mouseup event.
    */
   mouseup(e) {
-    var mouse = this._mousePos(e),
+    const mouse = this._mousePos(e),
       x = mouse.x,
       y = mouse.y;
 
     // update selection if a drag has happened
-    var isSelection = this._clickPos(x, y) !== this._selectionStart;
+    const isSelection = this._clickPos(x, y) !== this._selectionStart;
     if (this._hasFocus && this._selectionStart >= 0 && this._overInput(x, y) && isSelection) {
       this._selectionUpdated = true;
       delete this._selectionStart;
       this.render();
-    } else {
-      delete this._selectionStart;
-    }
+    } else delete this._selectionStart;
 
     this.click(e);
   }
@@ -571,9 +521,7 @@ export class CanvasInput {
       sw = this.shadowW,
       sh = this.shadowH;
 
-    if (!ctx) {
-      return;
-    }
+    if (!ctx) return;
 
     // clear the canvas
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
