@@ -4,22 +4,16 @@ import { Game } from "../modules/core/game.js";
 import { GameRunner } from "../modules/core/runner.js";
 import { level } from "./level.js";
 
-import { CanvasInput } from "../modules/plugins/canvas-input.js";
-
 export class MyGame extends Game {
   constructor({ ...options } = {}) {
     super(options);
     this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.DOWN_ARROW, "down");
-    this.textInput = new CanvasInput();
-    this.textInput._x = 150;
-    console.log(this.textInput);
     this.loadLevel(level);
   }
 
   draw() {
     super.draw();
-    this.textInput.render();
     /** Extra draw logic goes here. */
     const { offsetWidth } = this.system.canvas;
     this.fonts.standard.write("It Works!", offsetWidth / 2, 150, {
