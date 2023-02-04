@@ -894,7 +894,7 @@ export class CanvasInput {
       y = e.changedTouches[0].pageY;
     }
 
-    const style = document.defaultView.getComputedStyle(elm, undefined),
+    const style = document.defaultView.getComputedStyle(elm),
       paddingLeft = parseInt(style["paddingLeft"], 10) || 0,
       paddingTop = parseInt(style["paddingLeft"], 10) || 0,
       borderLeft = parseInt(style["borderLeftWidth"], 10) || 0,
@@ -905,7 +905,7 @@ export class CanvasInput {
       offsetY = 0;
 
     // calculate the total offset
-    if (typeof elm.offsetParent !== "undefined") {
+    if (elm.offsetParent != null) {
       do {
         offsetX += elm.offsetLeft;
         offsetY += elm.offsetTop;
