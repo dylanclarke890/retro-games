@@ -1,188 +1,182 @@
-    class ScreenFader {
-      defaultOptions= {
-        color: { r: 0, g: 0, b: 0, a: 1 },
-        fade: "in",
-        speed: 1,
-        screenWidth: 0,
-        screenHeight: 0,
-        waitUntilLoaded: true,
-        visible: true,
+export class ScreenFader {
+  defaultOptions = {
+    color: { r: 0, g: 0, b: 0, a: 1 },
+    fade: "in",
+    speed: 1,
+    screenWidth: 0,
+    screenHeight: 0,
+    waitUntilLoaded: true,
+    visible: true,
+  };
+  static globalSpeedFactor = 2 / 3;
+  static globalGameIsContext = true;
+  constructor(options) {
+    this._setOptions(options);
+
+    var isFadingIn = this.options.fade != "out";
+
+    this._alpha = isFadingIn ? 0 : 1; // set the initial alpha value
+    this._alphaChange = isFadingIn ? 1 : -1; // set the direction in which alpha changes each frame
+
+    // check if an image is defined. It will be "tiled" across the screen
+    if (this.options.tileImagePath) {
+      if (isNaN(this.options.tileWidth)) {
+        throw new Error("ScreenFader option for tileWidth is invalid");
+      } else if (isNaN(this.options.tileHeight)) {
+        throw new Error("ScreenFader option for tileHeight is invalid");
       }
 
-      constructor(options) {
-        this._setOptions(options);
+      // Create a 1 cell animation of the tile image, using width and height
+      this._sheet = new ig.AnimationSheet(
+        this.options.tileImagePath,
+        this.options.tileWidth,
+        this.options.tileHeight
+      );
+      this._anim = new ig.Animation(this._sheet, 1.0, [0]); // Use a 1 cell animation
+      this._anim.alpha = this._alpha; // set the initial alpha of the animation
+    }
 
-        var isFadingIn = this.options.fade != "out";
+    if (!isNaN(this.options.delayBefore)) {
+      var delayTime = this.options.delayBefore <= 0 ? 0 : this.options.delayBefore;
+      if (delayTime > 0) {
+        this.timerDelayBefore = new ig.Timer(delayTime);
+      }
+    }
+  }
 
-        this._alpha = isFadingIn ? 0 : 1; // set the initial alpha value
-        this._alphaChange = isFadingIn ? 1 : -1; // set the direction in which alpha changes each frame
+  draw() {
+    if (this.timerDelayAfter && this.timerDelayAfter.delta() > 0) {
+      delete this.timerDelayAfter;
+      this._callUserCallback();
+    }
 
-        // check if an image is defined. It will be "tiled" across the screen
-        if (this.options.tileImagePath) {
-          if (isNaN(this.options.tileWidth)) {
-            throw new Error("ScreenFader option for tileWidth is invalid");
-          } else if (isNaN(this.options.tileHeight)) {
-            throw new Error("ScreenFader option for tileHeight is invalid");
-          }
+    if (this.timerDelayBefore) {
+      if (this.timerDelayBefore.delta() < 0) {
+        return;
+      } else {
+        delete this.timerDelayBefore;
+      }
+    }
 
-          // Create a 1 cell animation of the tile image, using width and height
-          this._sheet = new ig.AnimationSheet(
-            this.options.tileImagePath,
-            this.options.tileWidth,
-            this.options.tileHeight
-          );
-          this._anim = new ig.Animation(this._sheet, 1.0, [0]); // Use a 1 cell animation
-          this._anim.alpha = this._alpha; // set the initial alpha of the animation
-        }
+    if (!this.options.visible) {
+      return;
+    }
 
-        if (!isNaN(this.options.delayBefore)) {
-          var delayTime = this.options.delayBefore <= 0 ? 0 : this.options.delayBefore;
-          if (delayTime > 0) {
-            this.timerDelayBefore = new ig.Timer(delayTime);
-          }
-        }
+    if (
+      !this.isFinished &&
+      (!this._sheet || this._sheet.image.loaded || !this.options.waitUntilLoaded)
+    ) {
+      this._fadeAlphaValue();
+    }
+
+    if (this._alpha <= 0) {
+      return;
+    }
+
+    if (this._anim) {
+      this.drawImageTiledOnScreen();
+    } else {
+      this.drawColorOnScreen();
+    }
+  }
+
+  drawImageTiledOnScreen() {
+    var tileX = 0,
+      tileY = 0,
+      totalWidth = this.options.screenWidth,
+      totalHeight = this.options.screenHeight;
+    var tileWidth = this.options.tileWidth,
+      tileHeight = this.options.tileHeight;
+
+    while (tileY < totalHeight) {
+      tileX = 0;
+
+      while (tileX < totalWidth) {
+        this._anim.draw(tileX, tileY);
+        tileX += tileWidth;
       }
 
-      draw() {
-        if (this.timerDelayAfter && this.timerDelayAfter.delta() > 0) {
-          delete this.timerDelayAfter;
-          this._callUserCallback();
-        }
+      tileY += tileHeight;
+    }
+  }
 
-        if (this.timerDelayBefore) {
-          if (this.timerDelayBefore.delta() < 0) {
-            return;
-          } else {
-            delete this.timerDelayBefore;
-          }
-        }
+  drawColorOnScreen() {
+    ig.system.clear(this.getColorCssValue());
+  }
 
-        if (!this.options.visible) {
-          return;
-        }
+  getColorCssValue(rgbaObject) {
+    var color = rgbaObject || this.options.color;
+    var a = (typeof color.a != "undefined" ? color.a : 1) * this._alpha;
+    if (a < 0) {
+      a = 0;
+    } else if (a > 1) {
+      a = 1;
+    }
+    return "rgba(" + color.r + "," + color.g + "," + color.b + "," + a + ")";
+  }
 
-        if (
-          !this.isFinished &&
-          (!this._sheet || this._sheet.image.loaded || !this.options.waitUntilLoaded)
-        ) {
-          this._fadeAlphaValue();
-        }
+  finish() {
+    if (this.isFinished) {
+      return;
+    }
 
-        if (this._alpha <= 0) {
-          return;
-        }
+    if (this._alphaChange > 0) {
+      this._alpha = 1;
+    } else {
+      this._alpha = 0;
+    }
 
-        if (this._anim) {
-          this.drawImageTiledOnScreen();
-        } else {
-          this.drawColorOnScreen();
-        }
-      },
+    if (this._anim) {
+      this._anim.alpha = this._alpha;
+    }
 
-      drawImageTiledOnScreen() {
-        var tileX = 0,
-          tileY = 0,
-          totalWidth = this.options.screenWidth,
-          totalHeight = this.options.screenHeight;
-        var tileWidth = this.options.tileWidth,
-          tileHeight = this.options.tileHeight;
+    this.isFinished = true;
 
-        while (tileY < totalHeight) {
-          tileX = 0;
+    if (typeof this.options.callback == "function") {
+      var delayTime = isNaN(this.options.delayAfter) ? 0 : this.options.delayAfter;
+      if (delayTime > 0) {
+        this.timerDelayAfter = new ig.Timer(delayTime);
+      } else {
+        this._callUserCallback();
+      }
+    }
+  }
 
-          while (tileX < totalWidth) {
-            this._anim.draw(tileX, tileY);
-            tileX += tileWidth;
-          }
+  _callUserCallback() {
+    this.options.callback.call(
+      this.options.context || (ig.ScreenFader.globalGameIsContext ? ig.game : this)
+    );
+  }
 
-          tileY += tileHeight;
-        }
-      },
+  _fadeAlphaValue() {
+    this._alpha +=
+      this._alphaChange * this.options.speed * ig.system.tick * ig.ScreenFader.globalSpeedFactor;
 
-      drawColorOnScreen() {
-        ig.system.clear(this.getColorCssValue());
-      },
+    if (
+      (this._alphaChange > 0 && this._alpha >= 1) ||
+      (this._alphaChange < 0 && this._alpha <= 0)
+    ) {
+      this.finish();
+    }
 
-      getColorCssValue(rgbaObject) {
-        var color = rgbaObject || this.options.color;
-        var a = (typeof color.a != "undefined" ? color.a : 1) * this._alpha;
-        if (a < 0) {
-          a = 0;
-        } else if (a > 1) {
-          a = 1;
-        }
-        return "rgba(" + color.r + "," + color.g + "," + color.b + "," + a + ")";
-      },
+    if (this._anim) {
+      this._anim.alpha = this._alpha;
+    }
+  }
 
-      finish() {
-        if (this.isFinished) {
-          return;
-        }
+  _setOptions(userOptions) {
+    this.options = ig.copy(this.defaultOptions);
 
-        if (this._alphaChange > 0) {
-          this._alpha = 1;
-        } else {
-          this._alpha = 0;
-        }
+    if (isNaN(this.options.screenWidth) || this.options.screenWidth <= 0) {
+      this.options.screenWidth = ig.system.width;
+    }
 
-        if (this._anim) {
-          this._anim.alpha = this._alpha;
-        }
+    if (isNaN(this.options.screenHeight) || this.options.screenHeight <= 0) {
+      this.options.screenHeight = ig.system.height;
+    }
 
-        this.isFinished = true;
-
-        if (typeof this.options.callback == "function") {
-          var delayTime = isNaN(this.options.delayAfter) ? 0 : this.options.delayAfter;
-          if (delayTime > 0) {
-            this.timerDelayAfter = new ig.Timer(delayTime);
-          } else {
-            this._callUserCallback();
-          }
-        }
-      },
-
-      _callUserCallback() {
-        this.options.callback.call(
-          this.options.context || (ig.ScreenFader.globalGameIsContext ? ig.game : this)
-        );
-      },
-
-      _fadeAlphaValue() {
-        this._alpha +=
-          this._alphaChange *
-          this.options.speed *
-          ig.system.tick *
-          ig.ScreenFader.globalSpeedFactor;
-
-        if (
-          (this._alphaChange > 0 && this._alpha >= 1) ||
-          (this._alphaChange < 0 && this._alpha <= 0)
-        ) {
-          this.finish();
-        }
-
-        if (this._anim) {
-          this._anim.alpha = this._alpha;
-        }
-      },
-
-      _setOptions(userOptions) {
-        this.options = ig.copy(this.defaultOptions);
-
-        if (isNaN(this.options.screenWidth) || this.options.screenWidth <= 0) {
-          this.options.screenWidth = ig.system.width;
-        }
-
-        if (isNaN(this.options.screenHeight) || this.options.screenHeight <= 0) {
-          this.options.screenHeight = ig.system.height;
-        }
-
-        if (userOptions) {
-          ig.merge(this.options, userOptions);
-        }
-      },
-    });
-
-    ig.ScreenFader.globalSpeedFactor = 2 / 3;
-    ig.ScreenFader.globalGameIsContext = true;
-  });
+    if (userOptions) {
+      ig.merge(this.options, userOptions);
+    }
+  }
+}
