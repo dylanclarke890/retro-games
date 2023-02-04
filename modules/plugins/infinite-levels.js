@@ -76,27 +76,21 @@ export class InfiniteLevel {
   }
 
   getMap(layerName) {
-    for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
-      if (layerName === ig.game.backgroundMaps[i].name) {
-        return ig.game.backgroundMaps[i];
-      } else if (layerName === "collision") {
-        return ig.game.collisionMap;
-      }
-    }
+    if (layerName === "collision") return this.game.collisionMap;
+    for (let i = 0; i < this.game.backgroundMaps.length; i++)
+      if (layerName === this.game.backgroundMaps[i].name) return this.game.backgroundMaps[i];
 
     return false;
   }
 
   getEmptyMapData(height, width) {
-    var data = [];
-
+    const data = [];
     // clear out the data
-    for (var j = 0; j < height; j++) {
-      var row = [];
-      for (var k = 0; k < width; k++) {
+    for (let j = 0; j < height; j++) {
+      const row = [];
+      for (let k = 0; k < width; k++) {
         row.push(0);
       }
-
       data.push(row);
     }
 
@@ -105,70 +99,54 @@ export class InfiniteLevel {
 
   update() {
     // load a new set piece if necessary
-    if (
-      ig.game.backgroundMaps[0].width * ig.game.backgroundMaps[0].tilesize - ig.game.screen.x <=
-      ig.system.width
-    ) {
-      var nextLevel = this.getNextLevel();
-
+    const firstMap = this.game.backgroundMaps[0];
+    if (firstMap.width * firstMap.tilesize - this.game.screen.actual.x <= this.game.system.width) {
+      const nextLevel = this.getNextLevel();
       // spawn entites
-      for (var i = 0; i < nextLevel.entities.length; i++) {
-        var entity = nextLevel.entities[i];
-        ig.game.spawnEntity(
-          entity.type,
-          entity.x + ig.game.backgroundMaps[0].width * ig.game.backgroundMaps[0].tilesize,
-          entity.y,
-          entity.settings
-        );
+      for (let i = 0; i < nextLevel.entities.length; i++) {
+        const { type, x, y, settings } = nextLevel.entities[i];
+        this.game.spawnEntity(type, x + firstMap.width * firstMap.tilesize, y, settings);
       }
 
       // add the tiles to the level
-      for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
-        this.extendMap(ig.game.backgroundMaps[i], nextLevel);
-      }
+      for (let i = 0; i < this.game.backgroundMaps.length; i++)
+        this.extendMap(this.game.backgroundMaps[i], nextLevel);
 
       // if there is a collision map, add the collision map tiles
-      if (ig.game.collisionMap.data) {
-        this.extendMap(ig.game.collisionMap, nextLevel);
-      }
+      if (this.game.collisionMap.data) this.extendMap(this.game.collisionMap, nextLevel);
     }
 
     // remove tiles that are no longer visible
-    if (ig.game.screen.x >= ig.game.backgroundMaps[0].tilesize) {
-      for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
-        var data = ig.game.backgroundMaps[i].data;
-        for (var j = 0; j < data.length; j++) {
-          data[j].shift();
+    if (this.game.screen.actual.x >= firstMap.tilesize) {
+      for (let i = 0; i < this.game.backgroundMaps.length; i++) {
+        const data = this.game.backgroundMaps[i].data;
+        for (let j = 0; j < data.length; j++) data[j].shift();
+        this.game.backgroundMaps[i].width--;
+      }
+
+      // if there is a collisionMap remove the tiles that are no longer visible
+      if (this.game.collisionMap.data) {
+        for (let i = 0; i < this.game.collisionMap.data.length; i++)
+          this.game.collisionMap.data[i].shift();
+
+        this.game.collisionMap.width--;
+      }
+
+      for (let i = 0; i < this.game.entities.length; i++) {
+        const entity = this.game.entities[i];
+        entity.pos.x -= firstMap.tilesize;
+        
+        // remove entities that are no longer visible
+        if (
+          (this.options.checkX && entity.pos.x + entity.size.x - this.game.screen.actual.x < 0) ||
+          (this.options.checkY &&
+            entity.pos.y > this.game.screen.actual.y + this.game.system.height)
+        ) {
+          entity.kill();
         }
-
-        ig.game.backgroundMaps[i].width--;
       }
 
-      // if theere is a collisionMap remove the tiles that are no longer visible
-      if (ig.game.collisionMap.data) {
-        for (var i = 0; i < ig.game.collisionMap.data.length; i++) {
-          ig.game.collisionMap.data[i].shift();
-        }
-
-        ig.game.collisionMap.width--;
-      }
-
-      for (var i = 0; i < ig.game.entities.length; i++) {
-        ig.game.entities[i].pos.x -= ig.game.backgroundMaps[0].tilesize;
-      }
-
-      ig.game.screen.x -= ig.game.backgroundMaps[0].tilesize;
-    }
-
-    // remove entities that are no longer visible
-    for (var i = 0; i < ig.game.entities.length; i++) {
-      var entity = ig.game.entities[i];
-      if (
-        (this.options.checkX && entity.pos.x + entity.size.x - ig.game.screen.x < 0) ||
-        (this.options.checkY && entity.pos.y > ig.game.screen.y + ig.system.height)
-      ) {
-        entity.kill();
-      }
+      this.game.screen.actual.x -= firstMap.tilesize;
     }
   }
 
