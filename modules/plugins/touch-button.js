@@ -97,64 +97,48 @@ export class TouchButton {
   }
 }
 
-class TouchButtonCollection {
+export class TouchButtonCollection {
   buttons = [];
 
-  constructor(buttons) {
+  constructor(system, input, buttons) {
+    this.system = system;
+    this.input = input;
     this.buttons = buttons;
-
-    document.addEventListener("touchstart", this.touchStart.bind(this), false);
-    document.addEventListener("touchend", this.touchEnd.bind(this), false);
-
-    document.addEventListener("MSPointerDown", this.touchStartMS.bind(this), false);
-    document.addEventListener("MSPointerUp", this.touchEndMS.bind(this), false);
+    document.addEventListener("touchstart", (e) => this.touchStart(e), false);
+    document.addEventListener("touchend", (e) => this.touchEnd(e), false);
+    document.addEventListener("MSPointerDown", (e) => this.touchStartMS(e), false);
+    document.addEventListener("MSPointerUp", (e) => this.touchEndMS(e), false);
     document.body.style.msTouchAction = "none";
   }
 
   touchStart(ev) {
     ev.preventDefault();
 
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].touchStart(ev);
-    }
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].touchStart(ev);
   }
 
   touchEnd(ev) {
     ev.preventDefault();
-
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].touchEnd(ev);
-    }
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].touchEnd(ev);
   }
 
   touchStartMS(ev) {
     ev.preventDefault();
-
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].touchStartMS(ev);
-    }
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].touchStartMS(ev);
   }
 
   touchEndMS(ev) {
     ev.preventDefault();
-
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].touchEndMS(ev);
-    }
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].touchEndMS(ev);
   }
 
   align() {
-    var w = ig.system.width || window.innerWidth;
-    var h = ig.system.height || window.innerHeight;
-
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].align(w, h);
-    }
+    const w = this.system.width || window.innerWidth;
+    const h = this.system.height || window.innerHeight;
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].align(w, h);
   }
 
   draw() {
-    for (var i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].draw();
-    }
+    for (let i = 0; i < this.buttons.length; i++) this.buttons[i].draw();
   }
 }
