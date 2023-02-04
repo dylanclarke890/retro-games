@@ -80,8 +80,13 @@
 /// <reference path="modules/plugins/fade-entity.js"/>
 /// <reference path="modules/plugins/fixed-entity.js"/>
 /// <reference path="modules/plugins/fixed-tick.js"/>
+/// <reference path="modules/plugins/infinite-levels.js"/>
 /// <reference path="modules/plugins/observable.js"/>
+/// <reference path="modules/plugins/persist-level-state.js"/>
 /// <reference path="modules/plugins/retro-highscore-namefield.js"/>
+/// <reference path="modules/plugins/screen-fader.js"/>
+/// <reference path="modules/plugins/splash-loader.js"/>
 /// <reference path="modules/plugins/state-machine.js"/>
+/// <reference path="modules/plugins/touch-button.js"/>
 
 //#endregion PLUGINS
