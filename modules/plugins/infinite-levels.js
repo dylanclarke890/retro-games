@@ -2,16 +2,16 @@ var nextLevelIndex = function (numLevels) {
   return Math.floor(Math.random() * numLevels);
 };
 
-ig.InfiniteLevel = ig.Class.extend({
-  levels: null,
-  options: {
+export class InfiniteLevel {
+  levels = null;
+  options = {
     start: null,
     checkX: true,
     checkY: true,
     nextLevelFunc: nextLevelIndex,
-  },
+  };
 
-  init: function (levels, options) {
+  constructor(levels, options) {
     this.levels = levels;
 
     if (options) {
@@ -74,9 +74,9 @@ ig.InfiniteLevel = ig.Class.extend({
     }
 
     ig.game.collisionMap.name = "collision";
-  },
+  }
 
-  getMap: function (layerName) {
+  getMap(layerName) {
     for (var i = 0; i < ig.game.backgroundMaps.length; i++) {
       if (layerName === ig.game.backgroundMaps[i].name) {
         return ig.game.backgroundMaps[i];
@@ -86,9 +86,9 @@ ig.InfiniteLevel = ig.Class.extend({
     }
 
     return false;
-  },
+  }
 
-  getEmptyMapData: function (height, width) {
+  getEmptyMapData(height, width) {
     var data = [];
 
     // clear out the data
@@ -102,9 +102,9 @@ ig.InfiniteLevel = ig.Class.extend({
     }
 
     return data;
-  },
+  }
 
-  update: function () {
+  update() {
     // load a new set piece if necessary
     if (
       ig.game.backgroundMaps[0].width * ig.game.backgroundMaps[0].tilesize - ig.game.screen.x <=
@@ -171,13 +171,13 @@ ig.InfiniteLevel = ig.Class.extend({
         entity.kill();
       }
     }
-  },
+  }
 
-  getNextLevel: function () {
+  getNextLevel() {
     return this.levels[this.options.nextLevelFunc(this.levels.length)];
-  },
+  }
 
-  extendMap: function (map, level) {
+  extendMap(map, level) {
     var layer = this.getLayer(map.name, level);
 
     if (!layer) {
@@ -193,9 +193,9 @@ ig.InfiniteLevel = ig.Class.extend({
     }
 
     map.width += layer.width;
-  },
+  }
 
-  getLayer: function (layerName, level) {
+  getLayer(layerName, level) {
     for (var i = 0; i < level.layer.length; i++) {
       if (layerName === level.layer[i].name) {
         return level.layer[i];
@@ -203,5 +203,5 @@ ig.InfiniteLevel = ig.Class.extend({
     }
 
     return false;
-  },
-});
+  }
+}
