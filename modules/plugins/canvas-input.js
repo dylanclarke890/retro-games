@@ -513,7 +513,7 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   render() {
-    var ctx = this.#renderCtx,
+    const ctx = this.#renderCtx,
       w = this.outerW,
       h = this.outerH,
       br = this._borderRadius,
@@ -551,27 +551,26 @@ export class CanvasInput {
       ctx.shadowBlur = 0;
 
       // clip the text so that it fits within the box
-      var text = this._clipText();
+      let text = this._clipText();
 
       // draw the selection
-      var paddingBorder = this._padding + this._borderWidth + this.shadowT;
+      const paddingBorder = this._padding + this._borderWidth + this.shadowT;
       if (this._selection[1] > 0) {
-        var selectOffset = this._textWidth(text.substring(0, this._selection[0])),
+        const selectOffset = this._textWidth(text.substring(0, this._selection[0])),
           selectWidth = this._textWidth(text.substring(this._selection[0], this._selection[1]));
-
         ctx.fillStyle = this._selectionColor;
         ctx.fillRect(paddingBorder + selectOffset, paddingBorder, selectWidth, this._height);
       }
 
       // draw the cursor
       if (this._cursor) {
-        var cursorOffset = this._textWidth(text.substring(0, this._cursorPos));
+        const cursorOffset = this._textWidth(text.substring(0, this._cursorPos));
         ctx.fillStyle = this._fontColor;
         ctx.fillRect(paddingBorder + cursorOffset, paddingBorder, 1, this._height);
       }
 
       // draw the text
-      var textX = this._padding + this._borderWidth + this.shadowL,
+      const textX = this._padding + this._borderWidth + this.shadowL,
         textY = Math.round(paddingBorder + this._height / 2);
 
       // only remove the placeholder text if they have typed something
@@ -592,7 +591,7 @@ export class CanvasInput {
       ctx.fillText(text, textX, textY);
 
       // parse inner shadow
-      var innerShadow = this._innerShadow.split("px "),
+      const innerShadow = this._innerShadow.split("px "),
         isOffsetX = this._innerShadow === "none" ? 0 : parseInt(innerShadow[0], 10),
         isOffsetY = this._innerShadow === "none" ? 0 : parseInt(innerShadow[1], 10),
         isBlur = this._innerShadow === "none" ? 0 : parseInt(innerShadow[2], 10),
@@ -600,7 +599,7 @@ export class CanvasInput {
 
       // draw the inner-shadow (damn you canvas, this should be easier than this...)
       if (isBlur > 0) {
-        var shadowCtx = this.#shadowCtx,
+        const shadowCtx = this.#shadowCtx,
           scw = shadowCtx.canvas.width,
           sch = shadowCtx.canvas.height;
 
@@ -685,7 +684,7 @@ export class CanvasInput {
    * @param {Function} fn Callback.
    */
   _drawTextBox(fn) {
-    var ctx = this.#renderCtx,
+    const ctx = this.#renderCtx,
       w = this.outerW,
       h = this.outerH,
       br = this._borderRadius,
@@ -705,14 +704,12 @@ export class CanvasInput {
         br
       );
       ctx.fill();
-
       fn();
     } else {
-      var img = new Image();
+      const img = new Image();
       img.src = this._backgroundImage;
-      img.onload = function () {
+      img.onload = () => {
         ctx.drawImage(img, 0, 0, img.width, img.height, bw + this.shadowL, bw + this.shadowT, w, h);
-
         fn();
       };
     }
@@ -723,20 +720,13 @@ export class CanvasInput {
    * @return {Boolean} true if text removed.
    */
   _clearSelection() {
-    if (this._selection[1] > 0) {
-      // clear the selected contents
-      var start = this._selection[0],
-        end = this._selection[1];
-
-      this._value = this._value.substr(0, start) + this._value.substr(end);
-      this._cursorPos = start;
-      this._cursorPos = this._cursorPos < 0 ? 0 : this._cursorPos;
-      this._selection = [0, 0];
-
-      return true;
-    }
-
-    return false;
+    if (this._selection[1] <= 0) return false;
+    const [start, end] = this._selection; // clear the selected contents
+    this._value = this._value.substring(0, start) + this._value.substring(end);
+    this._cursorPos = start;
+    this._cursorPos = this._cursorPos < 0 ? 0 : this._cursorPos;
+    this._selection = [0, 0];
+    return true;
   }
 
   /**
@@ -745,11 +735,11 @@ export class CanvasInput {
    * @return {string} The clipped text.
    */
   _clipText(value) {
-    value = typeof value === "undefined" ? this._value : value;
+    value = value == null ? this._value : value;
 
-    var textWidth = this._textWidth(value),
+    const textWidth = this._textWidth(value),
       fillPer = textWidth / (this._width - this._padding),
-      text = fillPer > 1 ? value.substr(-1 * Math.floor(value.length / fillPer)) : value;
+      text = fillPer > 1 ? value.substring(-1 * Math.floor(value.length / fillPer)) : value;
 
     return text + "";
   }
@@ -757,15 +747,13 @@ export class CanvasInput {
   /**
    * Gets the pixel with of passed text.
    * @param {string} text The text to measure.
-   * @return {number}      The measured width.
+   * @return {number} The measured width.
    */
   _textWidth(text) {
-    var ctx = this.#renderCtx;
-
+    const ctx = this.#renderCtx;
     ctx.font =
       this._fontStyle + " " + this._fontWeight + " " + this._fontSize + "px " + this._fontFamily;
     ctx.textAlign = "left";
-
     return ctx.measureText(text).width;
   }
 
@@ -782,7 +770,7 @@ export class CanvasInput {
    * Update the width and height of the off-DOM canvas when attributes are changed.
    */
   _updateCanvasWH() {
-    var oldW = this.#renderCanvas.width,
+    const oldW = this.#renderCanvas.width,
       oldH = this.#renderCanvas.height;
 
     // update off-DOM canvas
@@ -845,7 +833,7 @@ export class CanvasInput {
    * @return {Boolean}   True if it is over the input box.
    */
   _overInput(x, y) {
-    var xLeft = x >= this._x + this._extraX,
+    const xLeft = x >= this._x + this._extraX,
       xRight = x <= this._x + this._extraX + this._width + this._padding * 2,
       yTop = y >= this._y + this._extraY,
       yBottom = y <= this._y + this._extraY + this._height + this._padding * 2;
@@ -861,19 +849,19 @@ export class CanvasInput {
    * @return {number}   Cursor position.
    */
   _clickPos(x) {
-    var value = this._value;
+    let value = this._value;
 
     // don't count placeholder text in this
     if (this._value === this._placeHolder) value = "";
 
     // determine where the click was made along the string
-    var text = this._clipText(value),
-      totalW = 0,
+    const text = this._clipText(value);
+    let totalW = 0,
       pos = text.length;
 
     if (x - (this._x + this._extraX) < this._textWidth(text)) {
       // loop through each character to identify the position
-      for (var i = 0; i < text.length; i++) {
+      for (let i = 0; i < text.length; i++) {
         totalW += this._textWidth(text[i]);
         if (totalW >= x - (this._x + this._extraX)) {
           pos = i;
@@ -891,7 +879,7 @@ export class CanvasInput {
    * @return {Object}   x & y values
    */
   _mousePos(e) {
-    var elm = e.target,
+    let elm = e.target,
       x = e.pageX,
       y = e.pageY;
 
@@ -906,14 +894,14 @@ export class CanvasInput {
       y = e.changedTouches[0].pageY;
     }
 
-    var style = document.defaultView.getComputedStyle(elm, undefined),
+    const style = document.defaultView.getComputedStyle(elm, undefined),
       paddingLeft = parseInt(style["paddingLeft"], 10) || 0,
       paddingTop = parseInt(style["paddingLeft"], 10) || 0,
       borderLeft = parseInt(style["borderLeftWidth"], 10) || 0,
       borderTop = parseInt(style["borderLeftWidth"], 10) || 0,
       htmlTop = document.body.parentNode.offsetTop || 0,
-      htmlLeft = document.body.parentNode.offsetLeft || 0,
-      offsetX = 0,
+      htmlLeft = document.body.parentNode.offsetLeft || 0;
+    let offsetX = 0,
       offsetY = 0;
 
     // calculate the total offset
