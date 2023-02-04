@@ -4,8 +4,13 @@ const inputs = [];
 const noOp = () => {};
 // initialize the Canvas Input
 export class CanvasInput {
+  #renderCanvas;
+  #renderCtx;
+  #shadowCanvas;
+  #shadowCtx;
+
   constructor(opts) {
-    // setup the defaults
+    //#region setup the defaults
     this._canvas = opts.canvas || null;
     this._ctx = this._canvas ? this._canvas.getContext("2d") : null;
     this._x = opts.x || 0;
@@ -46,47 +51,50 @@ export class CanvasInput {
     this._hasFocus = false;
     this._selection = [0, 0];
     this._wasOver = false;
+    //#endregion setup the defaults
 
-    // parse box shadow
-    this.boxShadow(this._boxShadow, true);
+    this.boxShadow(this._boxShadow, true); // parse box shadow
+    this.#calculateSize(); // calculate the full width and height with padding, borders and shadows
 
-    // calculate the full width and height with padding, borders and shadows
-    this._calculate();
+    //#region setup the off-DOM canvas
+    this.#renderCanvas = document.createElement("canvas");
+    this.#renderCanvas.setAttribute("width", this.outerW);
+    this.#renderCanvas.setAttribute("height", this.outerH);
+    this.#renderCtx = this.#renderCanvas.getContext("2d");
+    //#endregion setup the off-DOM canvas
 
-    // setup the off-DOM canvas
-    this._renderCanvas = document.createElement("canvas");
-    this._renderCanvas.setAttribute("width", this.outerW);
-    this._renderCanvas.setAttribute("height", this.outerH);
-    this._renderCtx = this._renderCanvas.getContext("2d");
+    //#region setup another off-DOM canvas for inner-shadows
+    this.#shadowCanvas = document.createElement("canvas");
+    this.#shadowCanvas.setAttribute("width", this._width + this._padding * 2);
+    this.#shadowCanvas.setAttribute("height", this._height + this._padding * 2);
+    this.#shadowCtx = this.#shadowCanvas.getContext("2d");
+    //#endregion setup another off-DOM canvas for inner-shadows
 
-    // setup another off-DOM canvas for inner-shadows
-    this._shadowCanvas = document.createElement("canvas");
-    this._shadowCanvas.setAttribute("width", this._width + this._padding * 2);
-    this._shadowCanvas.setAttribute("height", this._height + this._padding * 2);
-    this._shadowCtx = this._shadowCanvas.getContext("2d");
-
-    // setup the background color
+    //#region setup the background color
     if (opts.backgroundGradient) {
-      this._backgroundColor = this._renderCtx.createLinearGradient(0, 0, 0, this.outerH);
+      this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
       this._backgroundColor.addColorStop(0, opts.backgroundGradient[0]);
       this._backgroundColor.addColorStop(1, opts.backgroundGradient[1]);
     } else this._backgroundColor = opts.backgroundColor || "#fff";
+    //#endregion setup the background color
 
-    // setup main canvas events
+    //#region setup main canvas events
     if (this._canvas) {
       this._canvas.addEventListener("mousemove", (e) => this.mousemove(e), false);
       this._canvas.addEventListener("mousedown", (e) => this.mousedown(e), false);
       this._canvas.addEventListener("mouseup", (e) => this.mouseup(e), false);
     }
+    //#endregion setup main canvas events
 
-    // setup a global mouseup to blur the input outside of the canvas
+    //#region setup a global mouseup to blur the input outside of the canvas
     const autoBlur = () => {
       if (this._hasFocus && !this._mouseDown) this.blur();
     };
     window.addEventListener("mouseup", autoBlur, true);
     window.addEventListener("touchend", autoBlur, true);
+    //#endregion setup a global mouseup to blur the input outside of the canvas
 
-    // create the hidden input element
+    //#region create the hidden input element
     this._hiddenInput = document.createElement("input");
     this._hiddenInput.type = "text";
     this._hiddenInput.style.position = "absolute";
@@ -100,7 +108,9 @@ export class CanvasInput {
     if (this._maxlength) this._hiddenInput.maxLength = this._maxlength;
     document.body.appendChild(this._hiddenInput);
     this._hiddenInput.value = this._value;
+    //#endregion create the hidden input element
 
+    //#region setup the keyboard events
     // setup the keydown listener
     this._hiddenInput.addEventListener("keydown", (e) => {
       if (this._hasFocus) {
@@ -121,6 +131,7 @@ export class CanvasInput {
       this.render();
       if (this._hasFocus) this._onkeyup(e);
     });
+    //#endregion setup the keyboard events
 
     // add this to the buffer
     inputs.push(this);
@@ -137,7 +148,7 @@ export class CanvasInput {
   width(data) {
     if (data != null) {
       this._width = data;
-      this._calculate();
+      this.#calculateSize();
       this._updateCanvasWH();
       this._updateHiddenInput();
 
@@ -155,7 +166,7 @@ export class CanvasInput {
   height(data) {
     if (data != null) {
       this._height = data;
-      this._calculate();
+      this.#calculateSize();
       this._updateCanvasWH();
       this._updateHiddenInput();
       return this.render();
@@ -172,7 +183,7 @@ export class CanvasInput {
   padding(data) {
     if (data != null) {
       this._padding = data;
-      this._calculate();
+      this.#calculateSize();
       this._updateCanvasWH();
       return this.render();
     } else return this._padding;
@@ -185,7 +196,7 @@ export class CanvasInput {
    */
   backgroundGradient(data) {
     if (data != null) {
-      this._backgroundColor = this._renderCtx.createLinearGradient(0, 0, 0, this.outerH);
+      this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
       this._backgroundColor.addColorStop(0, data[0]);
       this._backgroundColor.addColorStop(1, data[1]);
 
@@ -231,7 +242,7 @@ export class CanvasInput {
       this.shadowW = this.shadowL + this.shadowR;
       this.shadowH = this.shadowT + this.shadowB;
 
-      this._calculate();
+      this.#calculateSize();
 
       if (!doReturn) {
         this._updateCanvasWH();
@@ -578,7 +589,7 @@ export class CanvasInput {
    * @return {Object} Reference to the canvas.
    */
   renderCanvas() {
-    return this._renderCanvas;
+    return this.#renderCanvas;
   }
 
   /**
@@ -587,7 +598,7 @@ export class CanvasInput {
    * @return {CanvasInput}
    */
   render() {
-    var ctx = this._renderCtx,
+    var ctx = this.#renderCtx,
       w = this.outerW,
       h = this.outerH,
       br = this._borderRadius,
@@ -620,7 +631,7 @@ export class CanvasInput {
     }
 
     // draw the text box background
-    this._drawTextBox(function () {
+    this._drawTextBox(() => {
       // make sure all shadows are reset
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
@@ -676,7 +687,7 @@ export class CanvasInput {
 
       // draw the inner-shadow (damn you canvas, this should be easier than this...)
       if (isBlur > 0) {
-        var shadowCtx = this._shadowCtx,
+        var shadowCtx = this.#shadowCtx,
           scw = shadowCtx.canvas.width,
           sch = shadowCtx.canvas.height;
 
@@ -751,9 +762,9 @@ export class CanvasInput {
     // remove the hidden input box
     document.body.removeChild(this._hiddenInput);
     // remove off-DOM canvas
-    this._renderCanvas = null;
-    this._shadowCanvas = null;
-    this._renderCtx = null;
+    this.#renderCanvas = null;
+    this.#shadowCanvas = null;
+    this.#renderCtx = null;
   }
 
   /**
@@ -761,7 +772,7 @@ export class CanvasInput {
    * @param {Function} fn Callback.
    */
   _drawTextBox(fn) {
-    var ctx = this._renderCtx,
+    var ctx = this.#renderCtx,
       w = this.outerW,
       h = this.outerH,
       br = this._borderRadius,
@@ -836,7 +847,7 @@ export class CanvasInput {
    * @return {number}      The measured width.
    */
   _textWidth(text) {
-    var ctx = this._renderCtx;
+    var ctx = this.#renderCtx;
 
     ctx.font =
       this._fontStyle + " " + this._fontWeight + " " + this._fontSize + "px " + this._fontFamily;
@@ -848,7 +859,7 @@ export class CanvasInput {
   /**
    * Recalculate the outer with and height of the text box.
    */
-  _calculate() {
+  #calculateSize() {
     // calculate the full width and height with padding, borders and shadows
     this.outerW = this._width + this._padding * 2 + this._borderWidth * 2 + this.shadowW;
     this.outerH = this._height + this._padding * 2 + this._borderWidth * 2 + this.shadowH;
@@ -858,14 +869,14 @@ export class CanvasInput {
    * Update the width and height of the off-DOM canvas when attributes are changed.
    */
   _updateCanvasWH() {
-    var oldW = this._renderCanvas.width,
-      oldH = this._renderCanvas.height;
+    var oldW = this.#renderCanvas.width,
+      oldH = this.#renderCanvas.height;
 
     // update off-DOM canvas
-    this._renderCanvas.setAttribute("width", this.outerW);
-    this._renderCanvas.setAttribute("height", this.outerH);
-    this._shadowCanvas.setAttribute("width", this._width + this._padding * 2);
-    this._shadowCanvas.setAttribute("height", this._height + this._padding * 2);
+    this.#renderCanvas.setAttribute("width", this.outerW);
+    this.#renderCanvas.setAttribute("height", this.outerH);
+    this.#shadowCanvas.setAttribute("width", this._width + this._padding * 2);
+    this.#shadowCanvas.setAttribute("height", this._height + this._padding * 2);
 
     // clear the main canvas
     if (this._ctx) {
