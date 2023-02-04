@@ -33,12 +33,12 @@ export class EventChain {
     },
     orUntil: (predicate) => {
       const waitLink = this.#linkMap.get(this.#chain.length - 1);
-      if (!waitLink || !waitLink.isWaitLink) EventChain.#mustFollowWaitLink("orUntil");
+      if (!waitLink?.isWaitLink) EventChain.#mustFollowWaitLink("orUntil");
       waitLink.predicates.push(predicate);
     },
     every: (duration, action) => {
       const waitLink = this.#linkMap.get(this.#chain.length - 1);
-      if (!waitLink || !waitLink.isWaitLink) EventChain.#mustFollowWaitLink("every");
+      if (!waitLink?.isWaitLink) EventChain.#mustFollowWaitLink("every");
       const timer = new Timer(duration);
       waitLink.callbacks.push(() => {
         if (timer.delta() < 0) return;
@@ -48,7 +48,7 @@ export class EventChain {
     },
     whilst: (action) => {
       const waitLink = this.#linkMap.get(this.#chain.length - 1);
-      if (!waitLink || !waitLink.isWaitLink) EventChain.#mustFollowWaitLink("whilst");
+      if (!waitLink?.isWaitLink) EventChain.#mustFollowWaitLink("whilst");
       waitLink.callbacks.push(action);
     },
     waitUntil: (predicate) => {
