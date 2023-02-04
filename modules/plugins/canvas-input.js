@@ -8,6 +8,7 @@ export class CanvasInput {
   #renderCtx;
   #shadowCanvas;
   #shadowCtx;
+  #inputsIndex;
 
   constructor(opts) {
     //#region setup the defaults
@@ -56,74 +57,55 @@ export class CanvasInput {
     this.boxShadow(this._boxShadow, true); // parse box shadow
     this.#calculateSize(); // calculate the full width and height with padding, borders and shadows
 
-    //#region setup the off-DOM canvas
     this.#renderCanvas = document.createElement("canvas");
     this.#renderCanvas.setAttribute("width", this.outerW);
     this.#renderCanvas.setAttribute("height", this.outerH);
     this.#renderCtx = this.#renderCanvas.getContext("2d");
-    //#endregion setup the off-DOM canvas
 
-    //#region setup another off-DOM canvas for inner-shadows
     this.#shadowCanvas = document.createElement("canvas");
     this.#shadowCanvas.setAttribute("width", this._width + this._padding * 2);
     this.#shadowCanvas.setAttribute("height", this._height + this._padding * 2);
     this.#shadowCtx = this.#shadowCanvas.getContext("2d");
-    //#endregion setup another off-DOM canvas for inner-shadows
 
-    //#region setup the background color
     if (opts.backgroundGradient) {
       this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
       this._backgroundColor.addColorStop(0, opts.backgroundGradient[0]);
       this._backgroundColor.addColorStop(1, opts.backgroundGradient[1]);
     } else this._backgroundColor = opts.backgroundColor || "#fff";
-    //#endregion setup the background color
 
-    //#region setup main canvas events
     if (this._canvas) {
       this._canvas.addEventListener("mousemove", (e) => this.mousemove(e), false);
       this._canvas.addEventListener("mousedown", (e) => this.mousedown(e), false);
       this._canvas.addEventListener("mouseup", (e) => this.mouseup(e), false);
     }
-    //#endregion setup main canvas events
 
-    //#region setup a global mouseup to blur the input outside of the canvas
     const autoBlur = () => {
       if (this._hasFocus && !this._mouseDown) this.blur();
     };
     window.addEventListener("mouseup", autoBlur, true);
     window.addEventListener("touchend", autoBlur, true);
-    //#endregion setup a global mouseup to blur the input outside of the canvas
 
-    //#region create the hidden input element
     this._hiddenInput = document.createElement("input");
     this._hiddenInput.type = "text";
     this._hiddenInput.style.position = "absolute";
     this._hiddenInput.style.opacity = 0;
     this._hiddenInput.style.pointerEvents = "none";
     this._hiddenInput.style.zIndex = 0;
-    // hide native blue text cursor on iOS
-    this._hiddenInput.style.transform = "scale(0)";
-
+    this._hiddenInput.style.transform = "scale(0)"; // hide native blue text cursor on iOS
     this._updateHiddenInput();
+
     if (this._maxlength) this._hiddenInput.maxLength = this._maxlength;
     document.body.appendChild(this._hiddenInput);
     this._hiddenInput.value = this._value;
-    //#endregion create the hidden input element
 
-    //#region setup the keyboard events
-    // setup the keydown listener
     this._hiddenInput.addEventListener("keydown", (e) => {
-      if (this._hasFocus) {
-        window.focus(); // hack to fix touch event bug in iOS Safari
-        this._hiddenInput.focus();
-        // continue with the keydown event
-        this.keydown(e);
-      }
+      if (!this._hasFocus) return;
+      window.focus(); // hack to fix touch event bug in iOS Safari
+      this._hiddenInput.focus();
+      this.keydown(e); // continue with the keydown event
     });
 
-    // setup the keyup listener
     this._hiddenInput.addEventListener("keyup", (e) => {
-      // update the canvas input state information from the hidden input
       this._value = this._hiddenInput.value;
       this._cursorPos = this._hiddenInput.selectionStart;
       // update selection to hidden input's selection in case user did keyboard-based selection
@@ -131,11 +113,9 @@ export class CanvasInput {
       this.render();
       if (this._hasFocus) this._onkeyup(e);
     });
-    //#endregion setup the keyboard events
 
-    // add this to the buffer
-    inputs.push(this);
-    this._inputsIndex = inputs.length - 1;
+    inputs.push(this); // add this to the buffer
+    this.#inputsIndex = inputs.length - 1;
 
     this.render();
   }
@@ -143,7 +123,7 @@ export class CanvasInput {
   /**
    * Get/set the width of the text box.
    * @param {number} data Width in pixels.
-   * @return {this | string}      CanvasInput or current width.
+   * @return {this | number} CanvasInput or current width.
    */
   width(data) {
     if (data != null) {
@@ -151,17 +131,14 @@ export class CanvasInput {
       this.#calculateSize();
       this._updateCanvasWH();
       this._updateHiddenInput();
-
       return this.render();
-    } else {
-      return this._width;
-    }
+    } else return this._width;
   }
 
   /**
    * Get/set the height of the text box.
    * @param {number} data Height in pixels.
-   * @return {this | string}      CanvasInput or current height.
+   * @return {this | number} CanvasInput or current height.
    */
   height(data) {
     if (data != null) {
@@ -170,15 +147,13 @@ export class CanvasInput {
       this._updateCanvasWH();
       this._updateHiddenInput();
       return this.render();
-    } else {
-      return this._height;
-    }
+    } else return this._height;
   }
 
   /**
    * Get/set the padding of the text box.
    * @param {number} data Padding in pixels.
-   * @return {this | string} CanvasInput or current padding.
+   * @return {this | number} CanvasInput or current padding.
    */
   padding(data) {
     if (data != null) {
@@ -192,25 +167,22 @@ export class CanvasInput {
   /**
    * Get/set the background gradient.
    * @param {number} data Background gradient.
-   * @return {this | string}      CanvasInput or current background gradient.
+   * @return {this | number} CanvasInput or current background gradient.
    */
   backgroundGradient(data) {
     if (data != null) {
       this._backgroundColor = this.#renderCtx.createLinearGradient(0, 0, 0, this.outerH);
       this._backgroundColor.addColorStop(0, data[0]);
       this._backgroundColor.addColorStop(1, data[1]);
-
       return this.render();
-    } else {
-      return this._backgroundColor;
-    }
+    } else return this._backgroundColor;
   }
-  // setup the prototype
+
   /**
    * Get/set the box shadow.
-   * @param {string} data     Box shadow in CSS format (1px 1px 1px rgba(0, 0, 0.5)).
+   * @param {string} data Box shadow in CSS format (1px 1px 1px rgba(0, 0, 0.5)).
    * @param {Boolean} doReturn (optional) True to prevent a premature render.
-   * @return {this | string}          CanvasInput or current box shadow.
+   * @return {this | string} CanvasInput or current box shadow.
    */
   boxShadow(data, doReturn) {
     if (data != null) {
@@ -246,19 +218,15 @@ export class CanvasInput {
 
       if (!doReturn) {
         this._updateCanvasWH();
-
         return this.render();
       }
-    } else {
-      return this._boxShadow;
-    }
+    } else return this._boxShadow;
   }
 
-  // setup the prototype
   /**
    * Get/set the current text box value.
    * @param {string} data Text value.
-   * @return {this | string}      CanvasInput or current text value.
+   * @return {this | string} CanvasInput or current text value.
    */
   value(data) {
     if (data != null) {
@@ -271,9 +239,7 @@ export class CanvasInput {
       this.render();
 
       return this;
-    } else {
-      return this._value === this._placeHolder ? "" : this._value;
-    }
+    } else return this._value === this._placeHolder ? "" : this._value;
   }
 
   /**
@@ -383,7 +349,6 @@ export class CanvasInput {
 
   /**
    * Removes focus from the CanvasInput box.
-   * @param {Object} _this Reference to this.
    * @return {CanvasInput}
    */
   blur() {
@@ -441,7 +406,7 @@ export class CanvasInput {
       // tab key
       e.preventDefault();
       if (inputs.length > 1) {
-        var next = inputs[this._inputsIndex + 1] ? this._inputsIndex + 1 : 0;
+        var next = inputs[this.#inputsIndex + 1] ? this.#inputsIndex + 1 : 0;
         this.blur();
         setTimeout(function () {
           inputs[next].focus();
