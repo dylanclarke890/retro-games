@@ -1,3 +1,6 @@
+import { Game } from "../core/game.js";
+import { plugin } from "../lib/inject.js";
+
 /**
  * Contains functions to persist entity state
  * @class
@@ -5,6 +8,26 @@
 export class Persistence {
   static globalLoadFunctions = [];
   static globalSaveFunctions = [];
+
+  static {
+    const gameOverrides = [
+      {
+        name: "removeEntity",
+        value: function (entity) {
+          if (!entity.persist || entity._killed) {
+            this.parent(entity);
+            return;
+          }
+
+          if (!this.persistence.killedEntities) this.persistence.killedEntities = [];
+          this.persistence.killedEntities.push(entity);
+          this.parent(entity);
+        },
+      },
+    ];
+
+    plugin(gameOverrides).to(Game);
+  }
 
   /**
    * Initializes a new Persistence system
@@ -20,48 +43,27 @@ export class Persistence {
    * @returns {Array}
    */
   getLevelState() {
-    var i,
-      entity,
-      entityState,
-      eid,
-      levelState = false,
-      entities = ig.game.entities.slice(0);
+    let levelState = false;
 
-    if (this.killedEntities) {
-      entities = entities.concat(this.killedEntities);
-    }
+    const gameEntities = this.game.entities.slice(0);
+    const entities = this.killedEntities ? gameEntities.concat(this.killedEntities) : gameEntities;
+    for (let i = 0; i < entities.length; i++) {
+      const entity = entities[i];
+      if (!entity.persist) continue;
+      const eid = this.getEntityIdentifier(entity);
+      if (!eid) continue;
 
-    for (i = 0; i < entities.length; i++) {
-      entity = entities[i];
-
-      if (!entity.persist) {
-        continue;
-      }
-
-      eid = this.getEntityIdentifier(entity);
-      if (!eid) {
-        continue;
-      }
-
-      entityState = {
+      const entityState = {
         id: eid,
         x: entity.pos.x,
         y: entity.pos.y,
       };
 
-      if (entity._killed || entity.isKilled) {
-        entityState.killed = 1;
-      }
-
+      if (entity._killed || entity.isKilled) entityState.killed = 1;
       this.runStateHandlers("Save", entity, entityState);
 
-      if (entity.persistenceSave) {
-        entity.persistenceSave(entityState);
-      }
-
-      if (!levelState) {
-        levelState = [];
-      }
+      if (entity.persistenceSave) entity.persistenceSave(entityState);
+      if (!levelState) levelState = [];
 
       levelState.push(entityState);
     }
@@ -75,32 +77,19 @@ export class Persistence {
    * @returns {Number} Count of how many objects were restored using state passed in
    */
   loadLevelState(levelState) {
-    var entities = ig.game.entities,
-      loadCount = 0,
-      i,
-      entity;
+    const entities = this.game.entities;
 
     this.killedEntities = [];
-
-    for (i = 0; i < entities.length; i++) {
-      entity = entities[i];
-
-      if (!entity.persist) {
-        continue;
-      }
-
+    let loadCount = 0;
+    for (let i = 0; i < entities.length; i++) {
+      const entity = entities[i];
+      if (!entity.persist) continue;
       entity.originPersistId = {
         x: entity.pos.x,
         y: entity.pos.y,
       };
 
-      if (levelState) {
-        if (this.loadEntityState(entity, levelState)) {
-          loadCount++;
-        } else {
-          //console.log("state not found", this.getEntityIdentifier(entity));
-        }
-      }
+      if (levelState) if (this.loadEntityState(entity, levelState)) loadCount++;
     }
 
     return loadCount;
@@ -108,47 +97,30 @@ export class Persistence {
 
   /**
    * Restores a single object using a state array
-   * @param	{ig.Entity} entity		Single entity to restore
+   * @param	{Entity} entity		Single entity to restore
    * @param	{Array}		levelState	Array of states computed from getLevelState
    * @returns {Number}	Count of how many objects were restored using state passed in
    */
   loadEntityState(entity, levelState) {
-    var eid = this.getEntityIdentifier(entity),
-      levelStateItem,
-      s,
-      key,
-      value;
+    const eid = this.getEntityIdentifier(entity);
+    for (let s = 0; s < levelState.length; s++) {
+      const levelStateItem = levelState[s];
+      if (levelStateItem.id !== eid) continue;
+      this.runStateHandlers("Load", entity, levelStateItem);
+      if (entity.persistenceLoad) entity.persistenceLoad(levelStateItem);
 
-    for (s = 0; s < levelState.length; s++) {
-      levelStateItem = levelState[s];
-
-      if (levelStateItem.id == eid) {
-        this.runStateHandlers("Load", entity, levelStateItem);
-
-        if (entity.persistenceLoad) {
-          entity.persistenceLoad(levelStateItem);
+      for (const key in levelStateItem) {
+        if (key in levelStateItem) {
+          const value = levelStateItem[key];
+          if (key === "id") entity.idPersisted = value;
+          else if (key === "x") entity.pos.x = value;
+          else if (key === "y") entity.pos.y = value;
+          else if (key === "killed") this.game.removeEntity(entity);
+          else entity[key] = value;
         }
-
-        for (key in levelStateItem) {
-          if (levelStateItem.hasOwnProperty(key)) {
-            value = levelStateItem[key];
-
-            if (key == "id") {
-              entity.idPersisted = value;
-            } else if (key == "x") {
-              entity.pos.x = value;
-            } else if (key == "y") {
-              entity.pos.y = value;
-            } else if (key == "killed") {
-              ig.game.removeEntity(entity);
-            } else {
-              entity[key] = value;
-            }
-          }
-        }
-
-        return true;
       }
+
+      return true;
     }
 
     return false;
@@ -156,53 +128,24 @@ export class Persistence {
 
   /**
    * Computes a identifier used to restore an object
-   * @param	{ig.Entity} entity		An entity to get an identifier
+   * @param	{Entity} entity An entity to get an identifier
    * @returns {String}
    */
   getEntityIdentifier(entity) {
-    var pos = entity.originPersistId || entity.pos;
-
-    return "x_" + pos.x + "_y_" + pos.y;
+    const pos = entity.originPersistId || entity.pos;
+    return `x_${pos.x}_y_${pos.y}`;
   }
 
   /**
    * Calls all functions assigned to handle persistence
-   * @param	{String}		name		Event name (Load, Save)
-   * @param	{ig.Entity} entity	Entity context
-   * @param	{Object}		state		State data (single object)
+   * @param	{"Save" | "Load"} name Event name (Load, Save)
+   * @param	{Entity} entity	Entity context
+   * @param	{Object} state State data (single object)
    * @returns {undefined}
    */
   runStateHandlers(name, entity, state) {
-    var func,
-      i,
-      list = this["state" + name + "Functions"];
-
-    if (!list) {
-      return;
-    }
-
-    for (i = 0; i < list.length; i++) {
-      func = list[i];
-      func.call(entity, state);
-    }
+    const list = this["state" + name + "Functions"];
+    if (!list) return;
+    for (let i = 0; i < list.length; i++) list[i].call(entity, state);
   }
 }
-
-ig.Game.inject({
-  staticInstantiate() {
-    this.parent();
-    ig.game.persistence = new Persistence();
-  },
-
-  removeEntity(entity) {
-    if (entity.persist && !entity._killed) {
-      if (!this.persistence.killedEntities) {
-        this.persistence.killedEntities = [];
-      }
-
-      this.persistence.killedEntities.push(entity);
-    }
-
-    this.parent(entity);
-  },
-});
