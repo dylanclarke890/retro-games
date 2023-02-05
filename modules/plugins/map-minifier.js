@@ -1,214 +1,151 @@
-ig.module("plugins.map-minifier")
-  .requires("impact.game")
-  .defines(function () {
-    ig.MapMinifier = ig.Class.extend({
-      init: function () {},
+import { Game } from "../core/game.js";
+import { EditMap } from "../level-editor/edit-map.js";
+import { LevelEditor } from "../level-editor/level-editor.js";
+import { plugin } from "../lib/inject.js";
 
-      compress: function (layer) {},
+export class MapMinifier {
+  isEnabledForGame = false;
+  isEnabledForLevelEditor = false;
 
-      decompress: function (layer) {},
-    });
+  static enableForLevelEditor() {
+    if (MapMinifier.isEnabledForLevelEditor) return;
+    MapMinifier.isEnabledForLevelEditor = true;
 
-    ig.MapMinifierRle = ig.MapMinifier.extend({
-      init: function () {
-        this.parent();
+    // TODO
+    plugin({
+      name: "loadResponse",
+      value: function (data) {
+        this.parent(data);
       },
+    }).to(LevelEditor);
+    plugin({
+      name: "getSaveData",
+      value: function () {
+        const layer = this.parent();
+        if (!layer.dataCompression) MapMinifier.compressLayer(layer);
+        return layer;
+      },
+    }).to(EditMap);
+  }
 
-      compress: function (map) {
-        var source = ig.copy(map.data);
+  compressLayer(layer) {
+    const minifier = new MapMinifier();
+    layer.dataCompressed = minifier.compress(layer);
+    delete layer.data;
+  }
 
-        var table = {};
-        var lastRow = "?";
-        var rowCount = 0;
+  decompressLayer(layer) {
+    if (!layer.dataCompressed) return;
+    const minifier = new MapMinifier();
+    minifier.decompress(layer);
+    delete layer.dataCompressed;
+  }
 
-        this.compressedMap = "";
+  enableForGame() {
+    if (MapMinifier.isEnabledForGame) return;
+    MapMinifier.isEnabledForGame = true;
+    plugin({
+      name: "loadLevel",
+      value: function (level) {
+        for (let i = 0; i < level.layer.length; i++) MapMinifier.decompressLayer(level.layer[i]);
+        this.parent(level);
+      },
+    }).to(Game);
+  }
 
-        for (var r = 0; r < source.length; r++) {
-          var row = source[r];
+  compressedMap;
+  compressedCellCount;
+  compressedRow;
 
-          var lastValue = -1;
-          var valueCount = 0;
-          this.compressedCellCount = 0;
-          this.compressedRow = "";
+  compress(map) {
+    const source = Object.assign({}, map.data);
+    let lastRow = null;
+    let rowCount = 0;
+    this.compressedMap = "";
 
-          for (var c = 0; c < row.length; c++) {
-            var cell = row[c];
-            if (cell != lastValue) {
-              if (lastValue >= 0) {
-                this.addCompressedTiles(lastValue, valueCount);
-              }
+    for (let i = 0; i < source.length; i++) {
+      const row = source[i];
 
-              lastValue = cell;
-              valueCount = 1;
-            } else {
-              valueCount++;
-            }
-          }
+      let lastValue = -1;
+      let valueCount = 0;
+      this.compressedCellCount = 0;
+      this.compressedRow = "";
 
-          this.addCompressedTiles(lastValue, valueCount);
-
-          if (this.compressedRow != lastRow) {
-            if (lastRow != "?") {
-              this.addCompressedRows(lastRow, rowCount);
-            }
-            lastRow = this.compressedRow;
-            rowCount = 1;
-          } else {
-            rowCount++;
-          }
+      for (let j = 0; j < row.length; j++) {
+        const cell = row[j];
+        if (cell === lastValue) {
+          valueCount++;
+          continue;
         }
 
-        this.addCompressedRows(lastRow, rowCount);
-
-        return this.compressedMap;
-      },
-
-      decompress: function (map) {
-        var source = map.dataCompressed;
-
-        var compressedRows = source.split("/");
-        var uncompressedData = [];
-
-        for (var i = 0; i < compressedRows.length; i++) {
-          var rowCount = parseInt(compressedRows[i]);
-          var rowData = compressedRows[++i];
-
-          var plainRowData = this.decompressRow(rowData);
-
-          for (j = 0; j < rowCount; j++) {
-            uncompressedData.push(plainRowData);
-          }
-        }
-
-        map.data = uncompressedData;
-      },
-
-      decompressRow: function (rowData) {
-        var segments = rowData.split(",");
-        var a = [];
-
-        for (var s = 0; s < segments.length; s++) {
-          var segment = segments[s];
-          var cell = 0;
-
-          if (segment.indexOf("x") > -1) {
-            var xparts = segment.split("x");
-            var tile = parseInt(xparts[0]);
-            var count = parseInt(xparts[1]);
-
-            for (var n = 0; n < count; n++) {
-              a.push(tile);
-            }
-          } else {
-            a.push(parseInt(segment));
-          }
-        }
-
-        return a;
-      },
-
-      addCompressedTiles: function (tile, count) {
-        if (this.compressedCellCount > 0) {
-          this.compressedRow += ",";
-        }
-
-        this.compressedRow += tile.toString();
-
-        if (count > 1) {
-          this.compressedRow += "x" + count.toString();
-        }
-
-        this.compressedCellCount++;
-      },
-
-      addCompressedRows: function (rowData, count) {
-        if (this.compressedMap.length > 0) {
-          this.compressedMap += "/";
-        }
-
-        this.compressedMap += count.toString() + "/" + rowData;
-      },
-    });
-
-    ig.MapMinifier.compressionTypeDefault = "RLE";
-
-    ig.MapMinifier.compressionTypes = {
-      RLE: ig.MapMinifierRle,
-    };
-
-    ig.MapMinifier.compressLayer = function (layer, type) {
-      var compType = type || ig.MapMinifier.compressionTypeDefault;
-      var minifierClass = ig.MapMinifier.compressionTypes[compType];
-
-      var minifier = new minifierClass();
-
-      layer.dataCompressed = minifier.compress(layer);
-      layer.dataFormat = compType;
-      delete layer.data;
-    };
-
-    ig.MapMinifier.decompressLayer = function (layer) {
-      if (!layer.dataFormat || !layer.dataCompressed) {
-        return;
+        if (lastValue >= 0) this.addCompressedTiles(lastValue, valueCount);
+        lastValue = cell;
+        valueCount = 1;
       }
 
-      var minifierClass = ig.MapMinifier.compressionTypes[layer.dataFormat];
-      var minifier = new minifierClass();
+      this.addCompressedTiles(lastValue, valueCount);
 
-      minifier.decompress(layer);
-
-      delete layer.dataFormat;
-      delete layer.dataCompressed;
-    };
-
-    ig.MapMinifier.enableForGame = function () {
-      if (ig.MapMinifier.isGameEnabled) {
-        return;
+      if (this.compressedRow === lastRow) {
+        rowCount++;
+        continue;
       }
 
-      ig.MapMinifier.isGameEnabled = true;
+      if (lastRow) this.addCompressedRows(lastRow, rowCount);
+      lastRow = this.compressedRow;
+      rowCount = 1;
+    }
 
-      ig.Game.inject({
-        loadLevel: function (level) {
-          for (var i = 0; i < level.layer.length; i++) {
-            ig.MapMinifier.decompressLayer(level.layer[i]);
-          }
+    this.addCompressedRows(lastRow, rowCount);
 
-          this.parent(level);
-        },
-      });
-    };
+    return this.compressedMap;
+  }
 
-    ig.MapMinifier.enableForWeltmeister = function () {
-      if (ig.MapMinifier.isWmEnabled) {
-        return;
+  decompress(map) {
+    const source = map.dataCompressed;
+    const compressedRows = source.split("/");
+    const uncompressedData = [];
+
+    for (let i = 0; i < compressedRows.length; i++) {
+      const rowCount = parseInt(compressedRows[i]);
+      const rowData = compressedRows[++i];
+      const plainRowData = this.decompressRow(rowData);
+      for (let j = 0; j < rowCount; j++) uncompressedData.push(plainRowData);
+    }
+
+    map.data = uncompressedData;
+  }
+
+  decompressRow(rowData) {
+    const segments = rowData.split(",");
+    const a = [];
+
+    for (let s = 0; s < segments.length; s++) {
+      const segment = segments[s];
+
+      if (segment.indexOf("x") <= -1) {
+        a.push(parseInt(segment));
+        continue;
       }
 
-      ig.MapMinifier.isWmEnabled = true;
+      const xparts = segment.split("x");
+      const tile = parseInt(xparts[0]);
+      const count = parseInt(xparts[1]);
 
-      wm.Weltmeister.inject({
-        loadResponse: function (data) {
-          var jsonMatch = data.match(/\/\*JSON\[\*\/([\s\S]*?)\/\*\]JSON\*\//);
-          var pj = $.parseJSON(jsonMatch ? jsonMatch[1] : data);
+      for (let n = 0; n < count; n++) a.push(tile);
+    }
 
-          for (var i = 0; i < pj.layer.length; i++) {
-            ig.MapMinifier.decompressLayer(pj.layer[i]);
-          }
+    return a;
+  }
 
-          this.parent($.toJSON(pj));
-        },
-      });
+  addCompressedTiles(tile, count) {
+    if (this.compressedCellCount > 0) this.compressedRow += ",";
+    this.compressedRow += tile.toString();
+    if (count > 1) this.compressedRow += "x" + count.toString();
+    this.compressedCellCount++;
+  }
 
-      wm.EditMap.inject({
-        getSaveData: function () {
-          var layer = this.parent();
-
-          if (!layer.dataCompression) {
-            ig.MapMinifier.compressLayer(layer);
-          }
-
-          return layer;
-        },
-      });
-    };
-  });
+  addCompressedRows(rowData, count) {
+    if (this.compressedMap.length > 0) this.compressedMap += "/";
+    this.compressedMap += count.toString() + "/" + rowData;
+  }
+}
