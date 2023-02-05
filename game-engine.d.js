@@ -72,19 +72,24 @@
 
 //#region PLUGINS
 
+/// <reference path="modules/plugins/cheat-codes.js"/>
 /// <reference path="modules/plugins/clear-map-tile.js"/>
 /// <reference path="modules/plugins/clickable.js"/>
 /// <reference path="modules/plugins/combo-manager.js"/>
+/// <reference path="modules/plugins/damage-zone-entity.js"/>
 /// <reference path="modules/plugins/distance-based-sound.js"/>
 /// <reference path="modules/plugins/edges.js"/>
 /// <reference path="modules/plugins/fade-entity.js"/>
 /// <reference path="modules/plugins/fixed-entity.js"/>
 /// <reference path="modules/plugins/fixed-tick.js"/>
 /// <reference path="modules/plugins/infinite-levels.js"/>
+/// <reference path="modules/plugins/map-minifier.js"/>
 /// <reference path="modules/plugins/observable.js"/>
 /// <reference path="modules/plugins/persist-level-state.js"/>
 /// <reference path="modules/plugins/retro-highscore-namefield.js"/>
 /// <reference path="modules/plugins/screen-fader.js"/>
+/// <reference path="modules/plugins/screen-shaker.js"/>
+/// <reference path="modules/plugins/simple-loader.js"/>
 /// <reference path="modules/plugins/splash-loader.js"/>
 /// <reference path="modules/plugins/state-machine.js"/>
 /// <reference path="modules/plugins/touch-button.js"/>
