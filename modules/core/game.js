@@ -79,9 +79,6 @@ export class Game {
     const { drawPosition, scale } = this.system;
     if (this.clearColor) this.system.clear(this.clearColor);
 
-    /**  TODO: This is a bit of a circle jerk. Entities reference game.screen.rounded
-     * instead of game.screen.actual when drawing themselves in order to be
-     * "synchronized" to the rounded(?) screen position.*/
     this.screen.rounded = {
       x: drawPosition(this.screen.actual.x) / scale,
       y: drawPosition(this.screen.actual.y) / scale,
