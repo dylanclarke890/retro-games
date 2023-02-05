@@ -187,12 +187,23 @@ export class Game {
     this.#doSortEntities = true;
   }
 
+  /**
+   * Swap the positions of two entities in the list so as to draw one on top of the other.
+   * @param {Entity} a
+   * @param {Entity} b
+   */
+  swapEntities(a, b) {
+    const x = this.entities.indexOf(a);
+    const y = this.entities.indexOf(b);
+    this.entities[y] = a;
+    this.entities[x] = b;
+  }
+
   removeEntity(ent) {
     if (ent.name) delete this.namedEntities[ent.name];
-    // We can not remove the entity from the entities[] array in the midst
-    // of an update cycle, so remember all killed entities and remove
-    // them later.
-    // Also make sure this entity doesn't collide anymore and won't get
+    // We can't remove the entity from the entities[] array in the midst
+    // of an update cycle, so remember all killed entities, remove
+    // them later, make sure they don't collide anymore and won't get
     // updated or checked
     ent.killed = true;
     ent.type = Entity.TYPE.NONE;
