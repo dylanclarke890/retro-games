@@ -159,8 +159,8 @@ export class Game {
     const entityClass = Register.getEntityByType(type);
     const a = [];
     for (let i = 0; i < this.entities.length; i++) {
-      const ent = this.entities[i];
-      if (ent instanceof entityClass && !ent.killed) a.push(ent);
+      const entity = this.entities[i];
+      if (entity instanceof entityClass && !entity.killed) a.push(entity);
     }
     return a;
   }
@@ -169,10 +169,10 @@ export class Game {
     settings ??= {};
     const entityClass = Register.getEntityByType(type);
     if (!entityClass) throw new Error(`Can't spawn entity of type ${type}`);
-    const ent = new entityClass({ x, y, game: this, settings });
-    this.entities.push(ent);
-    if (ent.name) this.namedEntities[ent.name] = ent;
-    return ent;
+    const entity = new entityClass({ x, y, game: this, settings });
+    this.entities.push(entity);
+    if (entity.name) this.namedEntities[entity.name] = entity;
+    return entity;
   }
 
   sortEntities() {
