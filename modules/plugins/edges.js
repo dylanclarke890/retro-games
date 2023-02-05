@@ -27,6 +27,16 @@ export const EdgesMixin = (superclass) =>
       }
     }
 
+    get centerX() {
+      switch (this.collisionShape) {
+        case "rectangle":
+        default:
+          return this.pos.x + this.size.x / 2;
+        case "circle":
+          return this.pos.x;
+      }
+    }
+
     get top() {
       switch (this.collisionShape) {
         case "rectangle":
@@ -44,6 +54,16 @@ export const EdgesMixin = (superclass) =>
           return this.pos.y + this.size.y;
         case "circle":
           return this.pos.y + this.r;
+      }
+    }
+
+    get centerY() {
+      switch (this.collisionShape) {
+        case "rectangle":
+        default:
+          return this.pos.y + this.size.y / 2;
+        case "circle":
+          return this.pos.y;
       }
     }
   };

@@ -1,3 +1,5 @@
+export class PongGame {}
+
 var PONG = PONG || {};
 
 PONG.Ball = class {
@@ -213,8 +215,6 @@ PONG.utils.drawText = function (text, font, fillStyle, x, y, maxWidth = undefine
   ctx.fillText(text, x, y, maxWidth);
 };
 
-const [canvas, ctx] = new2dCanvas("play-area", 800, 500);
-
 /********************************************************
  *                  G L O B A L S
  */
@@ -224,29 +224,6 @@ const DIRECTION = {
   LEFT: "L",
   RIGHT: "R",
 };
-
-const center = {
-  w: canvas.width / 2,
-  h: canvas.height / 2,
-};
-
-const FIELD_SIDE_POS = {
-  LEFT: { paddleX: 20, scoreX: center.w - 50 },
-  RIGHT: { paddleX: canvas.width - 40, scoreX: center.w + 50 },
-};
-
-const audio = {
-  collision: document.getElementById("collision"),
-};
-
-const opponentSettings = {
-  pvp: true,
-  p1StartingSide: FIELD_SIDE_POS.RIGHT,
-  aiMaxPaddleSpeed: 20,
-};
-const { pvp, p1StartingSide, aiMaxPaddleSpeed } = opponentSettings;
-const p2StartingSide =
-  p1StartingSide === FIELD_SIDE_POS.LEFT ? FIELD_SIDE_POS.RIGHT : FIELD_SIDE_POS.LEFT;
 
 const board = {
   playerOne: new PONG.Paddle.Player("Dylan", "Standard", p1StartingSide),
