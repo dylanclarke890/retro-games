@@ -23,6 +23,11 @@ export function toDeg(value) {
   return (value * 180) / Math.PI;
 }
 
+export function randomNumber(upTo, floor = true) {
+  const rand = Math.random() * upTo;
+  return floor ? Math.floor(rand) : rand;
+}
+
 export function boolToOnOff(bool) {
   return bool ? "On" : "Off";
 }
