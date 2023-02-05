@@ -5,9 +5,9 @@ import { Register } from "./register.js";
 export class GameLoader {
   #assetsToPreload = [];
   #progressPercent = 0;
-  #status = 0;
   #unloaded = [];
 
+  status = 0;
   debugMode = false;
   done = false;
   gameClass = null;
@@ -47,7 +47,7 @@ export class GameLoader {
   }
 
   #drawLoadingScreen() {
-    this.#progressPercent += (this.#status - this.#progressPercent) / 5;
+    this.#progressPercent += (this.status - this.#progressPercent) / 5;
     const { scale, width, height, ctx } = this.runner.system;
     let barWidth = Math.floor(width * 0.6);
     let barHeight = Math.floor(height * 0.1);
@@ -69,7 +69,7 @@ export class GameLoader {
   #loadCallback(path, wasSuccessful) {
     if (!wasSuccessful) throw new Error(`Failed to load resource: ${path}`);
     removeItem(this.#unloaded, path);
-    this.#status = 1 - this.#unloaded.length / this.#assetsToPreload.length;
+    this.status = 1 - this.#unloaded.length / this.#assetsToPreload.length;
     if (this.#unloaded.length === 0) setTimeout(() => this.end(), 250);
   }
 }
