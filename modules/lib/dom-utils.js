@@ -33,3 +33,9 @@ export function loadScript({ src, isES6Module, cb = () => {} } = {}) {
   script.src = src;
   document.body.appendChild(script);
 }
+
+export function screenshotCanvas(canvas) {
+  const image = new Image();
+  image.src = canvas.toDataURL();
+  document.body.appendChild(image);
+}
