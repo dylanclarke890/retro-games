@@ -191,10 +191,12 @@ export class Game {
    * Swap the positions of two entities in the list so as to draw one on top of the other.
    * @param {Entity} a
    * @param {Entity} b
+   * @param {boolean} before If true, will ensure a is before b
    */
-  swapEntities(a, b) {
+  swapEntities(a, b, before) {
     const x = this.entities.indexOf(a);
     const y = this.entities.indexOf(b);
+    if (before && x < y) return; // no need to swap
     this.entities[y] = a;
     this.entities[x] = b;
   }
