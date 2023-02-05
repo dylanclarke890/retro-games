@@ -226,7 +226,7 @@ export class EditEntities {
   dragOnSelectedEntity(x, y) {
     if (!this.selectedEntity) return false;
 
-    if (this.selectedEntity._wmScalable && this.wasSelectedOnScaleBorder)
+    if (this.selectedEntity._levelEditorIsScalable && this.wasSelectedOnScaleBorder)
       this.scaleSelectedEntity(x, y);
     else this.moveSelectedEntity(x, y);
 
@@ -480,7 +480,7 @@ export class EditEntities {
 
     if (
       !this.selectedEntity ||
-      !(this.selectedEntity._wmScalable && this.selectedEntity.touches(this.selector))
+      !(this.selectedEntity._levelEditorIsScalable && this.selectedEntity.touches(this.selector))
     ) {
       document.body.style.cursor = "default";
       return;
