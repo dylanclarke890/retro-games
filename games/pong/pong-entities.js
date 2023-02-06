@@ -1,6 +1,5 @@
 import { Register } from "../../modules/core/register.js";
 import { Entity } from "../../modules/core/entity.js";
-import { EventChain } from "../../modules/lib/event-chain.js";
 
 export class EntityBall extends Entity {
   SPEED_INCREASE = 0.1;
@@ -14,16 +13,12 @@ export class EntityBall extends Entity {
 
   constructor(opts) {
     super(opts);
+    this.original = {
+      pos: { ...this.pos },
+      vel: { ...this.vel },
+    };
     this.createAnimationSheet("assets/images/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
-    this.chain = new EventChain()
-      .wait(3)
-      .then(() => {
-        const { x, y } = this.vel;
-        const s = this.SPEED_INCREASE;
-        this.vel = { x: x + x * s, y: y + y * s };
-      })
-      .repeat();
   }
 
   collideWith(other) {
@@ -32,7 +27,6 @@ export class EntityBall extends Entity {
   }
 
   update() {
-    this.chain.update();
     super.update();
   }
 }

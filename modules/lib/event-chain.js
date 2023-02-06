@@ -82,10 +82,7 @@ export class EventChain {
       const stepKey = this.#index;
       if (!this.#linkMap.has(stepKey)) {
         this.#linkMap.set(stepKey, { totalRepeats: amount, repeatsLeft: amount });
-        // Reset the counters of any repeat steps before this one.
-        for (const [key, { totalRepeats }] of this.#linkMap.entries())
-          if (totalRepeats != null && key < stepKey)
-            this.#linkMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
+        this.#resetRepeatLinks(stepKey);
       }
       return () => {
         const { totalRepeats, repeatsLeft } = this.#linkMap.get(stepKey);
@@ -94,6 +91,21 @@ export class EventChain {
           return;
         }
         this.#linkMap.set(stepKey, { totalRepeats, repeatsLeft: repeatsLeft - 1 });
+        this.reset();
+      };
+    },
+    repeatUntil: (predicate) => {
+      const stepKey = this.#index;
+      if (!this.#linkMap.has(stepKey)) {
+        this.#linkMap.set(stepKey, { predicate });
+        this.#resetRepeatLinks(stepKey);
+      }
+      return () => {
+        const { predicate } = this.#linkMap.get(stepKey);
+        if (predicate()) {
+          this.#nextLink();
+          return;
+        }
         this.reset();
       };
     },
@@ -107,6 +119,13 @@ export class EventChain {
   #nextLink() {
     this.#index++;
     this.#isNextLink = true;
+  }
+
+  /** Reset the counters of any repeat steps before this one. */
+  #resetRepeatLinks(currentStep) {
+    for (const [key, { totalRepeats }] of this.#linkMap.entries())
+      if (totalRepeats != null && key < currentStep)
+        this.#linkMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
   }
 
   /**
@@ -226,6 +245,16 @@ export class EventChain {
   repeat(amount) {
     amount ??= Infinity;
     this.#createLink(() => this.#actions.repeat(amount));
+    return this;
+  }
+
+  /**
+   * Repeat the previous links in the event chain until predicate returns true. ALL links are repeated, including
+   * any prior 'repeat' links.
+   * @param {() => boolean)} predicate
+   */
+  repeatUntil(predicate) {
+    this.#createLink(() => this.#actions.repeatUntil(predicate));
     return this;
   }
 
