@@ -7,7 +7,7 @@ $dir_val = $_GET["dir"];
 $dir = $file_root . str_replace('..', '', $dir_val);
 if ($dir[strlen($dir) - 1] !== '/') $dir .= '/';
 
-$find = '*.*';
+$find;
 switch ($_GET['type']) {
   case 'images':
     $find = '*.{png,gif,jpg,jpeg}';
@@ -16,6 +16,7 @@ switch ($_GET['type']) {
     $find = '*.js';
     break;
   default:
+    $find = '*.*';  
     break;
 }
 
