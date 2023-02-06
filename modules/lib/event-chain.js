@@ -3,21 +3,22 @@ import { Guard } from "./guard.js";
 
 export class EventChain {
   #chain;
-  #chainImmediately;
+  #maxChain;
+  #currentChain;
   #index;
   #isNextLink;
   #linkMap;
 
   static #mustFollowWaitLink(name) {
-    throw new Error(`Invalid event chain: '${name}' must follow a 'wait' link.`);
+    throw new TypeError(`Invalid event chain: '${name}' must follow a 'wait' link.`);
   }
 
   /**
-   * @param {boolean} chainImmediately If true, will chain events one after the other if possible,
-   * else will process maximum one link per frame. Defaults to true
+   * @param {Object} options
+   * @param {number?} options.maxChain If set, will chain events immediately up until maxChain. Default is 25.
    */
-  constructor(chainImmediately) {
-    this.#chainImmediately = chainImmediately == null ? true : chainImmediately;
+  constructor({ maxChain } = {}) {
+    this.#maxChain = maxChain == null ? 25 : maxChain;
     this.#chain = [];
     this.#index = 0;
     this.#isNextLink = true;
@@ -201,6 +202,7 @@ export class EventChain {
    * type that can follow 'wait'.
    * @param {number} duration Function to invoke at set interval.
    * @param {() => void} action Function to invoke at set interval.
+   * @throws {TypeError}
    */
   every(duration, action) {
     Guard.isTypeOf({ action }, "function");
@@ -222,8 +224,7 @@ export class EventChain {
   }
 
   /**
-   * Perform an action 'immediately' after the previous link in the event chain. Will be invoked on the
-   * following frame before continuing onto the next link in the event chain.
+   * Perform an action immediately after the previous link in the event chain.
    * @param {() => void} action
    */
   then(action) {
@@ -274,13 +275,14 @@ export class EventChain {
     if (this.#isNextLink) {
       link.handler = link.action();
       this.#isNextLink = false;
-      console.log(link.handler);
     }
     link.handler();
-    if (!this.#chainImmediately || !this.#isNextLink) return;
-    while (this.#isNextLink) {
+
+    if (!this.#maxChain || !this.#isNextLink) return;
+    this.#currentChain = 0;
+    while (this.#isNextLink && this.#currentChain < this.#maxChain) {
       this.update();
-      console.log(this.#isNextLink);
+      this.#currentChain++;
     }
   }
 }
