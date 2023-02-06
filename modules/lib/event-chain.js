@@ -3,6 +3,7 @@ import { Guard } from "./guard.js";
 
 export class EventChain {
   #chain;
+  #chainImmediately;
   #index;
   #isNextLink;
   #linkMap;
@@ -11,7 +12,12 @@ export class EventChain {
     throw new Error(`Invalid event chain: '${name}' must follow a 'wait' link.`);
   }
 
-  constructor() {
+  /**
+   * @param {boolean} chainImmediately If true, will chain events one after the other if possible,
+   * else will process maximum one link per frame. Defaults to true
+   */
+  constructor(chainImmediately) {
+    this.#chainImmediately = chainImmediately == null ? true : chainImmediately;
     this.#chain = [];
     this.#index = 0;
     this.#isNextLink = true;
@@ -270,5 +276,7 @@ export class EventChain {
       this.#isNextLink = false;
     }
     link.handler();
+    if (!this.#chainImmediately) return;
+    while (this.#isNextLink) this.update();
   }
 }

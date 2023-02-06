@@ -42,6 +42,7 @@ export class EntityPaddle extends Entity {
   }
 
   update() {
+    this.chain.update();
     if (!this.game.playing) {
       this.vel.x = 0;
       this.vel.y = 0;
