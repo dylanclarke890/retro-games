@@ -12,7 +12,7 @@ export const StateMachinePlugin = [
     value: function (state) {
       this._currentState = state;
       this._currentUpdate = this["update_" + state];
-      if (typeof this["_on_" + state] === "function") this["on_" + state]();
+      if (typeof this["on_" + state] === "function") this["on_" + state]();
     },
   },
 

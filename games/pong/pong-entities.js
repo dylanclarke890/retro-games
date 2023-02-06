@@ -2,7 +2,6 @@ import { Register } from "../../modules/core/register.js";
 import { Entity } from "../../modules/core/entity.js";
 
 export class EntityBall extends Entity {
-  SPEED_INCREASE = 0.1;
   name = "Ball baby";
   size = { x: 48, y: 48 };
   vel = { x: 100, y: 100 };
@@ -41,6 +40,14 @@ export class EntityPaddle extends Entity {
     this.createAnimationSheet("assets/images/paddle.png");
     this.addAnim("Default", 0.4, [0], true);
   }
+
+  update() {
+    if (!this.game.playing) {
+      this.vel.x = 0;
+      this.vel.y = 0;
+    }
+    super.update();
+  }
 }
 
 export class EntityPaddleCpu extends EntityPaddle {
@@ -50,10 +57,12 @@ export class EntityPaddleCpu extends EntityPaddle {
 
   update() {
     const ball = this.game.getEntitiesByType(EntityBall)[0];
-    this.vel.y =
-      ball.pos.y + ball.size.y / 2 > this.pos.y + this.size.y / 2
-        ? this.paddleSpeed
-        : -this.paddleSpeed;
+    const ballCenter = ball.pos.y + ball.size.y / 2;
+    let newVelY = 0;
+    if (ballCenter < this.pos.y) newVelY = -this.paddleSpeed;
+    else if (ballCenter > this.pos.y + this.size.y) newVelY = this.paddleSpeed;
+    this.vel.y = newVelY;
+
     super.update();
   }
 }
