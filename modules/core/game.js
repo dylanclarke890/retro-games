@@ -22,6 +22,8 @@ export class Game {
   entities = [];
   fonts = {};
   gravity = 0;
+  /** @type {Input} */
+  input;
   namedEntities = {};
   screen = {
     actual: { x: 0, y: 0 },

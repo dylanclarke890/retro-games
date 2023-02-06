@@ -49,6 +49,8 @@ export class Entity {
   collides = Entity.COLLIDES.NEVER;
   slopeStanding = { min: toRad(44), max: toRad(136) };
   killed = false;
+  /** @type {import("./game.js").Game} */
+  game;
 
   get skipCollisionChecks() {
     return (

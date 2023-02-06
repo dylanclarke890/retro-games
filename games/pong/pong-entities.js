@@ -2,17 +2,8 @@ import { Register } from "../../modules/core/register.js";
 import { Entity } from "../../modules/core/entity.js";
 
 class PongEntityBase extends Entity {
-  constructor({ settings, ...rest }) {
-    super({
-      ...rest,
-      settings: {
-        ...settings,
-        fadeInDuration: 1,
-        solidDuration: 1,
-        fadeOutDuration: 1,
-        loopFade: 5,
-      },
-    });
+  constructor(settings) {
+    super(settings);
   }
 }
 
