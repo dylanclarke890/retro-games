@@ -1,7 +1,7 @@
-import { Input } from "../modules/core/input.js";
-import { Font } from "../modules/core/font.js";
-import { Game } from "../modules/core/game.js";
-import { GameRunner } from "../modules/core/runner.js";
+import { Input } from "../../modules/core/input.js";
+import { Font } from "../../modules/core/font.js";
+import { Game } from "../../modules/core/game.js";
+import { GameRunner } from "../../modules/core/runner.js";
 import { level } from "./level.js";
 
 export class PongGame extends Game {
