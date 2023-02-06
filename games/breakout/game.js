@@ -4,30 +4,6 @@ function drawText(text, font, fillStyle, x, y, maxWidth = undefined) {
   ctx.fillText(text, x, y, maxWidth);
 }
 
-function fillEllipse(x, y, w, h, fillStyle) {
-  ctx.beginPath();
-  ctx.moveTo(x, y - h / 2); // A1
-  ctx.bezierCurveTo(
-    x + w / 2,
-    y - h / 2, // C1
-    x + w / 2,
-    y + h / 2, // C2
-    x,
-    y + h / 2
-  ); // A2
-  ctx.bezierCurveTo(
-    x - w / 2,
-    y + h / 2, // C3
-    x - w / 2,
-    y - h / 2, // C4
-    x,
-    y - h / 2
-  ); // A1
-  ctx.fillStyle = fillStyle;
-  ctx.fill();
-  ctx.closePath();
-}
-
 function randXDir() {
   const ran = Math.random();
   return ran > 0.5 ? DIRECTION.LEFT : DIRECTION.RIGHT;
