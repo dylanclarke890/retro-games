@@ -15,13 +15,13 @@ export class Persistence {
         name: "removeEntity",
         value: function (entity) {
           if (!entity.persist || entity._killed) {
-            this.parent(entity);
+            this.base(entity);
             return;
           }
 
           if (!this.persistence.killedEntities) this.persistence.killedEntities = [];
           this.persistence.killedEntities.push(entity);
-          this.parent(entity);
+          this.base(entity);
         },
       },
     ];

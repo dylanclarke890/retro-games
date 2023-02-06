@@ -10,7 +10,7 @@ export class CheatCodes {
       name: "keydown",
       value: function (event) {
         CheatCodes.keydown(event);
-        this.parent(event);
+        this.base(event);
       },
     }).to(Input);
   }

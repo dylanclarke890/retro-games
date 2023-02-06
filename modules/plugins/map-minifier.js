@@ -15,13 +15,13 @@ export class MapMinifier {
     plugin({
       name: "loadResponse",
       value: function (data) {
-        this.parent(data);
+        this.base(data);
       },
     }).to(LevelEditor);
     plugin({
       name: "getSaveData",
       value: function () {
-        const layer = this.parent();
+        const layer = this.base();
         if (!layer.dataCompression) MapMinifier.compressLayer(layer);
         return layer;
       },
@@ -48,7 +48,7 @@ export class MapMinifier {
       name: "loadLevel",
       value: function (level) {
         for (let i = 0; i < level.layer.length; i++) MapMinifier.decompressLayer(level.layer[i]);
-        this.parent(level);
+        this.base(level);
       },
     }).to(Game);
   }
