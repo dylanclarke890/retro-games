@@ -1,5 +1,3 @@
-export class PongGame {}
-
 var PONG = PONG || {};
 
 PONG.Ball = class {

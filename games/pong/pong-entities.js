@@ -1,5 +1,5 @@
-import { Register } from "../modules/core/register.js";
-import { Entity } from "../modules/core/entity.js";
+import { Register } from "../../modules/core/register.js";
+import { Entity } from "../../modules/core/entity.js";
 
 class PongEntityBase extends Entity {
   constructor({ settings, ...rest }) {
