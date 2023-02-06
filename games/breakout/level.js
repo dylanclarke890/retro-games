@@ -2,8 +2,88 @@ export const level = /*JSON-BEGIN*/ {
   "entities": [
     {
       "type": "Brick",
-      "x": 208,
-      "y": 356,
+      "x": 88,
+      "y": 180,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Paddle",
+      "x": 336,
+      "y": 564,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 88,
+      "y": 96,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 88,
+      "y": 124,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 88,
+      "y": 152,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 88,
+      "y": 208,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 176,
+      "y": 96,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 176,
+      "y": 208,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 156,
+      "y": 124,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 140,
+      "y": 152,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 156,
+      "y": 180,
       "settings": {
         
       }
@@ -11,39 +91,11 @@ export const level = /*JSON-BEGIN*/ {
   ],
   "layer": [
     {
-      "name": "collision",
-      "width": 16,
-      "height": 13,
-      "linkWithCollision": false,
-      "visible": true,
-      "tilesetName": "",
-      "repeat": false,
-      "preRender": false,
-      "distance": 1,
-      "tilesize": 48,
-      "foreground": false,
-      "data": [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
-      ]
-    },
-    {
       "name": "new_layer_1",
       "width": 16,
       "height": 13,
       "linkWithCollision": true,
-      "visible": false,
+      "visible": true,
       "tilesetName": "assets/images/shared/block.png",
       "repeat": false,
       "preRender": false,
@@ -66,6 +118,34 @@ export const level = /*JSON-BEGIN*/ {
         [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
       ],
       "tileset": "assets/images/shared/block.png"
+    },
+    {
+      "name": "collision",
+      "width": 16,
+      "height": 13,
+      "linkWithCollision": false,
+      "visible": false,
+      "tilesetName": "",
+      "repeat": false,
+      "preRender": false,
+      "distance": 1,
+      "tilesize": 48,
+      "foreground": false,
+      "data": [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+      ]
     }
   ]
 }; /*JSON-END*/

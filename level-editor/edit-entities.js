@@ -3,6 +3,7 @@ import { $el, $new, loadScript } from "../modules/lib/dom-utils.js";
 
 import { Register } from "../modules/core/register.js";
 import { Game } from "../modules/core/game.js";
+import { removeItem } from "../modules/lib/array-utils.js";
 
 export class EditEntities {
   active = true;
@@ -204,9 +205,9 @@ export class EditEntities {
     return true;
   }
 
-  removeEntity(ent) {
-    if (ent.name) delete this.namedEntities[ent.name];
-    this.entities.erase(ent);
+  removeEntity(entity) {
+    if (entity.name) delete this.namedEntities[entity.name];
+    removeItem(this.entities, entity);
   }
 
   cloneSelectedEntity() {

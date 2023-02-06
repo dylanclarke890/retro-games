@@ -24,8 +24,10 @@ export class Brick extends Entity {
   size = { x: 48, y: 24 };
   constructor(opts) {
     super(opts);
-    this.createAnimationSheet("assets/images/breakout/brick-whole.png");
+    this.createAnimationSheet("assets/images/breakout/brick.png");
     this.addAnim("Default", 0.4, [0], false);
+    this.addAnim("Cracked", 0.4, [1], false);
+    this.addAnim("Broken", 0.4, [2], false);
   }
 }
 
@@ -40,4 +42,8 @@ export class SafetyNetPowerup extends PowerupBase {}
 export class NoCollisionPowerup extends PowerupBase {}
 
 Register.entityTypes(Paddle, Brick, Ball, MultiBallPowerup, SafetyNetPowerup, NoCollisionPowerup);
-Register.preloadImages("assets/images/breakout/paddle.png", "assets/images/shared/ball.png");
+Register.preloadImages(
+  "assets/images/breakout/paddle.png",
+  "assets/images/breakout/brick.png",
+  "assets/images/shared/ball.png"
+);
