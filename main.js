@@ -1,8 +1,9 @@
 import { GameRunner } from "./modules/core/runner.js";
+import { BreakoutGame } from "./games/breakout/game.js";
 
 new GameRunner({
   canvasId: "play-area",
-  gameClass: PongGame,
+  gameClass: BreakoutGame,
   fps: 60,
   width: 768,
   height: 624,
