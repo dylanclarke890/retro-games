@@ -20,18 +20,13 @@ export class PongGame extends Game {
   draw() {
     super.draw();
     /** Extra draw logic goes here. */
-    const { offsetWidth } = this.system.canvas;
-    this.fonts.standard.write(
-      `${this.score.player} - ${this.score.opponent}`,
-      offsetWidth / 2,
-      150,
-      {
-        align: Font.ALIGN.CENTER,
-        alpha: 1,
-        color: "green",
-        size: 80,
-      }
-    );
+    const { width } = this.system;
+    this.fonts.standard.write(`${this.score.player} - ${this.score.opponent}`, width / 2, 150, {
+      align: Font.ALIGN.CENTER,
+      alpha: 1,
+      color: "green",
+      size: 80,
+    });
   }
 
   update() {

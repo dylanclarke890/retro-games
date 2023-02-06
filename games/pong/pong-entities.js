@@ -19,7 +19,7 @@ export class EntityBall extends Entity {
 
   collideWith(other) {
     super.collideWith(other);
-    this.hitSound.play();
+    // this.hitSound.play(); uncomment to play sound
   }
 }
 
