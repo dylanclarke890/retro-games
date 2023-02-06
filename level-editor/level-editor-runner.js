@@ -1,10 +1,10 @@
-import { $new } from "../lib/dom-utils.js";
-import { plugin } from "../lib/inject.js";
+import { $new } from "../modules/lib/dom-utils.js";
+import { plugin } from "../modules/lib/inject.js";
 
-import { System } from "../core/system.js";
-import { GameImage } from "../core/image.js";
-import { SoundManager } from "../core/sound.js";
-import { MediaFactory } from "../core/media-factory.js";
+import { System } from "../modules/core/system.js";
+import { GameImage } from "../modules/core/image.js";
+import { SoundManager } from "../modules/core/sound.js";
+import { MediaFactory } from "../modules/core/media-factory.js";
 
 import { LevelEditorHttpClient } from "./http-client.js";
 import { EventedInput } from "./evented-input.js";

@@ -1,4 +1,4 @@
-import { Guard } from "../lib/guard.js";
+import { Guard } from "../modules/lib/guard.js";
 
 export class Undo {
   static TYPE = {

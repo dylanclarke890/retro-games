@@ -1,6 +1,6 @@
-import { Guard } from "../lib/guard.js";
-import { $new, $el, getInnerHeight, getInnerWidth } from "../lib/dom-utils.js";
-import { slideUp, slideDown } from "../lib/ui-effects.js";
+import { Guard } from "../modules/lib/guard.js";
+import { $new, $el, getInnerHeight, getInnerWidth } from "../modules/lib/dom-utils.js";
+import { slideUp, slideDown } from "../modules/lib/ui-effects.js";
 
 export class SelectFileDropdown {
   boundShow = null;

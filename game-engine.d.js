@@ -37,19 +37,19 @@
 
 //#region LEVEL-EDITOR
 
-/// <reference path="modules/level-editor/jQuery/jquery-1.7.1.min.js"/>
-/// <reference path="modules/level-editor/jQuery/jquery-ui-1.8.1.custom.min.js"/>
-/// <reference path="modules/level-editor/config.js"/>
-/// <reference path="modules/level-editor/edit-entities.js"/>
-/// <reference path="modules/level-editor/edit-map.js"/>
-/// <reference path="modules/level-editor/evented-input.js"/>
-/// <reference path="modules/level-editor/http-client.js"/>
-/// <reference path="modules/level-editor/level-editor-runner.js"/>
-/// <reference path="modules/level-editor/level-editor.js"/>
-/// <reference path="modules/level-editor/modal-dialogs.js"/>
-/// <reference path="modules/level-editor/select-file-dropdown.js"/>
-/// <reference path="modules/level-editor/tile-select.js"/>
-/// <reference path="modules/level-editor/undo.js"/>
+/// <reference path="level-editor/jQuery/jquery-1.7.1.min.js"/>
+/// <reference path="level-editor/jQuery/jquery-ui-1.8.1.custom.min.js"/>
+/// <reference path="level-editor/config.js"/>
+/// <reference path="level-editor/edit-entities.js"/>
+/// <reference path="level-editor/edit-map.js"/>
+/// <reference path="level-editor/evented-input.js"/>
+/// <reference path="level-editor/http-client.js"/>
+/// <reference path="level-editor/level-editor-runner.js"/>
+/// <reference path="level-editor/level-editor.js"/>
+/// <reference path="level-editor/modal-dialogs.js"/>
+/// <reference path="level-editor/select-file-dropdown.js"/>
+/// <reference path="level-editor/tile-select.js"/>
+/// <reference path="level-editor/undo.js"/>
 
 //#endregion LEVEL-EDITOR
 

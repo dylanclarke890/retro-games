@@ -1,4 +1,4 @@
-import { Input } from "../core/input.js";
+import { Input } from "../modules/core/input.js";
 
 export class EventedInput extends Input {
   delayedKeyup = { push: function () {}, length: 0 };

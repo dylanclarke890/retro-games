@@ -1,11 +1,11 @@
-import { $new, $el } from "../lib/dom-utils.js";
-import { Guard } from "../lib/guard.js";
+import { $new, $el } from "../modules/lib/dom-utils.js";
+import { toInt } from "../modules/lib/number-utils.js";
+import { Guard } from "../modules/lib/guard.js";
 
-import { GameImage } from "../core/image.js";
-import { BackgroundMap } from "../core/map.js";
+import { GameImage } from "../modules/core/image.js";
+import { BackgroundMap } from "../modules/core/map.js";
 
 import { TileSelect } from "./tile-select.js";
-import { toInt } from "../lib/number-utils.js";
 
 export class EditMap extends BackgroundMap {
   name = "";

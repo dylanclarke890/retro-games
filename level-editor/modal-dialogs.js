@@ -1,6 +1,6 @@
-import { $new } from "../lib/dom-utils.js";
-import { Guard } from "../lib/guard.js";
-import { fadeOut, fadeIn } from "../lib/ui-effects.js";
+import { $new } from "../modules/lib/dom-utils.js";
+import { Guard } from "../modules/lib/guard.js";
+import { fadeOut, fadeIn } from "../modules/lib/ui-effects.js";
 import { SelectFileDropdown } from "./select-file-dropdown.js";
 
 export class ModalDialog {
