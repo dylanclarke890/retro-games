@@ -284,6 +284,8 @@ export class EventChain {
     while (this.#isNextLink && this.#currentChain < this.#maxChain) {
       this.update();
       this.#currentChain++;
+      if (this.#currentChain === this.#maxChain)
+        console.debug("EventChain: Exceeded max chain count.");
     }
   }
 }

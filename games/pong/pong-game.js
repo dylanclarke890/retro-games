@@ -39,8 +39,7 @@ export class PongGame extends Game {
         this.score.player = 0;
         this.score.opponent = 0;
       })
-      .waitUntil(() => ball.pos.x + ball.size.x < 0)
-      .orUntil(() => ball.pos.x - ball.size.x > this.system.width)
+      .waitUntil(() => ball.pos.x + ball.size.x < 0 || ball.pos.x - ball.size.x > this.system.width)
       .every(3, () => {
         const s = this.SPEED_INCREASE;
         ball.vel.x += ball.vel.x * s;
