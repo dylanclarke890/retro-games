@@ -2,6 +2,7 @@ import { Entity } from "../../modules/core/entity.js";
 import { Register } from "../../modules/core/register.js";
 
 export class Paddle extends Entity {
+  size = { x: 72, y: 16 };
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/ball.png");
@@ -10,6 +11,7 @@ export class Paddle extends Entity {
 }
 
 export class Ball extends Entity {
+  size = { x: 48, y: 48 };
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/ball.png");
@@ -19,6 +21,7 @@ export class Ball extends Entity {
 }
 
 export class Brick extends Entity {
+  size = { x: 48, y: 24 };
   constructor(opts) {
     super(opts);
   }
