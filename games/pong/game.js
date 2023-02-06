@@ -4,7 +4,7 @@ import { Game } from "../../modules/core/game.js";
 import { GameRunner } from "../../modules/core/runner.js";
 import { level } from "./level.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
-import { EntityBall, EntityPaddle } from "./pong-entities.js";
+import { EntityBall, EntityPaddle } from "./entities.js";
 
 export class PongGame extends Game {
   SPEED_INCREASE = 0.1;

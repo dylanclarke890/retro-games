@@ -1,8 +1,8 @@
 // #region GAMES
 
 /// <reference path="games/pong/level.js"/>
-/// <reference path="games/pong/pong-entities.js"/>
-/// <reference path="games/pong/pong-game.js"/>
+/// <reference path="games/pong/entities.js"/>
+/// <reference path="games/pong/game.js"/>
 
 // #endregion GAMES
 
