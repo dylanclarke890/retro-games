@@ -16,7 +16,7 @@ export class EntityBall extends Entity {
       pos: { ...this.pos },
       vel: { ...this.vel },
     };
-    this.createAnimationSheet("assets/images/ball.png");
+    this.createAnimationSheet("assets/images/pong/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
   }
 
@@ -37,7 +37,7 @@ export class EntityPaddle extends Entity {
   paddleSpeed = 150;
   constructor(opts) {
     super(opts);
-    this.createAnimationSheet("assets/images/paddle.png");
+    this.createAnimationSheet("assets/images/pong/paddle.png");
     this.addAnim("Default", 0.4, [0], true);
   }
 
