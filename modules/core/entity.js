@@ -42,10 +42,15 @@ export class Entity {
   bounciness = 0;
   minBounceVelocity = 40;
   anims = {};
+  /** @type {import("./animation.js").GameAnimationSheet} */
   animSheet = null;
+  /** @type {GameAnimation} */
   currentAnim = null;
+  /** @type {keyof Entity.TYPE} */
   type = Entity.TYPE.NONE;
+  /** @type {keyof Entity.TYPE} */
   checkAgainst = Entity.TYPE.NONE;
+  /** @type {keyof Entity.COLLIDES} */
   collides = Entity.COLLIDES.NEVER;
   slopeStanding = { min: toRad(44), max: toRad(136) };
   killed = false;
@@ -182,11 +187,17 @@ export class Entity {
     this.game.removeEntity(this);
   }
 
+  /**
+   * @param {number} amount
+   */
   receiveDamage(amount) {
     this.health -= amount;
     if (this.health <= 0) this.kill();
   }
 
+  /**
+   * @param {Entity} other
+   */
   touches(other) {
     return !(
       this.pos.x >= other.pos.x + other.size.x ||
@@ -196,12 +207,18 @@ export class Entity {
     );
   }
 
+  /**
+   * @param {Entity} other
+   */
   distanceTo(other) {
     const xd = this.pos.x + this.size.x / 2 - (other.pos.x + other.size.x / 2);
     const yd = this.pos.y + this.size.y / 2 - (other.pos.y + other.size.y / 2);
     return Math.sqrt(xd * xd + yd * yd);
   }
 
+  /**
+   * @param {Entity} other
+   */
   angleTo(other) {
     return Math.atan2(
       other.pos.y + other.size.y / 2 - (this.pos.y + this.size.y / 2),
@@ -209,6 +226,9 @@ export class Entity {
     );
   }
 
+  /**
+   * @param {Entity} other
+   */
   checkWith(other) {
     // Do these entities want checks?
     if (this.checkAgainst & other.type) this.check(other);
@@ -219,6 +239,10 @@ export class Entity {
       this.solveCollision(this, other);
   }
 
+  /**
+   * @param {Entity} a
+   * @param {Entity} b
+   */
   solveCollision(a, b) {
     // If one entity is FIXED, or the other entity is LITE, the weak
     // (FIXED/NON-LITE) entity won't move in collision response

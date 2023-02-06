@@ -1,27 +1,22 @@
 import { Register } from "../../modules/core/register.js";
 import { Entity } from "../../modules/core/entity.js";
 
-class PongEntityBase extends Entity {
-  constructor(settings) {
-    super(settings);
-  }
-}
-
-export class EntityBall extends PongEntityBase {
+export class EntityBall extends Entity {
   name = "Ball baby";
   size = { x: 48, y: 48 };
   vel = { x: 250, y: 100 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
-  hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
+
   constructor(opts) {
     super(opts);
+    this.hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
     this.createAnimationSheet("assets/images/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
   }
 }
 
-export class EntityPaddle extends PongEntityBase {
+export class EntityPaddle extends Entity {
   name = "Paddle";
   size = { x: 64, y: 128 };
   collides = Entity.COLLIDES.FIXED;

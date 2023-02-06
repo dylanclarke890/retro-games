@@ -16,10 +16,15 @@ export class Game {
   #sortBy = Game.SORT.Z_INDEX;
 
   backgroundAnims = {};
+  /** @type {BackgroundMap[]} */
   backgroundMaps = [];
   clearColor = "#000000";
+  /** @type {CollisionMap} */
   collisionMap = CollisionMap.staticNoCollision;
+  /** @type {Entity[]} */
   entities = [];
+  /** @type {import("./media-factory.js").MediaFactory} */
+  media;
   fonts = {};
   gravity = 0;
   /** @type {Input} */
