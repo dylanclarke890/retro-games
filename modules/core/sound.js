@@ -29,7 +29,7 @@ export class SoundManager {
     // Probe sound formats and determine the file extension to load
     const probe = new Audio();
     for (let i = 0; i < Sound.use.length; i++) {
-      const format = Sound.use[i];
+      const format = Sound.FORMAT[Sound.use[i]];
       if (!probe.canPlayType(format.mime)) continue;
       this.#format = format;
       break;
@@ -156,7 +156,8 @@ export class SoundManager {
 }
 
 export class GameAudio {
-  soundManager = null;
+  /** @type {SoundManager} */
+  soundManager;
 
   constructor({ soundManager }) {
     Guard.againstNull({ soundManager });

@@ -54,18 +54,30 @@ export class MediaFactory {
     return asset;
   }
 
+  /**
+   * @returns {Font} 
+   */
   createFont({ path, name } = {}) {
     return this.#createAsset(path, { name }, "font");
   }
 
+  /**
+   * @returns {GameAnimationSheet} 
+   */
   createAnimationSheet({ path, size }) {
     return this.#createAsset(path, { size, mediaFactory: this }, "animation");
   }
 
+  /**
+   * @returns {Sound}
+   */
   createSound({ path, multiChannel = false }) {
     return this.#createAsset(path, { multiChannel }, "sound");
   }
 
+  /**
+   * @returns {GameImage}
+   */
   createImage({ path, ...data }) {
     return this.#createAsset(path, data, "image");
   }

@@ -57,6 +57,7 @@ export class Entity {
   /** @type {import("./game.js").Game} */
   game;
 
+
   get skipCollisionChecks() {
     return (
       this.type === Entity.TYPE.NONE &&
@@ -139,6 +140,9 @@ export class Entity {
     return constrain(vel, -max, max);
   }
 
+  /**
+   * @param {MovementTrace} res
+   */
   handleMovementTrace(res) {
     this.standing = false;
     if (res.collision.y) this.handleMapCollisionOnYAxis();
@@ -396,4 +400,25 @@ export class Entity {
   ready() {}
   erase() {}
 }
+
+/**
+ * @typedef {Object} CollisionState
+ * @property {boolean} x
+ * @property {boolean} y
+ * @property {boolean} slope
+ */
+
+/**
+ * @typedef {Object} Position2D
+ * @property {number} x
+ * @property {number} y
+ */
+
+/**
+ * @typedef {Object} MovementTrace
+ * @property {CollisionState} collision
+ * @property {Position2D} pos
+ * @property {Position2D} tile
+ */
+
 Register.entityType(Entity);
