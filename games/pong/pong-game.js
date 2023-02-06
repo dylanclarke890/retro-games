@@ -63,7 +63,8 @@ export class PongGame extends Game {
       .thenUntil(
         () => this.playing,
         () => this.drawGameOver()
-      );
+      )
+      .repeat();
   }
 
   draw() {

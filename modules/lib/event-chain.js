@@ -274,9 +274,13 @@ export class EventChain {
     if (this.#isNextLink) {
       link.handler = link.action();
       this.#isNextLink = false;
+      console.log(link.handler);
     }
     link.handler();
-    if (!this.#chainImmediately) return;
-    while (this.#isNextLink) this.update();
+    if (!this.#chainImmediately || !this.#isNextLink) return;
+    while (this.#isNextLink) {
+      this.update();
+      console.log(this.#isNextLink);
+    }
   }
 }
