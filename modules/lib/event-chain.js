@@ -31,6 +31,18 @@ export class EventChain {
         for (let i = 0; i < callbacks.length; i++) callbacks[i]();
       };
     },
+    waitUntil: (predicate) => {
+      const key = this.#index;
+      this.#linkMap.get(key).predicates.push(predicate);
+      return () => {
+        const { predicates, callbacks } = this.#linkMap.get(key);
+        if (predicates.some((check) => check())) {
+          this.#nextLink();
+          return;
+        }
+        for (let i = 0; i < callbacks.length; i++) callbacks[i]();
+      };
+    },
     orUntil: (predicate) => {
       const waitLink = this.#linkMap.get(this.#chain.length - 1);
       if (!waitLink?.isWaitLink) EventChain.#mustFollowWaitLink("orUntil");
@@ -50,12 +62,6 @@ export class EventChain {
       const waitLink = this.#linkMap.get(this.#chain.length - 1);
       if (!waitLink?.isWaitLink) EventChain.#mustFollowWaitLink("whilst");
       waitLink.callbacks.push(action);
-    },
-    waitUntil: (predicate) => {
-      return () => {
-        if (!predicate()) return;
-        this.#nextLink();
-      };
     },
     then: (action) => {
       return () => {
@@ -121,6 +127,7 @@ export class EventChain {
 
   /**
    * Wait a period of time before continuing to the next link in the event chain.
+   * Can be extended with 'orUntil', 'every' and 'whilst' links.
    * @param {number} duration Amount of time to wait in seconds.
    */
   wait(duration) {
@@ -136,9 +143,25 @@ export class EventChain {
   }
 
   /**
+   * Wait until a predicate returns true before continuing to the next link in the event chain.
+   * Can be extended with 'orUntil', 'every' and 'whilst' links.
+   * @param {() => boolean} predicate
+   */
+  waitUntil(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
+    this.#linkMap.set(this.#chain.length, {
+      predicates: [],
+      callbacks: [],
+      isWaitLink: true,
+    });
+    this.#createLink(() => this.#actions.waitUntil(predicate));
+    return this;
+  }
+
+  /**
    * Breaks out of the previous 'wait' link and proceeds to the next link in the event chain
    * if a predicate returns true. Throws an error if the previous link in the event chain is not
-   * 'wait' or another link type that can follow 'wait'.
+   * 'wait', 'waitUntil' or another link type that can follow 'wait'.
    * @param {() => boolean} predicate
    */
   orUntil(predicate) {
@@ -170,16 +193,6 @@ export class EventChain {
   whilst(action) {
     Guard.isTypeOf({ action }, "function");
     this.#actions.whilst(action);
-    return this;
-  }
-
-  /**
-   * Wait until a predicate returns true before continuing to the next link in the event chain.
-   * @param {() => boolean} predicate
-   */
-  waitUntil(predicate) {
-    Guard.isTypeOf({ predicate }, "function");
-    this.#createLink(() => this.#actions.waitUntil(predicate));
     return this;
   }
 
