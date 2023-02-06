@@ -1,25 +1,39 @@
 import { Register } from "../../modules/core/register.js";
 import { Entity } from "../../modules/core/entity.js";
+import { EventChain } from "../../modules/lib/event-chain.js";
 
 export class EntityBall extends Entity {
+  SPEED_INCREASE = 0.1;
   name = "Ball baby";
   size = { x: 48, y: 48 };
-  vel = { x: 250, y: 100 };
+  vel = { x: 100, y: 100 };
+  maxVel = { x: 500, y: 500 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
-  hitSound;
+  hitSound = this.game.media.createSound({ path: "assets/sounds/collision.mp3" });
 
   constructor(opts) {
     super(opts);
-
-    this.hitSound = this.game.media.createSound({ path: "assets/sounds/collision.mp3" });
     this.createAnimationSheet("assets/images/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
+    this.chain = new EventChain()
+      .wait(3)
+      .then(() => {
+        const { x, y } = this.vel;
+        const s = this.SPEED_INCREASE;
+        this.vel = { x: x + x * s, y: y + y * s };
+      })
+      .repeat();
   }
 
   collideWith(other) {
     super.collideWith(other);
-    // this.hitSound.play(); uncomment to play sound
+    // this.hitSound.play(); uncomment later to play sound
+  }
+
+  update() {
+    this.chain.update();
+    super.update();
   }
 }
 
