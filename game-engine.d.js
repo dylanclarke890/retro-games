@@ -1,3 +1,11 @@
+// #region GAMES
+
+/// <reference path="games/pong/level.js"/>
+/// <reference path="games/pong/pong-entities.js"/>
+/// <reference path="games/pong/pong-game.js"/>
+
+// #endregion GAMES
+
 // #region CORE
 
 /// <reference path="modules/core/animation.js"/>
@@ -23,14 +31,6 @@
 /// <reference path="modules/debug/debug.js"/>
 
 // #endregion DEBUG
-
-// #region EXAMPLE
-
-/// <reference path="example/my-game.js"/>
-/// <reference path="example/pong-entities.js"/>
-/// <reference path="example/level.js"/>
-
-// #endregion EXAMPLE
 
 //#region LEVEL-EDITOR
 
