@@ -455,7 +455,7 @@ input#toggleSidebar {
   width: 200px;
   height: 47px;
   text-indent: -99999px;
-  background: url(../images/arrow.png) 50% -37px no-repeat;
+  background: url(../images/level-editor/arrow.png) 50% -37px no-repeat;
   transition: 0s linear;
   -webkit-transition: 0s linear;
   opacity: 0.25;

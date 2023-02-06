@@ -3,7 +3,7 @@ export const levelEditorConfig = {
     /** Takes an array of glob regexes which specify where to load entities from.
      *  Can be individual files or entire directories.
      *  @example 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/laser.js'] */
-    entityFiles: ["example/pong-entities.js"],
+    entityFiles: ["games/breakout/entities.js"],
     /** Default path for the level file selection box. */
     levelPath: "example",
     /** True to prettify the JSON saved to file. */
@@ -69,7 +69,7 @@ export const levelEditorConfig = {
    *  The tilesize only specifies the size in the image - resizing to final
    *  size for each layer happens in level editor. */
   collisionTiles: {
-    path: "assets/images/collisiontiles-64.png",
+    path: "assets/images/level-editor/collisiontiles-64.png",
     tilesize: 64,
   },
 };

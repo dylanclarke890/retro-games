@@ -77,5 +77,6 @@ export class EntityPaddlePlayer extends EntityPaddle {
 }
 
 Register.entityTypes(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);
-Register.preloadImages("assets/images/paddle.png", "assets/images/ball.png");
+const imagesPrefix = "assets/images/pong/";
+Register.preloadImages(`${imagesPrefix}paddle.png`, `${imagesPrefix}ball.png`);
 Register.preloadSounds("assets/sounds/collision.mp3");
