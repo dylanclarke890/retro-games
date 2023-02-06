@@ -24,6 +24,8 @@ export class Brick extends Entity {
   size = { x: 48, y: 24 };
   constructor(opts) {
     super(opts);
+    this.createAnimationSheet("assets/images/breakout/brick-whole.png");
+    this.addAnim("Default", 0.4, [0], false);
   }
 }
 
