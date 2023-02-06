@@ -16,7 +16,7 @@ export class EntityBall extends Entity {
       pos: { ...this.pos },
       vel: { ...this.vel },
     };
-    this.createAnimationSheet("assets/images/pong/ball.png");
+    this.createAnimationSheet("assets/images/shared/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
   }
 
@@ -77,6 +77,5 @@ export class EntityPaddlePlayer extends EntityPaddle {
 }
 
 Register.entityTypes(EntityBall, EntityPaddleCpu, EntityPaddlePlayer);
-const imagesPrefix = "assets/images/pong/";
-Register.preloadImages(`${imagesPrefix}paddle.png`, `${imagesPrefix}ball.png`);
+Register.preloadImages("assets/images/pong/paddle.png", "assets/images/shared/ball.png");
 Register.preloadSounds("assets/sounds/collision.mp3");
