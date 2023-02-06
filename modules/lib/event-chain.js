@@ -133,6 +133,7 @@ export class EventChain {
     for (const [key, { totalRepeats }] of this.#linkMap.entries())
       if (totalRepeats != null && key < currentStep)
         this.#linkMap.set(key, { totalRepeats, repeatsLeft: totalRepeats });
+      else break;
   }
 
   /**
