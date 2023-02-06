@@ -61,7 +61,6 @@
 /// <reference path="modules/lib/inject.js"/>
 /// <reference path="modules/lib/mixin.js"/>
 /// <reference path="modules/lib/number-utils.js"/>
-/// <reference path="modules/lib/polyfills.js"/>
 /// <reference path="modules/lib/string-utils.js"/>
 /// <reference path="modules/lib/timer.js"/>
 /// <reference path="modules/lib/ui-effects.js"/>

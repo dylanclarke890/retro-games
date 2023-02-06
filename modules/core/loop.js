@@ -1,5 +1,4 @@
 import { $el } from "../lib/dom-utils.js";
-import { caf, raf } from "../lib/polyfills.js";
 import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
 
@@ -30,8 +29,8 @@ export class GameLoop {
   }
 
   main(timestamp) {
-    if (this.stopped) return caf(this.rafId);
-    this.rafId = raf((t) => this.main(t));
+    if (this.stopped) return cancelAnimationFrame(this.rafId);
+    this.rafId = requestAnimationFrame((t) => this.main(t));
 
     Timer.step();
     this.runner.system.tick = this.clock.tick();
