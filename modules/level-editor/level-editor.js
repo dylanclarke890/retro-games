@@ -1,4 +1,3 @@
-import { raf, caf } from "../lib/polyfills.js";
 import { constrain } from "../lib/number-utils.js";
 import { formatAsJSON } from "../lib/string-utils.js";
 import { $el } from "../lib/dom-utils.js";
@@ -832,7 +831,7 @@ export class LevelEditor {
 
   // eslint-disable-next-line no-unused-vars
   drawIfNeeded(_timestamp) {
-    this.#rafId = raf((t) => this.drawIfNeeded(t));
+    this.#rafId = requestAnimationFrame((t) => this.drawIfNeeded(t));
     if (!this.needsDraw) return; // Only draw if flag is set
     this.needsDraw = false;
     this.system.clear(this.config.colors.clear);
@@ -862,7 +861,7 @@ export class LevelEditor {
   }
 
   stopDrawing() {
-    caf(this.#rafId);
+    cancelAnimationFrame(this.#rafId);
     this.needsDraw = false;
   }
 

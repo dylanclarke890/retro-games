@@ -1,4 +1,3 @@
-import { caf, raf } from "../lib/polyfills.js";
 import { Timer } from "../lib/timer.js";
 
 export const FixedTickPlugin = {
@@ -16,9 +15,9 @@ export const FixedTickPlugin = {
     {
       name: "main",
       value: function (timestamp) {
-        if (this.stopped) return caf(this.rafId);
+        if (this.stopped) return cancelAnimationFrame(this.rafId);
 
-        this.rafId = raf((t) => this.main(t));
+        this.rafId = requestAnimationFrame((t) => this.main(t));
         // Track the accumulated time that hasn't been simulated yet
         this._delta += timestamp - this._lastRun;
         this._lastRun = timestamp;

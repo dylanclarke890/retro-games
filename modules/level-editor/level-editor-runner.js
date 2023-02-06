@@ -1,5 +1,5 @@
 import { $new } from "../lib/dom-utils.js";
-import { plug } from "../lib/inject.js";
+import { plugin } from "../lib/inject.js";
 
 import { System } from "../core/system.js";
 import { GameImage } from "../core/image.js";
@@ -101,7 +101,7 @@ export class LevelEditorRunner {
         this.scaleCache["x" + scale] = this.data;
       },
     };
-    plug(imageOverrides).into(GameImage);
+    plugin(imageOverrides).to(GameImage);
   }
 }
 
