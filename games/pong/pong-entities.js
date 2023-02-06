@@ -10,7 +10,7 @@ export class EntityBall extends Entity {
 
   constructor(opts) {
     super(opts);
-    this.hitSound = this.game.media.createSound({ path: "assets/sounds/hit.m4a" });
+    this.hitSound = this.game.media.createSound({ path: "assets/sounds/collision.mp3" });
     this.createAnimationSheet("assets/images/ball.png");
     this.addAnim("Default", 0.4, [0, 1], false);
   }
