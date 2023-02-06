@@ -128,7 +128,7 @@ export class EventChain {
     this.#isNextLink = true;
   }
 
-  /** Reset the counters of any repeat steps before this one. */
+  /** Reset the counters of any repeat links before this one. */
   #resetRepeatLinks(currentStep) {
     for (const [key, { totalRepeats }] of this.#linkMap.entries())
       if (totalRepeats != null && key < currentStep)
