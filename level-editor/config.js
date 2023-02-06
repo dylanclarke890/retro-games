@@ -5,7 +5,7 @@ export const levelEditorConfig = {
      *  @example 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/laser.js'] */
     entityFiles: ["games/breakout/entities.js"],
     /** Default path for the level file selection box. */
-    levelPath: "example",
+    levelPath: "games/breakout",
     /** True to prettify the JSON saved to file. */
     prettyPrint: true,
   },
