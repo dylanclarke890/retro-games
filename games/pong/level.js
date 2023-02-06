@@ -25,7 +25,7 @@ export const level = /*JSON-BEGIN*/ {
       width: 16,
       height: 13,
       visible: true,
-      tilesetName: "assets/images/block.png",
+      tilesetName: "assets/images/shared/block.png",
       repeat: false,
       preRender: false,
       distance: 1,
@@ -46,7 +46,7 @@ export const level = /*JSON-BEGIN*/ {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       ],
-      tileset: "assets/images/block.png",
+      tileset: "assets/images/shared/block.png",
     },
     {
       name: "collision",
