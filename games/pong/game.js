@@ -1,7 +1,6 @@
 import { Input } from "../../modules/core/input.js";
 import { Font } from "../../modules/core/font.js";
 import { Game } from "../../modules/core/game.js";
-import { GameRunner } from "../../modules/core/runner.js";
 import { level } from "./level.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
 import { EntityBall, EntityPaddle } from "./entities.js";
@@ -118,16 +117,3 @@ export class PongGame extends Game {
     });
   }
 }
-
-new GameRunner({
-  canvasId: "play-area",
-  gameClass: PongGame,
-  fps: 60,
-  width: 768,
-  height: 624,
-  debugMode: false,
-  fonts: {
-    standard: "assets/fonts/arcade-classic.TTF",
-    freedom: "assets/fonts/freedom.ttf",
-  },
-});
