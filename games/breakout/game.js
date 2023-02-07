@@ -24,14 +24,16 @@ export class BreakoutGame extends Game {
         ball.vel.y += ball.vel.y * 0.1;
       })
       .then(() => {
-        if (this.getEntitiesByType(Brick).length === 0) this.won = true;
+        if (this.getEntitiesByType(Brick).length === 0) {
+          this.won = true;
+          this.playing = false;
+        }
       })
       .thenUntil(
         () => this.playing,
         () => this.displayLevelOverMessage()
       );
   }
-
   update() {
     super.update();
     if (!this.playing) {

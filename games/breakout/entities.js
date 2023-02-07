@@ -55,9 +55,9 @@ export class Brick extends Entity {
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/brick.png");
+    this.addAnim("Broken", 0.4, [2], false);
     this.addAnim("Default", 0.4, [0], false);
     this.addAnim("Cracked", 0.4, [1], false);
-    this.addAnim("Broken", 0.4, [2], false);
   }
 
   collideWith() {
