@@ -10,16 +10,8 @@ export const level2 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Brick",
-      "x": 256,
-      "y": 348,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 404,
-      "y": 420,
+      "x": 312,
+      "y": 416,
       "settings": {
         
       }
@@ -28,14 +20,6 @@ export const level2 = /*JSON-BEGIN*/ {
       "type": "Ball",
       "x": 308,
       "y": 524,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 348,
-      "y": 340,
       "settings": {
         
       }

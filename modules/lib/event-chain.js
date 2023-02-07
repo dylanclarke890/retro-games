@@ -309,7 +309,10 @@ export class EventChain {
 
   #invokeCurrentLinkHandler() {
     const link = this.#chain[this.#index];
-    if (!link || this.stopped) return;
+    if (!link || this.stopped) {
+      this.stopped = true;
+      return;
+    }
     if (this.#isNextLink) {
       link.handler = link.action();
       this.#isNextLink = false;
@@ -318,14 +321,12 @@ export class EventChain {
   }
 
   #chainLinkUpdates() {
+    this.#currentChain++;
     // if chaining disabled or chain condition not met or already chaining or stopped
-    if (!this.#maxChain || !this.#isNextLink || this.#currentChain > 0 || this.stopped) {
-      this.#currentChain = 0;
-      return;
-    }
+    if (!this.#maxChain || !this.#isNextLink || this.#currentChain > 0 || this.stopped) return;
+
     while (this.#isNextLink && this.#currentChain < this.#maxChain) {
       this.update();
-      this.#currentChain++;
       if (this.#currentChain === this.#maxChain)
         console.debug("EventChain: Exceeded max chain count.");
     }

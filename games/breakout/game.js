@@ -1,46 +1,82 @@
 import { Game } from "../../modules/core/game.js";
 import { Input } from "../../modules/core/input.js";
+import { removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
-import { Ball, Brick, GameHud } from "./entities.js";
-
-import { level } from "./level.js";
+import { Ball, Brick, GameHud, Paddle } from "./entities.js";
+import { level1 } from "./level-1.js";
+import { level2 } from "./level-2.js";
 
 export class BreakoutGame extends Game {
   playing = false;
+  currentLevel;
+  initialBallVel = { x: 300, y: -300 };
+  currentSpeedIncrease = 0;
+  ballSpeedIncrease = 0.1;
+  static levels = [level1, level2];
 
   constructor(opts) {
     super(opts);
-    this.loadLevel(level);
-    this.spawnEntity(GameHud, 0, 0, {});
+    this.currentLevel = 1;
+
+    this.loadLevel(BreakoutGame.levels[this.currentLevel]);
+    const hud = this.spawnEntity(GameHud, 0, 0, {});
+
     this.input.bind(Input.KEY.SPACE, "play");
     this.input.bind(Input.KEY.LEFT_ARROW, "left");
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
-    const ball = this.getEntitiesByType(Ball)[0];
+    const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
+
     this.chain = new EventChain()
       .waitUntil(() => this.playing)
-      .then(() => (ball.vel = { ...ball.initialVel }))
+      .then(() => {
+        const ball = this.getEntitiesByType(Ball)[0];
+        ball.vel = { ...this.initialBallVel };
+      })
       .waitUntil(() => this.getEntitiesByType(Brick).length === 0)
-      .orUntil(() => ball.killed === true)
+      .orUntil(() => this.getEntitiesByType(Ball).length === 0)
+      .whilst(() => {
+        const balls = this.getEntitiesByType(Ball);
+        const { height } = this.system;
+        for (let i = 0; i < balls.length; i++) {
+          const ball = balls[i];
+          if (ball.pos.y + ball.size.y > height) ball.kill();
+        }
+      })
       .every(2, () => {
-        ball.vel.x += ball.vel.x * 0.1;
-        ball.vel.y += ball.vel.y * 0.1;
+        const balls = this.getEntitiesByType(Ball);
+        for (let i = 0; i < balls.length; i++) {
+          const ball = balls[i];
+          ball.vel.x += ball.vel.x * this.ballSpeedIncrease;
+          ball.vel.y += ball.vel.y * this.ballSpeedIncrease;
+        }
       })
       .then(() => {
         if (this.getEntitiesByType(Brick).length === 0) {
-          this.won = true;
           this.playing = false;
+          hud.won = true;
+          hud.showEndGameMessage = true;
+        } else if (this.getEntitiesByType(Ball).length === 0) {
+          this.playing = false;
+          if (hud.lifeEntities.length) {
+            const entity = hud.lifeEntities[hud.lifeEntities.length - 1];
+            entity.kill();
+            removeItem(hud.lifeEntities, entity);
+          }
+          this.getEntitiesByType(Paddle)[0].resetPosition();
+          this.spawnEntity(Ball, initialBallPos.x, initialBallPos.y);
         }
+      })
+      .repeatUntil(() => --hud.lives < 0)
+      .then(() => {
+        this.playing = false;
+        hud.won = false;
+        hud.showEndGameMessage = true;
       });
   }
 
   update() {
     super.update();
-    if (!this.playing) {
-      if (this.input.state("play")) {
-        this.playing = true;
-        this.won = false;
-      }
-    }
+    if (!this.playing) if (this.input.state("play")) this.playing = true;
     this.chain.update();
   }
 }

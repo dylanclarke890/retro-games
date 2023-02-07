@@ -36,6 +36,8 @@ export class Game {
     actual: { x: 0, y: 0 },
     rounded: { x: 0, y: 0 },
   };
+  /** @type {import("./system.js").System} */
+  system;
 
   static get SORT() {
     return {
@@ -176,11 +178,12 @@ export class Game {
 
   /**
    *
-   * @param {Entity} type
+   * @template EntityType
+   * @param {EntityType | string} type
    * @param {number} x
    * @param {number} y
    * @param {[Object.<string, any>]} settings
-   * @returns {Entity}
+   * @returns {new (...args) => EntityType}
    */
   spawnEntity(type, x, y, settings) {
     settings ??= {};

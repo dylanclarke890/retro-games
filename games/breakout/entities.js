@@ -6,12 +6,18 @@ import { EventChain } from "../../modules/lib/event-chain.js";
 export class Paddle extends Entity {
   size = { x: 72, y: 16 };
   collides = Entity.COLLIDES.FIXED;
+  initialPos;
   paddleSpeed = 600;
   maxVel = { x: this.paddleSpeed, y: 0 };
   constructor(opts) {
     super(opts);
+    this.initialPos = { ...this.pos };
     this.createAnimationSheet("assets/images/breakout/paddle.png");
     this.addAnim("Default", 0.4, [0], false);
+  }
+
+  resetPosition() {
+    this.pos = { ...this.initialPos };
   }
 
   update() {
@@ -24,9 +30,9 @@ export class Paddle extends Entity {
 
 export class Ball extends Entity {
   size = { x: 48, y: 48 };
+  maxVel = { x: 1000, y: 1000 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
-  initialVel = { x: 200, y: -200 };
   poweredUp = false;
 
   constructor(opts) {
@@ -76,22 +82,53 @@ export class Brick extends Entity {
   }
 }
 
+export class PaddleLife extends Entity {
+  size = { x: 16, y: 16 };
+  collides = Entity.COLLIDES.NEVER;
+  type = Entity.TYPE.NONE;
+  checkAgainst = Entity.TYPE.NONE;
+
+  draw() {
+    const { ctx } = this.game.system;
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(this.pos.x, this.pos.y, this.size.x / 2, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+}
+
 export class GameHud extends Entity {
   size = { x: this.game.system.width, y: this.game.system.height };
   collides = Entity.COLLIDES.NEVER;
   type = Entity.TYPE.NONE;
   checkAgainst = Entity.TYPE.NONE;
   maxVel = { x: 0, y: 0 };
-  show = false;
+  showEndGameMessage = false;
+  won = false;
+  lives;
+
+  constructor(opts) {
+    super(opts);
+    this.lives = 3;
+    this.lifeEntities = [];
+    let xOffset = 72;
+    const yOffset = 72;
+    for (let i = 0; i < this.lives; i++) {
+      this.lifeEntities.push(this.game.spawnEntity(PaddleLife, xOffset, yOffset));
+      xOffset += 30;
+    }
+    console.log(this.lifeEntities);
+  }
 
   draw() {
-    if (!this.show) return;
-    const { width } = this.system;
-    this.fonts.standard.write("Level Over!", width / 2, 150, {
-      color: "green",
-      size: 50,
-      align: Font.ALIGN.CENTER,
-    });
+    const { width } = this.game.system;
+    if (this.showEndGameMessage) {
+      this.game.fonts.standard.write("Level Over!", width / 2, 150, {
+        color: "green",
+        size: 50,
+        align: Font.ALIGN.CENTER,
+      });
+    }
   }
 }
 
