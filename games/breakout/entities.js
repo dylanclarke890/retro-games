@@ -1,17 +1,34 @@
 import { Entity } from "../../modules/core/entity.js";
+import { Input } from "../../modules/core/input.js";
 import { Register } from "../../modules/core/register.js";
 
 export class Paddle extends Entity {
   size = { x: 72, y: 16 };
+  collides = Entity.COLLIDES.FIXED;
+  paddleSpeed = 600;
+  maxVel = { x: this.paddleSpeed, y: 0 };
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/paddle.png");
     this.addAnim("Default", 0.4, [0], false);
+    this.game.input.bind(Input.KEY.LEFT_ARROW, "left");
+    this.game.input.bind(Input.KEY.RIGHT_ARROW, "right");
+  }
+
+  update() {
+    super.update();
+    if (this.game.input.state("left")) this.vel.x = -this.paddleSpeed;
+    else if (this.game.input.state("right")) this.vel.x = this.paddleSpeed;
+    else this.vel.x = 0;
   }
 }
 
 export class Ball extends Entity {
   size = { x: 48, y: 48 };
+  collides = Entity.COLLIDES.ACTIVE;
+  bounciness = 1;
+  initialVel = { x: 200, y: -200 };
+
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/shared/ball.png");
@@ -22,12 +39,30 @@ export class Ball extends Entity {
 
 export class Brick extends Entity {
   size = { x: 48, y: 24 };
+  collides = Entity.COLLIDES.FIXED;
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/brick.png");
     this.addAnim("Default", 0.4, [0], false);
     this.addAnim("Cracked", 0.4, [1], false);
     this.addAnim("Broken", 0.4, [2], false);
+  }
+
+  collideWith() {
+    super.collideWith();
+    switch (this.currentAnim) {
+      case this.anims.Default:
+        this.currentAnim = this.anims.Cracked;
+        break;
+      case this.anims.Cracked:
+        this.currentAnim = this.anims.Broken;
+        break;
+      case this.anims.Broken:
+        this.kill();
+        break;
+      default:
+        break;
+    }
   }
 }
 

@@ -25,10 +25,12 @@ export class Game {
   entities = [];
   /** @type {import("./media-factory.js").MediaFactory} */
   media;
+  /** @type {Object.<string, import("./font.js").Font>} */
   fonts = {};
   gravity = 0;
   /** @type {Input} */
   input;
+  /** @type {Object.<string, Entity>} */
   namedEntities = {};
   screen = {
     actual: { x: 0, y: 0 },
@@ -69,7 +71,7 @@ export class Game {
     // remove all killed entities
     for (let i = 0; i < this.#deferredKills.length; i++) {
       const entity = this.#deferredKills[i];
-      removeItem(this.#deferredKills, entity);
+      removeItem(this.entities, entity);
       entity.erase();
     }
     this.#deferredKills = [];
@@ -205,17 +207,17 @@ export class Game {
     this.entities[x] = b;
   }
 
-  removeEntity(ent) {
-    if (ent.name) delete this.namedEntities[ent.name];
+  removeEntity(entity) {
+    if (entity.name) delete this.namedEntities[entity.name];
     // We can't remove the entity from the entities[] array in the midst
     // of an update cycle, so remember all killed entities, remove
     // them later, make sure they don't collide anymore and won't get
     // updated or checked
-    ent.killed = true;
-    ent.type = Entity.TYPE.NONE;
-    ent.checkAgainst = Entity.TYPE.NONE;
-    ent.collides = Entity.COLLIDES.NEVER;
-    this.#deferredKills.push(ent);
+    entity.killed = true;
+    entity.type = Entity.TYPE.NONE;
+    entity.checkAgainst = Entity.TYPE.NONE;
+    entity.collides = Entity.COLLIDES.NEVER;
+    this.#deferredKills.push(entity);
   }
 
   /** Insert all entities into a spatial hash and check them against any

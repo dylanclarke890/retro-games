@@ -3,15 +3,15 @@ export const level = /*JSON-BEGIN*/ {
     {
       "type": "Brick",
       "x": 88,
-      "y": 180,
+      "y": 192,
       "settings": {
         
       }
     },
     {
       "type": "Paddle",
-      "x": 336,
-      "y": 564,
+      "x": 296,
+      "y": 588,
       "settings": {
         
       }
@@ -27,7 +27,7 @@ export const level = /*JSON-BEGIN*/ {
     {
       "type": "Brick",
       "x": 88,
-      "y": 124,
+      "y": 128,
       "settings": {
         
       }
@@ -35,7 +35,7 @@ export const level = /*JSON-BEGIN*/ {
     {
       "type": "Brick",
       "x": 88,
-      "y": 152,
+      "y": 160,
       "settings": {
         
       }
@@ -43,7 +43,7 @@ export const level = /*JSON-BEGIN*/ {
     {
       "type": "Brick",
       "x": 88,
-      "y": 208,
+      "y": 224,
       "settings": {
         
       }
@@ -58,8 +58,8 @@ export const level = /*JSON-BEGIN*/ {
     },
     {
       "type": "Brick",
-      "x": 176,
-      "y": 208,
+      "x": 156,
+      "y": 192,
       "settings": {
         
       }
@@ -67,14 +67,142 @@ export const level = /*JSON-BEGIN*/ {
     {
       "type": "Brick",
       "x": 156,
-      "y": 124,
+      "y": 128,
       "settings": {
         
       }
     },
     {
       "type": "Brick",
-      "x": 140,
+      "x": 144,
+      "y": 160,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 176,
+      "y": 224,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 300,
+      "y": 128,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 256,
+      "y": 192,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 376,
+      "y": 308,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 256,
+      "y": 160,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 244,
+      "y": 128,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 448,
+      "y": 128,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 464,
+      "y": 96,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 412,
+      "y": 160,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 364,
+      "y": 96,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 588,
+      "y": 184,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 380,
+      "y": 128,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 412,
+      "y": 224,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 588,
+      "y": 216,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 532,
+      "y": 216,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 588,
       "y": 152,
       "settings": {
         
@@ -82,8 +210,64 @@ export const level = /*JSON-BEGIN*/ {
     },
     {
       "type": "Brick",
-      "x": 156,
-      "y": 180,
+      "x": 532,
+      "y": 152,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 532,
+      "y": 120,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 588,
+      "y": 88,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 532,
+      "y": 88,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 412,
+      "y": 192,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Ball",
+      "x": 308,
+      "y": 524,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 260,
+      "y": 224,
+      "settings": {
+        
+      }
+    },
+    {
+      "type": "Brick",
+      "x": 300,
+      "y": 308,
       "settings": {
         
       }
