@@ -19,9 +19,10 @@ export class BreakoutGame extends Game {
     this.currentLevel = 1;
 
     this.loadLevel(BreakoutGame.levels[this.currentLevel]);
-    const hud = this.spawnEntity(GameHud, 0, 0, {});
+    this.hud = this.spawnEntity(GameHud, 0, 0, {});
 
     this.input.bind(Input.KEY.SPACE, "play");
+    this.input.bind(Input.KEY.R, "restart");
     this.input.bind(Input.KEY.LEFT_ARROW, "left");
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
     const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
@@ -53,29 +54,37 @@ export class BreakoutGame extends Game {
       .then(() => {
         if (this.getEntitiesByType(Brick).length === 0) {
           this.playing = false;
-          hud.won = true;
-          hud.showEndGameMessage = true;
+          this.hud.won = true;
+          this.hud.showEndGameMessage = true;
         } else if (this.getEntitiesByType(Ball).length === 0) {
           this.playing = false;
-          if (hud.lifeEntities.length) {
-            const entity = hud.lifeEntities[hud.lifeEntities.length - 1];
+          if (this.hud.lifeEntities.length) {
+            const entity = this.hud.lifeEntities[this.hud.lifeEntities.length - 1];
             entity.kill();
-            removeItem(hud.lifeEntities, entity);
+            removeItem(this.hud.lifeEntities, entity);
           }
           this.getEntitiesByType(Paddle)[0].resetPosition();
           this.spawnEntity(Ball, initialBallPos.x, initialBallPos.y);
         }
       })
-      .repeatUntil(() => --hud.lives < 0)
+      .repeatUntil(() => --this.hud.lives < 0)
       .then(() => {
         this.playing = false;
-        hud.won = false;
-        hud.showEndGameMessage = true;
+        this.hud.won = false;
+        this.hud.showEndGameMessage = true;
       });
+  }
+
+  restart() {
+      this.playing = false;
+      this.loadLevel(BreakoutGame.levels[this.currentLevel]);
+      this.hud = this.spawnEntity(GameHud, 0, 0, {});
+      this.chain.reset();
   }
 
   update() {
     super.update();
+    if (this.input.state("restart")) this.restart();
     if (!this.playing) if (this.input.state("play")) this.playing = true;
     this.chain.update();
   }
