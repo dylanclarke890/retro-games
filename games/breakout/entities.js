@@ -1,6 +1,5 @@
 import { Entity } from "../../modules/core/entity.js";
 import { Font } from "../../modules/core/font.js";
-import { Input } from "../../modules/core/input.js";
 import { Register } from "../../modules/core/register.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
 
@@ -13,8 +12,6 @@ export class Paddle extends Entity {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/paddle.png");
     this.addAnim("Default", 0.4, [0], false);
-    this.game.input.bind(Input.KEY.LEFT_ARROW, "left");
-    this.game.input.bind(Input.KEY.RIGHT_ARROW, "right");
   }
 
   update() {

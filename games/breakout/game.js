@@ -13,6 +13,8 @@ export class BreakoutGame extends Game {
     this.loadLevel(level);
     this.spawnEntity(GameHud, 0, 0, {});
     this.input.bind(Input.KEY.SPACE, "play");
+    this.input.bind(Input.KEY.LEFT_ARROW, "left");
+    this.input.bind(Input.KEY.RIGHT_ARROW, "right");
     const ball = this.getEntitiesByType(Ball)[0];
     this.chain = new EventChain()
       .waitUntil(() => this.playing)
