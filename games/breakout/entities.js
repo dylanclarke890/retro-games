@@ -1,4 +1,5 @@
 import { Entity } from "../../modules/core/entity.js";
+import { Font } from "../../modules/core/font.js";
 import { Input } from "../../modules/core/input.js";
 import { Register } from "../../modules/core/register.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
@@ -78,6 +79,25 @@ export class Brick extends Entity {
   }
 }
 
+export class GameHud extends Entity {
+  size = { x: this.game.system.width, y: this.game.system.height };
+  collides = Entity.COLLIDES.NEVER;
+  type = Entity.TYPE.NONE;
+  checkAgainst = Entity.TYPE.NONE;
+  maxVel = { x: 0, y: 0 };
+  show = false;
+
+  draw() {
+    if (!this.show) return;
+    const { width } = this.system;
+    this.fonts.standard.write("Level Over!", width / 2, 150, {
+      color: "green",
+      size: 50,
+      align: Font.ALIGN.CENTER,
+    });
+  }
+}
+
 class PowerupBase extends Entity {
   constructor(opts) {
     super(opts);
@@ -88,7 +108,16 @@ export class MultiBallPowerup extends PowerupBase {}
 export class SafetyNetPowerup extends PowerupBase {}
 export class NoCollisionPowerup extends PowerupBase {}
 
-Register.entityTypes(Paddle, Brick, Ball, MultiBallPowerup, SafetyNetPowerup, NoCollisionPowerup);
+Register.entityTypes(
+  Paddle,
+  Brick,
+  Ball,
+  GameHud,
+  MultiBallPowerup,
+  SafetyNetPowerup,
+  NoCollisionPowerup
+);
+
 Register.preloadImages(
   "assets/images/breakout/paddle.png",
   "assets/images/breakout/brick.png",

@@ -174,6 +174,14 @@ export class Game {
     return a;
   }
 
+  /**
+   *
+   * @param {Entity} type
+   * @param {number} x
+   * @param {number} y
+   * @param {[Object.<string, any>]} settings
+   * @returns {Entity}
+   */
   spawnEntity(type, x, y, settings) {
     settings ??= {};
     const entityClass = Register.getEntityByType(type);

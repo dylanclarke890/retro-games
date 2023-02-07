@@ -1,8 +1,7 @@
 import { Game } from "../../modules/core/game.js";
-import { Font } from "../../modules/core/font.js";
 import { Input } from "../../modules/core/input.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
-import { Ball, Brick } from "./entities.js";
+import { Ball, Brick, GameHud } from "./entities.js";
 
 import { level } from "./level.js";
 
@@ -12,6 +11,7 @@ export class BreakoutGame extends Game {
   constructor(opts) {
     super(opts);
     this.loadLevel(level);
+    this.spawnEntity(GameHud, 0, 0, {});
     this.input.bind(Input.KEY.SPACE, "play");
     const ball = this.getEntitiesByType(Ball)[0];
     this.chain = new EventChain()
@@ -28,12 +28,9 @@ export class BreakoutGame extends Game {
           this.won = true;
           this.playing = false;
         }
-      })
-      .thenUntil(
-        () => this.playing,
-        () => this.displayLevelOverMessage()
-      );
+      });
   }
+
   update() {
     super.update();
     if (!this.playing) {
@@ -43,14 +40,5 @@ export class BreakoutGame extends Game {
       }
     }
     this.chain.update();
-  }
-
-  displayLevelOverMessage() {
-    const { width } = this.system;
-    this.fonts.standard.write("Level Over!", width / 2, 150, {
-      color: "green",
-      size: 50,
-      align: Font.ALIGN.CENTER,
-    });
   }
 }
