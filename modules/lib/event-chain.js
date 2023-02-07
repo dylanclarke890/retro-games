@@ -9,6 +9,7 @@ export class EventChain {
   #isNextLink;
   #linkMap;
   #maxChain;
+  #startConditions;
 
   static #mustFollowWaitLink(name) {
     throw new TypeError(`Invalid event chain: '${name}' must follow a 'wait' link.`);
@@ -18,11 +19,12 @@ export class EventChain {
    * @param {Object} options
    * @param {number?} options.maxChain If set, will immediately move onto the next link in the event chain,
    * if the current link completes in the current frame, and will continue to up until the limit specified.
-   * Defaults to 1000.
+   * Defaults to 100.
    */
   constructor({ maxChain } = {}) {
-    this.#maxChain = maxChain == null ? 1000 : maxChain;
+    this.#maxChain = maxChain == null ? 100 : maxChain;
     this.#breakConditions = [];
+    this.#startConditions = [];
     this.#chain = [];
     this.#index = 0;
     this.#isNextLink = true;
@@ -35,7 +37,7 @@ export class EventChain {
       this.#linkMap.get(key).timer.set(duration);
       return () => {
         const { timer, predicates, callbacks } = this.#linkMap.get(key);
-        if (timer.delta() > 0 || predicates.some((check) => check())) {
+        if (timer.delta() > 0 || predicates.some((predicate) => predicate())) {
           this.#nextLink();
           return;
         }
@@ -47,7 +49,7 @@ export class EventChain {
       this.#linkMap.get(key).predicates.push(predicate);
       return () => {
         const { predicates, callbacks } = this.#linkMap.get(key);
-        if (predicates.some((check) => check())) {
+        if (predicates.some((predicate) => predicate())) {
           this.#nextLink();
           return;
         }
@@ -271,7 +273,7 @@ export class EventChain {
   }
 
   /**
-   * Immediately stop the event chain when predicate returns true. 'break' conditions are ran after each chain
+   * Stop the event chain when predicate returns true. 'break' conditions are ran after each chain
    * call, similar to the 'do ... while ...' pattern.
    */
   breakWhen(predicate) {
@@ -281,17 +283,27 @@ export class EventChain {
   }
 
   /**
+   * Start the event chain when predicate returns true. 'start' conditions are ran before each chain
+   * call, but only if the event chain is currently stopped.
+   */
+  startWhen(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
+    this.#startConditions.push(predicate);
+    return this;
+  }
+
+  /**
    * Call as part of your game's update loop. Invokes the current link's handler once per frame or
    * (if chaining is enabled)
    */
   update() {
+    if (this.stopped) this.stopped = this.#startConditions.some((predicate) => predicate());
     this.#invokeCurrentLinkHandler();
 
-    if (this.#breakConditions.some((check) => check())) {
+    if (this.#breakConditions.some((predicate) => predicate())) {
       this.stop();
       return;
     }
-
     this.#chainLinkUpdates();
   }
 
