@@ -305,13 +305,14 @@ export class EventChain {
   }
 
   #chainLinkUpdates() {
-    if (!this.#maxChain || !this.#isNextLink) return;
-    this.#currentChain = 0;
+    // if chaining disabled or chain condition not met or already chaining
+    if (!this.#maxChain || !this.#isNextLink || this.#currentChain > 0) return;
     while (this.#isNextLink && this.#currentChain < this.#maxChain) {
       this.update();
       this.#currentChain++;
       if (this.#currentChain === this.#maxChain)
         console.debug("EventChain: Exceeded max chain count.");
     }
+    this.#currentChain = 0;
   }
 }
