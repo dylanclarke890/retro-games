@@ -50,3 +50,11 @@ export function uniqueId(prefix = null) {
   );
   return prefix ? `${prefix}${id}` : id;
 }
+
+/**
+ * @param {string} str hyphenated-string
+ * @returns {string} camelCased string
+ */
+export function hyphenToCamelCase(str) {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase()).replace("-", "");
+}

@@ -1,4 +1,4 @@
-export const level-1 = /*JSON-BEGIN*/ {
+export const level1 = /*JSON-BEGIN*/ {
   "entities": [
     {
       "type": "Brick",

@@ -1,13 +1,5 @@
-export const level-2 = /*JSON-BEGIN*/ {
+export const level2 = /*JSON-BEGIN*/ {
   "entities": [
-    {
-      "type": "Brick",
-      "x": 88,
-      "y": 192,
-      "settings": {
-        
-      }
-    },
     {
       "type": "Paddle",
       "x": 296,
@@ -18,232 +10,16 @@ export const level-2 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Brick",
-      "x": 88,
-      "y": 96,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 88,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 88,
-      "y": 160,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 88,
-      "y": 224,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 176,
-      "y": 96,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 156,
-      "y": 192,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 156,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 144,
-      "y": 160,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 176,
-      "y": 224,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 300,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
       "x": 256,
-      "y": 192,
+      "y": 348,
       "settings": {
         
       }
     },
     {
       "type": "Brick",
-      "x": 376,
-      "y": 308,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 256,
-      "y": 160,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 244,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 448,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 464,
-      "y": 96,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 412,
-      "y": 160,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 364,
-      "y": 96,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 588,
-      "y": 184,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 380,
-      "y": 128,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 412,
-      "y": 224,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 588,
-      "y": 216,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 532,
-      "y": 216,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 588,
-      "y": 152,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 532,
-      "y": 152,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 532,
-      "y": 120,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 588,
-      "y": 88,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 532,
-      "y": 88,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 412,
-      "y": 192,
+      "x": 404,
+      "y": 420,
       "settings": {
         
       }
@@ -258,16 +34,8 @@ export const level-2 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Brick",
-      "x": 260,
-      "y": 224,
-      "settings": {
-        
-      }
-    },
-    {
-      "type": "Brick",
-      "x": 300,
-      "y": 308,
+      "x": 348,
+      "y": 340,
       "settings": {
         
       }
