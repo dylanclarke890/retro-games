@@ -2,12 +2,13 @@ import { Timer } from "./timer.js";
 import { Guard } from "./guard.js";
 
 export class EventChain {
+  #breakConditions;
   #chain;
-  #maxChain;
   #currentChain;
   #index;
   #isNextLink;
   #linkMap;
+  #maxChain;
 
   static #mustFollowWaitLink(name) {
     throw new TypeError(`Invalid event chain: '${name}' must follow a 'wait' link.`);
@@ -19,6 +20,7 @@ export class EventChain {
    */
   constructor({ maxChain } = {}) {
     this.#maxChain = maxChain == null ? 25 : maxChain;
+    this.#breakConditions = [];
     this.#chain = [];
     this.#index = 0;
     this.#isNextLink = true;
@@ -150,6 +152,7 @@ export class EventChain {
    */
   stop() {
     this.stopped = true;
+    this.#isNextLink = false;
   }
 
   /**
@@ -267,10 +270,31 @@ export class EventChain {
   }
 
   /**
+   * Immediately stop the event chain when predicate returns true. 'break' conditions are ran after each chain
+   * call, in a 'do ... while ...' pattern.
+   */
+  breakWhen(predicate) {
+    Guard.isTypeOf({ predicate }, "function");
+    this.#breakConditions.push(predicate);
+    return this;
+  }
+
+  /**
    * Call as part of your game's update loop. Invokes the current link's handler until completion, then moves
    * onto the next link in the event chain on the next frame.
    */
   update() {
+    this.#invokeCurrentLinkHandler();
+
+    if (this.#breakConditions.some((check) => check())) {
+      this.stop();
+      return;
+    }
+
+    this.#chainLinkUpdates();
+  }
+
+  #invokeCurrentLinkHandler() {
     const link = this.#chain[this.#index];
     if (!link || this.stopped) return;
     if (this.#isNextLink) {
@@ -278,7 +302,9 @@ export class EventChain {
       this.#isNextLink = false;
     }
     link.handler();
+  }
 
+  #chainLinkUpdates() {
     if (!this.#maxChain || !this.#isNextLink) return;
     this.#currentChain = 0;
     while (this.#isNextLink && this.#currentChain < this.#maxChain) {
