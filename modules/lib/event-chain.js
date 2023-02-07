@@ -16,10 +16,12 @@ export class EventChain {
 
   /**
    * @param {Object} options
-   * @param {number?} options.maxChain If set, will chain events immediately up until maxChain. Default is 25.
+   * @param {number?} options.maxChain If set, will immediately move onto the next link in the event chain,
+   * if the current link completes in the current frame, and will continue to up until the limit specified.
+   * Defaults to 1000.
    */
   constructor({ maxChain } = {}) {
-    this.#maxChain = maxChain == null ? 25 : maxChain;
+    this.#maxChain = maxChain == null ? 1000 : maxChain;
     this.#breakConditions = [];
     this.#chain = [];
     this.#index = 0;
@@ -152,7 +154,6 @@ export class EventChain {
    */
   stop() {
     this.stopped = true;
-    this.#isNextLink = false;
   }
 
   /**
@@ -271,7 +272,7 @@ export class EventChain {
 
   /**
    * Immediately stop the event chain when predicate returns true. 'break' conditions are ran after each chain
-   * call, in a 'do ... while ...' pattern.
+   * call, similar to the 'do ... while ...' pattern.
    */
   breakWhen(predicate) {
     Guard.isTypeOf({ predicate }, "function");
@@ -280,8 +281,8 @@ export class EventChain {
   }
 
   /**
-   * Call as part of your game's update loop. Invokes the current link's handler until completion, then moves
-   * onto the next link in the event chain on the next frame.
+   * Call as part of your game's update loop. Invokes the current link's handler once per frame or
+   * (if chaining is enabled)
    */
   update() {
     this.#invokeCurrentLinkHandler();
@@ -305,8 +306,11 @@ export class EventChain {
   }
 
   #chainLinkUpdates() {
-    // if chaining disabled or chain condition not met or already chaining
-    if (!this.#maxChain || !this.#isNextLink || this.#currentChain > 0) return;
+    // if chaining disabled or chain condition not met or already chaining or stopped
+    if (!this.#maxChain || !this.#isNextLink || this.#currentChain > 0 || this.stopped) {
+      this.#currentChain = 0;
+      return;
+    }
     while (this.#isNextLink && this.#currentChain < this.#maxChain) {
       this.update();
       this.#currentChain++;
