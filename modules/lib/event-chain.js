@@ -82,6 +82,12 @@ export class EventChain {
         this.#nextLink();
       };
     },
+    thenIf: (predicate, action) => {
+      return () => {
+        if (predicate()) action();
+        this.#nextLink();
+      };
+    },
     thenUntil: (predicate, action) => {
       return () => {
         if (predicate()) {
@@ -237,6 +243,13 @@ export class EventChain {
   then(action) {
     Guard.isTypeOf({ action }, "function");
     this.#createLink(() => this.#actions.then(action));
+    return this;
+  }
+
+  thenIf(predicate, action) {
+    Guard.isTypeOf({ predicate }, "function");
+    Guard.isTypeOf({ action }, "function");
+    this.#createLink(() => this.#actions.thenIf(predicate, action));
     return this;
   }
 

@@ -122,12 +122,24 @@ export class GameHud extends Entity {
 
   draw() {
     const { width } = this.game.system;
+    const center = width / 2;
+    const sharedOpts = { color: "green", align: Font.ALIGN.CENTER };
     if (this.showEndGameMessage) {
-      this.game.fonts.standard.write("Level Over!", width / 2, 150, {
-        color: "green",
+      this.game.fonts.standard.write("Level Over!", center, 150, {
         size: 50,
-        align: Font.ALIGN.CENTER,
+        ...sharedOpts,
       });
+
+      if (this.won)
+        this.game.fonts.standard.write("Press 'N' to continue to the next level!", center, 200, {
+          size: 30,
+          ...sharedOpts,
+        });
+      else
+        this.game.fonts.standard.write("Press 'R' to restart", center, 200, {
+          size: 30,
+          ...sharedOpts,
+        });
     }
   }
 }
