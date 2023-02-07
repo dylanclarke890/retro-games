@@ -20,7 +20,6 @@ export class GameAnimationSheet {
 export class GameAnimation {
   #frame;
   #frameTime;
-  #loopCount;
   #sequence;
   #sheet;
   #stop;
@@ -31,6 +30,7 @@ export class GameAnimation {
   angle;
   flip;
   pivot;
+  loopCount;
 
   constructor(sheet, frameTime, sequence, stop) {
     Guard.againstNull({ sheet });
@@ -84,15 +84,15 @@ export class GameAnimation {
 
   update() {
     const frameTotal = Math.floor(this.#timer.delta() / this.#frameTime);
-    this.#loopCount = Math.floor(frameTotal / this.#sequence.length);
-    if (this.#stop && this.#loopCount > 0) this.#frame = this.#sequence.length - 1;
+    this.loopCount = Math.floor(frameTotal / this.#sequence.length);
+    if (this.#stop && this.loopCount > 0) this.#frame = this.#sequence.length - 1;
     else this.#frame = frameTotal % this.#sequence.length;
     this.#tile = this.#sequence[this.#frame];
   }
 
   rewind() {
     this.#timer.set();
-    this.#loopCount = 0;
+    this.loopCount = 0;
     this.#frame = 0;
     this.#tile = this.#sequence[0];
     return this;
