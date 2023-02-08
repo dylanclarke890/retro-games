@@ -6,8 +6,7 @@ export class Paddle extends Entity {
   size = { x: 72, y: 16 };
   collides = Entity.COLLIDES.FIXED;
   initialPos;
-  paddleSpeed = 600;
-  maxVel = { x: this.paddleSpeed, y: 0 };
+  maxVel = { x: 600, y: 0 };
   constructor(opts) {
     super(opts);
     this.initialPos = { ...this.pos };
@@ -21,8 +20,8 @@ export class Paddle extends Entity {
 
   update() {
     super.update();
-    if (this.game.input.state("left")) this.vel.x = -this.paddleSpeed;
-    else if (this.game.input.state("right")) this.vel.x = this.paddleSpeed;
+    if (this.game.input.state("left")) this.vel.x = -this.maxVel.x;
+    else if (this.game.input.state("right")) this.vel.x = this.maxVel.x;
     else this.vel.x = 0;
   }
 }
