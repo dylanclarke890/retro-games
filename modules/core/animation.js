@@ -2,9 +2,13 @@ import { Guard } from "../lib/guard.js";
 import { Timer } from "../lib/timer.js";
 
 export class GameAnimationSheet {
+  /** @type {number} */
   height;
+  /** @type {import("./image.js").GameImage} */
   image;
+  /** @type {import("./system.js").System} */
   system;
+  /** @type {number} */
   width;
 
   constructor({ path, size = {}, system, mediaFactory }) {
@@ -21,6 +25,7 @@ export class GameAnimation {
   #frame;
   #frameTime;
   #sequence;
+  /** @type {GameAnimationSheet} */
   #sheet;
   #stop;
   #tile;
