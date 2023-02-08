@@ -22,7 +22,7 @@ export class BreakoutGame extends Game {
     super(opts);
     this.currentLevel = 0;
     this.loadLevel();
-    this.initChains();
+    this.initChain();
 
     this.input.bind(Input.KEY.SPACE, "play");
     this.input.bind(Input.KEY.R, "restart");
@@ -31,7 +31,7 @@ export class BreakoutGame extends Game {
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
   }
 
-  initChains() {
+  initChain() {
     const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
     this.mainChain = new EventChain()
       .waitUntil(() => this.playing)
