@@ -4,11 +4,15 @@ import { $el, $new } from "../lib/dom-utils.js";
 import { VendorAttributes } from "../lib/vendor-attributes.js";
 
 export class System {
-  #runner = null;
+  /** @type {import("./runner.js").GameRunner} */
+  #runner;
 
-  canvas = null;
-  ctx = null;
-  clock = null;
+  /** @type {HTMLCanvasElement} */
+  canvas;
+  /** @type {CanvasRenderingContext2D} */
+  ctx;
+  /** @type {import("../lib/timer.js").Timer} */
+  clock;
   tick = 0;
   scale = 1;
   drawPosition = this.DRAW.SMOOTH;
@@ -21,15 +25,18 @@ export class System {
   constructor({ runner, canvasId = null, width, height, scale }) {
     Guard.againstNull({ runner });
     this.#runner = runner;
+
     let insertElement = false;
     this.canvas = $el("#" + canvasId);
     if (!this.canvas) {
       this.canvas = $new("canvas");
       insertElement = true;
     }
+
     this.canvas.id = canvasId ?? uniqueId("canvas-");
     this.resize(width, height, scale);
     this.ctx = this.canvas.getContext("2d");
+
     if (insertElement) document.body.insertBefore(this.canvas, document.body.firstChild);
     this.width = width;
     this.height = height;

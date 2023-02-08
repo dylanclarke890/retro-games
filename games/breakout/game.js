@@ -3,7 +3,7 @@ import { Input } from "../../modules/core/input.js";
 import { randomItem, removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
 import { Ball, Brick, GameHud, Paddle } from "./entities.js";
-import { MultiBallPowerup, PowerupBase } from "./powerups.js";
+import { PowerupBase, SafetyNet, SafetyNetPowerup } from "./powerups.js";
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
 
@@ -14,9 +14,10 @@ export class BreakoutGame extends Game {
   currentSpeedIncrease = 0;
   ballSpeedIncrease = 0.1;
   static levels = [level1, level2];
-  static Powerups = [MultiBallPowerup];
+  static Powerups = [SafetyNetPowerup];
   static MultiBallSpawnAmount = 2;
   static PowerupDropChance = 0.25;
+  static SafetyNetDuration = 5;
 
   constructor(opts) {
     super(opts);
@@ -102,6 +103,11 @@ export class BreakoutGame extends Game {
             ball.vel = { x: velX, y: velY };
           }
         }
+        break;
+      case "SafetyNetPowerup":
+        console.log("Here");
+        this.getEntitiesByType(SafetyNet)[0].setActiveFor(BreakoutGame.SafetyNetDuration);
+        console.log(this.getEntitiesByType(SafetyNet));
         break;
       default:
         break;
