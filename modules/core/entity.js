@@ -41,6 +41,7 @@ export class Entity {
   standing = false;
   bounciness = 0;
   minBounceVelocity = 40;
+  /** @type {Object.<string, GameAnimation>} */
   anims = {};
   /** @type {import("./animation.js").GameAnimationSheet} */
   animSheet = null;
@@ -56,7 +57,6 @@ export class Entity {
   killed = false;
   /** @type {import("./game.js").Game} */
   game;
-
 
   get skipCollisionChecks() {
     return (
