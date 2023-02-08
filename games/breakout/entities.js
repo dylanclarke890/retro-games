@@ -20,6 +20,10 @@ export class Paddle extends Entity {
 
   update() {
     super.update();
+    if (!this.game.playing) {
+      this.vel.x = 0;
+      return;
+    }
     if (this.game.input.state("left")) this.vel.x = -this.maxVel.x;
     else if (this.game.input.state("right")) this.vel.x = this.maxVel.x;
     else this.vel.x = 0;
