@@ -66,7 +66,6 @@ export class BreakoutGame extends Game {
             const entity = this.hud.lifeEntities[this.hud.lifeEntities.length - 1];
             entity.kill();
             removeItem(this.hud.lifeEntities, entity);
-            this.powerupChain.reset();
           }
           this.getEntitiesByType(Paddle)[0].resetPosition();
           this.spawnEntity(Ball, initialBallPos.x, initialBallPos.y);
@@ -79,22 +78,18 @@ export class BreakoutGame extends Game {
         this.hud.won = false;
         this.hud.showEndLevelMessage = true;
       });
+  }
 
-    this.powerupChain = new EventChain()
-      .waitUntil(() => this.getEntitiesByType(Brick).some((b) => b.killed))
-      .then(() => {
-        const killed = this.getEntitiesByType(Brick).filter((b) => b.killed);
-        if (Math.random() <= BreakoutGame.PowerupDropChance)
-          this.spawnEntity(randomItem(BreakoutGame.Powerups), killed.x, killed.y);
-      })
-      .repeatUntil(() => !this.playing);
+  onBrickDestroyed(x, y) {
+    console.log("called");
+    if (Math.random() <= BreakoutGame.PowerupDropChance)
+      this.spawnEntity(randomItem(BreakoutGame.Powerups), x, y);
   }
 
   loadLevel() {
     super.loadLevel(BreakoutGame.levels[this.currentLevel]);
     this.hud = this.spawnEntity(GameHud, 0, 0, {});
     if (this.mainChain) this.mainChain.reset();
-    if (this.powerupChain) this.powerupChain.reset();
   }
 
   nextLevel() {
@@ -115,6 +110,5 @@ export class BreakoutGame extends Game {
     if (this.hud.won && this.input.state("nextLevel")) this.nextLevel();
     if (!this.playing) if (this.input.state("play")) this.playing = true;
     this.mainChain.update();
-    this.powerupChain.update();
   }
 }
