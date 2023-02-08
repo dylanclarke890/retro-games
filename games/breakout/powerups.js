@@ -13,15 +13,6 @@ export class PowerupBase extends Entity {
   constructor(opts) {
     super(opts);
   }
-}
-
-export class MultiBallPowerup extends PowerupBase {
-  _levelEditorIgnore = true;
-  constructor(opts) {
-    super(opts);
-    this.createAnimationSheet("assets/images/breakout/multi-ball.png");
-    this.addAnim("Default", 0.4, [0], false);
-  }
 
   checkWith(other) {
     if (!(other instanceof Paddle)) return;
@@ -34,8 +25,22 @@ export class MultiBallPowerup extends PowerupBase {
     this.kill();
   }
 }
+
+export class MultiBallPowerup extends PowerupBase {
+  _levelEditorIgnore = true;
+  constructor(opts) {
+    super(opts);
+    this.createAnimationSheet("assets/images/breakout/multi-ball.png");
+    this.addAnim("Default", 0.4, [0], false);
+  }
+}
 export class SafetyNetPowerup extends PowerupBase {
   _levelEditorIgnore = true;
+  constructor(opts) {
+    super(opts);
+    this.createAnimationSheet("assets/images/breakout/shield.png");
+    this.addAnim("Default", 0.4, [0], false);
+  }
 }
 
 export class SafetyNet extends Entity {
@@ -46,7 +51,17 @@ export class SafetyNet extends Entity {
 
 export class NoCollisionPowerup extends PowerupBase {
   _levelEditorIgnore = true;
+  constructor(opts) {
+    super(opts);
+    this.createAnimationSheet("assets/images/breakout/damage-increase.png");
+    this.addAnim("Default", 0.4, [0], false);
+  }
 }
 
 Register.entityTypes(MultiBallPowerup, SafetyNetPowerup, SafetyNet, NoCollisionPowerup);
-Register.preloadImages("assets/images/breakout/multi-ball.png");
+
+Register.preloadImages(
+  "assets/images/breakout/multi-ball.png",
+  "assets/images/breakout/shield.png",
+  "assets/images/breakout/damage-increase.png"
+);
