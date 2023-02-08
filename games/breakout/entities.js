@@ -114,10 +114,8 @@ export class GameHud extends Entity {
     this.lifeEntities = [];
     let xOffset = 72;
     const yOffset = 72;
-    for (let i = 0; i < this.lives; i++) {
+    for (let i = 0; i < this.lives; i++, xOffset += 30)
       this.lifeEntities.push(this.game.spawnEntity(PaddleLife, xOffset, yOffset));
-      xOffset += 30;
-    }
   }
 
   draw() {
