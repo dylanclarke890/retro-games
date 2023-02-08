@@ -12,9 +12,9 @@ export class Game {
   #cellSize = 64;
   #deferredKills = [];
   #doSortEntities = false;
-  #levelToLoad = null;
   #sortBy = Game.SORT.Z_INDEX;
 
+  levelToLoad = null;
   backgroundAnims = {};
   /** @type {BackgroundMap[]} */
   backgroundMaps = [];
@@ -59,9 +59,9 @@ export class Game {
 
   update() {
     this.input.clearPressed();
-    if (this.#levelToLoad) {
-      this.loadLevel(this.#levelToLoad);
-      this.#levelToLoad = null;
+    if (this.levelToLoad) {
+      this.loadLevel(this.levelToLoad);
+      this.levelToLoad = null;
     }
 
     for (let i = 0; i < this.entities.length; i++) {
@@ -152,7 +152,7 @@ export class Game {
   }
 
   loadLevelDeferred(data) {
-    this.#levelToLoad = data;
+    this.levelToLoad = data;
   }
 
   getMapByName(name) {

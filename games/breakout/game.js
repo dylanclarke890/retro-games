@@ -17,16 +17,18 @@ export class BreakoutGame extends Game {
   constructor(opts) {
     super(opts);
     this.currentLevel = 1;
-
-    this.loadLevel(BreakoutGame.levels[this.currentLevel]);
-    this.hud = this.spawnEntity(GameHud, 0, 0, {});
+    this.loadLevel();
+    this.initChain();
 
     this.input.bind(Input.KEY.SPACE, "play");
     this.input.bind(Input.KEY.R, "restart");
+    this.input.bind(Input.KEY.N, "nextLevel");
     this.input.bind(Input.KEY.LEFT_ARROW, "left");
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
-    const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
+  }
 
+  initChain() {
+    const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
     this.chain = new EventChain()
       .waitUntil(() => this.playing)
       .then(() => {
@@ -69,22 +71,35 @@ export class BreakoutGame extends Game {
       })
       .repeatUntil(() => --this.hud.lives < 0)
       .then(() => {
+        if (this.hud.showEndLevelMessage) return; // already showing the 'you win' screen
         this.playing = false;
         this.hud.won = false;
         this.hud.showEndGameMessage = true;
       });
   }
 
+  loadLevel() {
+    super.loadLevel(BreakoutGame.levels[this.currentLevel]);
+    this.hud = this.spawnEntity(GameHud, 0, 0, {});
+    if (this.chain) this.chain.reset();
+  }
+
+  nextLevel() {
+    this.currentLevel++;
+    const next = BreakoutGame.levels[this.currentLevel];
+    if (!next) this.displayEndOfGameScreen();
+    else this.levelToLoad = next;
+  }
+
   restart() {
-      this.playing = false;
-      this.loadLevel(BreakoutGame.levels[this.currentLevel]);
-      this.hud = this.spawnEntity(GameHud, 0, 0, {});
-      this.chain.reset();
+    this.playing = false;
+    this.loadLevel();
   }
 
   update() {
     super.update();
-    if (this.input.state("restart")) this.restart();
+    if (this.hud.lives < 0 && this.input.state("restart")) this.restart();
+    if (this.hud.won && this.input.state("nextLevel")) this.nextLevel();
     if (!this.playing) if (this.input.state("play")) this.playing = true;
     this.chain.update();
   }

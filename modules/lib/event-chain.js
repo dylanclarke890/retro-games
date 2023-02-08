@@ -246,6 +246,11 @@ export class EventChain {
     return this;
   }
 
+  /**
+   * Conditionally perform an action immediately after the previous link in the event chain.
+   * @param {() => boolean} predicate
+   * @param {() => void} action
+   */
   thenIf(predicate, action) {
     Guard.isTypeOf({ predicate }, "function");
     Guard.isTypeOf({ action }, "function");

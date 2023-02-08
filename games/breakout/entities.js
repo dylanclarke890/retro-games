@@ -104,6 +104,7 @@ export class GameHud extends Entity {
   checkAgainst = Entity.TYPE.NONE;
   maxVel = { x: 0, y: 0 };
   showEndGameMessage = false;
+  showEndLevelMessage = false;
   won = false;
   lives;
 
@@ -117,14 +118,13 @@ export class GameHud extends Entity {
       this.lifeEntities.push(this.game.spawnEntity(PaddleLife, xOffset, yOffset));
       xOffset += 30;
     }
-    console.log(this.lifeEntities);
   }
 
   draw() {
     const { width } = this.game.system;
     const center = width / 2;
     const sharedOpts = { color: "green", align: Font.ALIGN.CENTER };
-    if (this.showEndGameMessage) {
+    if (this.showEndLevelMessage && !this.showEndGameMessage) {
       this.game.fonts.standard.write("Level Over!", center, 150, {
         size: 50,
         ...sharedOpts,
@@ -140,6 +140,17 @@ export class GameHud extends Entity {
           size: 30,
           ...sharedOpts,
         });
+    }
+
+    if (this.showEndGameMessage) {
+      this.game.fonts.standard.write("All levels complete!", center, 150, {
+        size: 60,
+        ...sharedOpts,
+      });
+      this.game.fonts.standard.write("Thanks for playing!", center, 250, {
+        size: 45,
+        ...sharedOpts,
+      });
     }
   }
 }
