@@ -29,7 +29,7 @@ export class Paddle extends Entity {
 }
 
 export class Ball extends Entity {
-  size = { x: 48, y: 48 };
+  size = { x: 16, y: 16 };
   maxVel = { x: 1000, y: 1000 };
   collides = Entity.COLLIDES.ACTIVE;
   bounciness = 1;
@@ -37,7 +37,7 @@ export class Ball extends Entity {
 
   constructor(opts) {
     super(opts);
-    this.createAnimationSheet("assets/images/shared/ball.png");
+    this.createAnimationSheet("assets/images/breakout/ball.png");
     this.addAnim("Default", 0.4, [0], false);
     this.addAnim("PoweredUp", 0.4, [1], false);
     const timeOutSequence = [0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
