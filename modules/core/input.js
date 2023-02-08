@@ -7,7 +7,6 @@ export class Input {
     MOUSE2: -3,
     MWHEEL_UP: -4,
     MWHEEL_DOWN: -5,
-
     BACKSPACE: 8,
     TAB: 9,
     ENTER: 13,
@@ -102,14 +101,16 @@ export class Input {
   #isUsingKeyboard = false;
   #isUsingMouse = false;
   #locks = {};
-  #userAgent = null;
+  /** @type {UserAgent} */
+  #userAgent;
   #presses = {};
 
   accel = { x: 0, y: 0, z: 0 };
   actions = {};
   bindings = {};
   mouse = { x: 0, y: 0 };
-  system = null;
+  /** @type {import("./system.js").System} */
+  system;
 
   constructor({ system } = {}) {
     Guard.againstNull({ system });
