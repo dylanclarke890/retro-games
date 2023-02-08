@@ -29,7 +29,7 @@ export class Paddle extends Entity {
 export class Ball extends Entity {
   size = { x: 16, y: 16 };
   maxVel = { x: 1000, y: 1000 };
-  collides = Entity.COLLIDES.ACTIVE;
+  collides = Entity.COLLIDES.PASSIVE;
   bounciness = 1;
   poweredUp = false;
 

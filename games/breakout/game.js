@@ -15,7 +15,7 @@ export class BreakoutGame extends Game {
   ballSpeedIncrease = 0.1;
   static levels = [level1, level2];
   static Powerups = [MultiBallPowerup];
-  static PowerupDropChance = 1;
+  static PowerupDropChance = 0.25;
 
   constructor(opts) {
     super(opts);
@@ -84,6 +84,23 @@ export class BreakoutGame extends Game {
   onBrickDestroyed(x, y) {
     if (Math.random() <= BreakoutGame.PowerupDropChance)
       this.spawnEntity(randomItem(BreakoutGame.Powerups), x, y);
+  }
+
+  onPowerupCollected(powerup) {
+    const balls = this.getEntitiesByType(Ball);
+    switch (powerup.constructor.name) {
+      case "MultiBallPowerup":
+        for (let i = 0; i < balls.length; i++) {
+          const { x, y } = balls[i].pos;
+          const ball = this.spawnEntity(Ball, x, y);
+          const velX = Math.random() > 0.5 ? -this.initialBallVel.x : this.initialBallVel.x;
+          const velY = Math.random() > 0.5 ? -this.initialBallVel.y : this.initialBallVel.y;
+          ball.vel = { x: velX, y: velY };
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   loadLevel() {
