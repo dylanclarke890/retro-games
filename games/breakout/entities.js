@@ -1,7 +1,6 @@
 import { Entity } from "../../modules/core/entity.js";
 import { Font } from "../../modules/core/font.js";
 import { Register } from "../../modules/core/register.js";
-import { EventChain } from "../../modules/lib/event-chain.js";
 
 export class Paddle extends Entity {
   size = { x: 72, y: 16 };
@@ -42,14 +41,6 @@ export class Ball extends Entity {
     this.addAnim("PoweredUp", 0.4, [1], false);
     const timeOutSequence = [0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
     this.addAnim("PowerUpTimingOut", 0.2, timeOutSequence, true);
-    this.chain = new EventChain()
-      .waitUntil(() => this.poweredUp)
-      .then(() => (this.currentAnim = this.anims.PoweredUp))
-      .wait(2)
-      .then(() => (this.currentAnim = this.anims.PowerUpTimingOut))
-      .waitUntil(() => this.currentAnim.loopCount > 0)
-      .then(() => (this.currentAnim = this.anims.Default))
-      .repeat();
   }
 }
 
