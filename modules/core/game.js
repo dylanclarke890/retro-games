@@ -10,11 +10,12 @@ import { Entity } from "./entity.js";
 export class Game {
   #autoSort = false;
   #cellSize = 64;
+  /** @type {Entity[]} */
   #deferredKills = [];
   #doSortEntities = false;
   #sortBy = Game.SORT.Z_INDEX;
 
-  levelToLoad = null;
+  levelToLoad;
   backgroundAnims = {};
   /** @type {BackgroundMap[]} */
   backgroundMaps = [];
@@ -41,9 +42,11 @@ export class Game {
 
   static get SORT() {
     return {
-      Z_INDEX: (a, b) => a.zIndex - b.zIndex,
-      POS_X: (a, b) => a.pos.x + a.size.x - (b.pos.x + b.size.x),
-      POS_Y: (a, b) => a.pos.y + a.size.y - (b.pos.y + b.size.y),
+      Z_INDEX: (/** @type {Entity} */ a, /** @type {Entity} */ b) => a.zIndex - b.zIndex,
+      POS_X: (/** @type {Entity} */ a, /** @type {Entity} */ b) =>
+        a.pos.x + a.size.x - (b.pos.x + b.size.x),
+      POS_Y: (/** @type {Entity} */ a, /** @type {Entity} */ b) =>
+        a.pos.y + a.size.y - (b.pos.y + b.size.y),
     };
   }
 
