@@ -34,11 +34,13 @@ export function mix(superclass) {
 }
 
 class MixinBuilder {
+  #superclass;
+
   constructor(superclass) {
-    this.superclass = superclass;
+    this.#superclass = superclass;
   }
 
   with(...mixins) {
-    return mixins.reduce((c, mixin) => mixin(c), this.superclass);
+    return mixins.reduce((c, mixin) => mixin(c), this.#superclass);
   }
 }
