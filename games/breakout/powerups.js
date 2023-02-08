@@ -2,7 +2,7 @@ import { Entity } from "../../modules/core/entity.js";
 import { Register } from "../../modules/core/register.js";
 import { Paddle } from "./entities.js";
 
-class PowerupBase extends Entity {
+export class PowerupBase extends Entity {
   gravityFactor = 1;
   vel = { x: 0, y: 50 };
   size = { x: 24, y: 24 };

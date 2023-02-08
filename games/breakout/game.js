@@ -3,7 +3,7 @@ import { Input } from "../../modules/core/input.js";
 import { randomItem, removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
 import { Ball, Brick, GameHud, Paddle } from "./entities.js";
-import { MultiBallPowerup } from "./powerups.js";
+import { MultiBallPowerup, PowerupBase } from "./powerups.js";
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
 
@@ -15,6 +15,7 @@ export class BreakoutGame extends Game {
   ballSpeedIncrease = 0.1;
   static levels = [level1, level2];
   static Powerups = [MultiBallPowerup];
+  static MultiBallSpawnAmount = 2;
   static PowerupDropChance = 0.25;
 
   constructor(opts) {
@@ -70,6 +71,8 @@ export class BreakoutGame extends Game {
           }
           this.getEntitiesByType(Paddle)[0].resetPosition();
           this.spawnEntity(Ball, initialBallPos.x, initialBallPos.y);
+          const powerups = this.getEntitiesByType(PowerupBase);
+          for (let i = 0; i < powerups.length; i++) powerups[i].kill();
         }
       })
       .repeatUntil(() => --this.hud.lives < 0)
@@ -92,10 +95,12 @@ export class BreakoutGame extends Game {
       case "MultiBallPowerup":
         for (let i = 0; i < balls.length; i++) {
           const { x, y } = balls[i].pos;
-          const ball = this.spawnEntity(Ball, x, y);
-          const velX = Math.random() > 0.5 ? -this.initialBallVel.x : this.initialBallVel.x;
-          const velY = Math.random() > 0.5 ? -this.initialBallVel.y : this.initialBallVel.y;
-          ball.vel = { x: velX, y: velY };
+          for (let i = 0; i < BreakoutGame.MultiBallSpawnAmount; i++) {
+            const ball = this.spawnEntity(Ball, x, y);
+            const velX = Math.random() > 0.5 ? -this.initialBallVel.x : this.initialBallVel.x;
+            const velY = Math.random() > 0.5 ? -this.initialBallVel.y : this.initialBallVel.y;
+            ball.vel = { x: velX, y: velY };
+          }
         }
         break;
       default:

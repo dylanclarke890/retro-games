@@ -2,15 +2,15 @@ export const level2 = /*JSON-BEGIN*/ {
   "entities": [
     {
       "type": "Paddle",
-      "x": 296,
-      "y": 588,
+      "x": 304,
+      "y": 540,
       "settings": {
         
       }
     },
     {
       "type": "Brick",
-      "x": 312,
+      "x": 396,
       "y": 416,
       "settings": {
         
@@ -18,8 +18,8 @@ export const level2 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Ball",
-      "x": 324,
-      "y": 564,
+      "x": 332,
+      "y": 520,
       "settings": {
         
       }

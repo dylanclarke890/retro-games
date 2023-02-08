@@ -10,8 +10,8 @@ export const level1 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Paddle",
-      "x": 296,
-      "y": 588,
+      "x": 316,
+      "y": 544,
       "settings": {
         
       }
@@ -250,8 +250,8 @@ export const level1 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Ball",
-      "x": 324,
-      "y": 564,
+      "x": 344,
+      "y": 520,
       "settings": {
         
       }
