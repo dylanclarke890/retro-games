@@ -145,39 +145,10 @@ export class GameHud extends Entity {
   }
 }
 
-class PowerupBase extends Entity {
-  gravityFactor = 1;
-  vel = { x: 0, y: -50 };
-  size = { x: 24, y: 24 };
-  constructor(opts) {
-    super(opts);
-  }
-}
-
-export class MultiBallPowerup extends PowerupBase {
-  constructor(opts) {
-    super(opts);
-    this.createAnimationSheet("assets/images/breakout/multi-ball.png");
-    this.addAnim("Default", 0.4, [0], false);
-  }
-}
-export class SafetyNetPowerup extends PowerupBase {}
-export class NoCollisionPowerup extends PowerupBase {}
-
-Register.entityTypes(
-  Paddle,
-  Brick,
-  Ball,
-  GameHud,
-  PaddleLife,
-  MultiBallPowerup,
-  SafetyNetPowerup,
-  NoCollisionPowerup
-);
+Register.entityTypes(Paddle, Brick, Ball, GameHud, PaddleLife);
 
 Register.preloadImages(
   "assets/images/breakout/paddle.png",
   "assets/images/breakout/brick.png",
-  "assets/images/breakout/multi-ball.png",
   "assets/images/shared/ball.png"
 );

@@ -2,7 +2,8 @@ import { Game } from "../../modules/core/game.js";
 import { Input } from "../../modules/core/input.js";
 import { randomItem, removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
-import { Ball, Brick, GameHud, MultiBallPowerup, Paddle } from "./entities.js";
+import { Ball, Brick, GameHud, Paddle } from "./entities.js";
+import { MultiBallPowerup } from "./powerups.js";
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
 

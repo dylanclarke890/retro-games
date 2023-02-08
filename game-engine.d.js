@@ -5,6 +5,7 @@
 /// <reference path="games/pong/level.js"/>
 /// <reference path="games/breakout/game.js"/>
 /// <reference path="games/breakout/entities.js"/>
+/// <reference path="games/breakout/powerups.js"/>
 /// <reference path="games/breakout/level-1.js"/>
 /// <reference path="games/breakout/level-2.js"/>
 
