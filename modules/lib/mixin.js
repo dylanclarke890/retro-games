@@ -4,7 +4,7 @@
  * @example
  * class Base {
  *   do() {
- *     console.log("Doing.");
+ *     console.example("Doing.");
  *   }
  * }
  *
@@ -12,14 +12,14 @@
  *   class extends superclass {
  *     do() {
  *       super.do();
- *       console.log("Mixin also doing.");
+ *       console.example("Mixin also doing.");
  *     }
  *   };
  *
  * class Example extends mix(Base).with(Mixin) {
  *   do() {
  *     super.do();
- *     console.log("Example also also doing.");
+ *     console.example("Example also also doing.");
  *   }
  * }
  *

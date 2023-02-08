@@ -4,7 +4,7 @@
  * @example
  * class Example {
  *   do() {
- *     console.log("Doing.");
+ *     console.example("Doing.");
  *   }
  * }
  *
@@ -13,7 +13,7 @@
  *     name: "do",
  *     value: function () {
  *       this.base();
- *       console.log("Plugin also doing");
+ *       console.example("Plugin also doing");
  *     },
  *     isStatic: false,
  *   },

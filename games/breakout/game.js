@@ -82,7 +82,6 @@ export class BreakoutGame extends Game {
   }
 
   onBrickDestroyed(x, y) {
-    console.log("called");
     if (Math.random() <= BreakoutGame.PowerupDropChance)
       this.spawnEntity(randomItem(BreakoutGame.Powerups), x, y);
   }
