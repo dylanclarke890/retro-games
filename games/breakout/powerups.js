@@ -3,18 +3,20 @@ import { Register } from "../../modules/core/register.js";
 import { Paddle } from "./entities.js";
 
 export class PowerupBase extends Entity {
+  _levelEditorIgnore = true;
+
   gravityFactor = 1;
   vel = { x: 0, y: 50 };
   size = { x: 24, y: 24 };
   collides = Entity.COLLIDES.PASSIVE;
   checkAgainst = Entity.TYPE.A;
-
   constructor(opts) {
     super(opts);
   }
 }
 
 export class MultiBallPowerup extends PowerupBase {
+  _levelEditorIgnore = true;
   constructor(opts) {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/multi-ball.png");
@@ -32,8 +34,19 @@ export class MultiBallPowerup extends PowerupBase {
     this.kill();
   }
 }
-export class SafetyNetPowerup extends PowerupBase {}
-export class NoCollisionPowerup extends PowerupBase {}
+export class SafetyNetPowerup extends PowerupBase {
+  _levelEditorIgnore = true;
+}
 
-Register.entityTypes(MultiBallPowerup, SafetyNetPowerup, NoCollisionPowerup);
+export class SafetyNet extends Entity {
+  _levelEditorIsScalable = true;
+  _levelEditorDrawBox = true;
+  _levelEditorBoxColor = "orange";
+}
+
+export class NoCollisionPowerup extends PowerupBase {
+  _levelEditorIgnore = true;
+}
+
+Register.entityTypes(MultiBallPowerup, SafetyNetPowerup, SafetyNet, NoCollisionPowerup);
 Register.preloadImages("assets/images/breakout/multi-ball.png");

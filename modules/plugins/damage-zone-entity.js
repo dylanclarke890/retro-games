@@ -1,8 +1,8 @@
 import { Entity } from "../core/entity.js";
 
 export class EntityDamageZone extends Entity {
-  _wmDrawBox = true;
-  _wmBoxColor = "rgba(0, 0, 255, 0.7)";
+  _levelEditorDrawBox = true;
+  _levelEditorBoxColor = "rgba(0, 0, 255, 0.7)";
   size = { x: 16, y: 16 };
   damage = 9999;
   ignoreknockback = "true";

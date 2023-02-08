@@ -10,7 +10,7 @@ export const level1 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Paddle",
-      "x": 316,
+      "x": 304,
       "y": 544,
       "settings": {
         
@@ -250,8 +250,8 @@ export const level1 = /*JSON-BEGIN*/ {
     },
     {
       "type": "Ball",
-      "x": 344,
-      "y": 520,
+      "x": 332,
+      "y": 524,
       "settings": {
         
       }
@@ -270,6 +270,17 @@ export const level1 = /*JSON-BEGIN*/ {
       "y": 308,
       "settings": {
         
+      }
+    },
+    {
+      "type": "SafetyNet",
+      "x": 52,
+      "y": 576,
+      "settings": {
+        "size": {
+          "x": 664,
+          "y": 48
+        }
       }
     }
   ],

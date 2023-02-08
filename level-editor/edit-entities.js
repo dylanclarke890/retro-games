@@ -100,11 +100,11 @@ export class EditEntities {
         const entityName = className.replace(/^Entity/, "");
         const classDef = Register.getEntityByType(className);
         if (!classDef) {
-          invalidClasses.push(className); // should never happen.
+          invalidClasses.push(className);
           continue;
         }
 
-        if (classDef.prototype._wmIgnore) continue;
+        if (classDef.prototype._levelEditorIgnore) continue;
         const entityDiv = $new("div");
         entityDiv.id = className;
         entityDiv.textContent = entityName;
@@ -327,8 +327,15 @@ export class EditEntities {
 
   loadEntitySettings() {
     if (!this.selectedEntity) return;
+
+    const defaultEls = document.querySelectorAll(".default");
+    this.entityDefinitions.innerHTML = "";
+
+    defaultEls.forEach((v) => this.entityDefinitions.appendChild(v));
+
     $el("#position-x").textContent = this.selectedEntity.pos.x;
     $el("#position-y").textContent = this.selectedEntity.pos.y;
+
     const html = this.loadEntitySettingsRecursive(this.selectedEntity._additionalSettings);
     this.entityDefinitions.innerHTML += html;
 
@@ -507,11 +514,11 @@ export class EditEntities {
 
     const { scale, ctx, drawPosition } = this.system;
     // box
-    if (entity._wmDrawBox) {
-      ctx.fillStyle = entity._wmBoxColor || "rgba(128, 128, 128, 0.9)";
+    if (entity._levelEditorDrawBox) {
+      ctx.fillStyle = entity._levelEditorBoxColor || "rgba(128, 128, 128, 0.9)";
       ctx.fillRect(
-        drawPosition(entity.pos.x - this.editor.screen.x),
-        drawPosition(entity.pos.y - this.editor.screen.y),
+        drawPosition(entity.pos.x - this.editor.screen.rounded.x),
+        drawPosition(entity.pos.y - this.editor.screen.rounded.y),
         entity.size.x * scale,
         entity.size.y * scale
       );
