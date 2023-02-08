@@ -1,24 +1,26 @@
 import { Game } from "../../modules/core/game.js";
 import { Input } from "../../modules/core/input.js";
-import { removeItem } from "../../modules/lib/array-utils.js";
+import { randomItem, removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
-import { Ball, Brick, GameHud, Paddle } from "./entities.js";
+import { Ball, Brick, GameHud, MultiBallPowerup, Paddle } from "./entities.js";
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
 
 export class BreakoutGame extends Game {
   playing = false;
   currentLevel;
-  initialBallVel = { x: 300, y: -300 };
+  initialBallVel = { x: 200, y: -200 };
   currentSpeedIncrease = 0;
   ballSpeedIncrease = 0.1;
   static levels = [level1, level2];
+  static Powerups = [MultiBallPowerup];
+  static PowerupDropChance = 1;
 
   constructor(opts) {
     super(opts);
-    this.currentLevel = 1;
+    this.currentLevel = 0;
     this.loadLevel();
-    this.initChain();
+    this.initChains();
 
     this.input.bind(Input.KEY.SPACE, "play");
     this.input.bind(Input.KEY.R, "restart");
@@ -27,9 +29,9 @@ export class BreakoutGame extends Game {
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
   }
 
-  initChain() {
+  initChains() {
     const initialBallPos = this.getEntitiesByType(Ball)[0].pos;
-    this.chain = new EventChain()
+    this.mainChain = new EventChain()
       .waitUntil(() => this.playing)
       .then(() => {
         const ball = this.getEntitiesByType(Ball)[0];
@@ -64,6 +66,7 @@ export class BreakoutGame extends Game {
             const entity = this.hud.lifeEntities[this.hud.lifeEntities.length - 1];
             entity.kill();
             removeItem(this.hud.lifeEntities, entity);
+            this.powerupChain.reset();
           }
           this.getEntitiesByType(Paddle)[0].resetPosition();
           this.spawnEntity(Ball, initialBallPos.x, initialBallPos.y);
@@ -74,20 +77,30 @@ export class BreakoutGame extends Game {
         if (this.hud.showEndLevelMessage) return; // already showing the 'you win' screen
         this.playing = false;
         this.hud.won = false;
-        this.hud.showEndGameMessage = true;
+        this.hud.showEndLevelMessage = true;
       });
+
+    this.powerupChain = new EventChain()
+      .waitUntil(() => this.getEntitiesByType(Brick).some((b) => b.killed))
+      .then(() => {
+        const killed = this.getEntitiesByType(Brick).filter((b) => b.killed);
+        if (Math.random() <= BreakoutGame.PowerupDropChance)
+          this.spawnEntity(randomItem(BreakoutGame.Powerups), killed.x, killed.y);
+      })
+      .repeatUntil(() => !this.playing);
   }
 
   loadLevel() {
     super.loadLevel(BreakoutGame.levels[this.currentLevel]);
     this.hud = this.spawnEntity(GameHud, 0, 0, {});
-    if (this.chain) this.chain.reset();
+    if (this.mainChain) this.mainChain.reset();
+    if (this.powerupChain) this.powerupChain.reset();
   }
 
   nextLevel() {
     this.currentLevel++;
     const next = BreakoutGame.levels[this.currentLevel];
-    if (!next) this.displayEndOfGameScreen();
+    if (!next) this.hud.showEndGameMessage = true;
     else this.levelToLoad = next;
   }
 
@@ -101,6 +114,7 @@ export class BreakoutGame extends Game {
     if (this.hud.lives < 0 && this.input.state("restart")) this.restart();
     if (this.hud.won && this.input.state("nextLevel")) this.nextLevel();
     if (!this.playing) if (this.input.state("play")) this.playing = true;
-    this.chain.update();
+    this.mainChain.update();
+    this.powerupChain.update();
   }
 }
