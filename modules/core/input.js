@@ -180,9 +180,9 @@ export class Input {
 
     let pos = { left: 0, top: 0 };
     if (system.canvas.getBoundingClientRect) pos = system.canvas.getBoundingClientRect();
-    const ev = event.touches ? event.touches[0] : event;
-    this.mouse.x = (ev.clientX - pos.left) / scale;
-    this.mouse.y = (ev.clientY - pos.top) / scale;
+    const { clientX, clientY } = event.touches ? event.touches[0] : event;
+    this.mouse.x = (clientX - pos.left) / scale;
+    this.mouse.y = (clientY - pos.top) / scale;
   }
 
   contextmenu(event) {
