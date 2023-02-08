@@ -57,7 +57,7 @@ export class BreakoutGame extends Game {
         if (this.getEntitiesByType(Brick).length === 0) {
           this.playing = false;
           this.hud.won = true;
-          this.hud.showEndGameMessage = true;
+          this.hud.showEndLevelMessage = true;
         } else if (this.getEntitiesByType(Ball).length === 0) {
           this.playing = false;
           if (this.hud.lifeEntities.length) {
