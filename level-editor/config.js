@@ -3,9 +3,9 @@ export const levelEditorConfig = {
     /** Takes an array of glob regexes which specify where to load entities from.
      *  Can be individual files or entire directories.
      *  @example 'entityFiles': ['lib/game/powerups/*.js', 'lib/game/entities/laser.js'] */
-    entityFiles: ["games/breakout/entities.js", "games/breakout/powerups.js"],
+    entityFiles: ["games/snake/entities.js"],
     /** Default path for the level file selection box. */
-    levelPath: "games/breakout/level.js",
+    levelPath: "games/snake/level.js",
     /** True to prettify the JSON saved to file. */
     prettyPrint: true,
   },
