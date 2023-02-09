@@ -28,6 +28,13 @@ export function randomNumber(upTo, floor = true) {
   return floor ? Math.floor(rand) : rand;
 }
 
+/**
+ * Generate a random number between min and max (min and max included).
+*/ 
+export function randomIntFromInterval(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 export function boolToOnOff(bool) {
   return bool ? "On" : "Off";
 }

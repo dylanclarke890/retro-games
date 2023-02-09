@@ -36,6 +36,12 @@ export class Ball extends Entity {
   collides = Entity.COLLIDES.PASSIVE;
   bounciness = 1;
 
+  constructor(opts) {
+    super(opts);
+    this.createAnimationSheet("assets/images/breakout/ball.png");
+    this.addAnim("Default", 0.4, [0], false);
+  }
+
   get noCollisionActive() {
     return this.game.noCollisionTimer.delta() < 0;
   }
@@ -48,12 +54,6 @@ export class Ball extends Entity {
   separateOnYAxis(left, right, weak) {
     if (this.noCollisionActive && !(left instanceof Paddle || right instanceof Paddle)) return;
     super.separateOnYAxis(left, right, weak);
-  }
-
-  constructor(opts) {
-    super(opts);
-    this.createAnimationSheet("assets/images/breakout/ball.png");
-    this.addAnim("Default", 0.4, [0], false);
   }
 }
 

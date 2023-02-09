@@ -13,6 +13,7 @@ import {
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
 import { Timer } from "../../modules/lib/timer.js";
+import { randomIntFromInterval } from "../../modules/lib/number-utils.js";
 
 export class BreakoutGame extends Game {
   playing = false;
@@ -49,7 +50,8 @@ export class BreakoutGame extends Game {
       .waitUntil(() => this.playing)
       .then(() => {
         const ball = this.getEntitiesByType(Ball)[0];
-        ball.vel = { ...this.initialBallVel };
+        ball.vel.x = randomIntFromInterval(this.initialBallVel.x - 20, this.initialBallVel.x + 20);
+        ball.vel.y = randomIntFromInterval(this.initialBallVel.y - 20, this.initialBallVel.y + 20);
       })
       .waitUntil(() => this.getEntitiesByType(Brick).length === 0)
       .orUntil(() => this.getEntitiesByType(Ball).length === 0)
@@ -109,8 +111,16 @@ export class BreakoutGame extends Game {
           const { x, y } = balls[i].pos;
           for (let i = 0; i < BreakoutGame.MultiBallSpawnAmount; i++) {
             const ball = this.spawnEntity(Ball, x, y);
-            const velX = Math.random() > 0.5 ? -this.initialBallVel.x : this.initialBallVel.x;
-            const velY = Math.random() > 0.5 ? -this.initialBallVel.y : this.initialBallVel.y;
+            let velX = randomIntFromInterval(
+              this.initialBallVel.x - 20,
+              this.initialBallVel.x + 20
+            );
+            let velY = randomIntFromInterval(
+              this.initialBallVel.y - 20,
+              this.initialBallVel.y + 20
+            );
+            if (Math.random() > 0.5) velX = -velX;
+            if (Math.random() > 0.5) velY = -velY;
             ball.vel = { x: velX, y: velY };
           }
         }
