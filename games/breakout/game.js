@@ -3,9 +3,16 @@ import { Input } from "../../modules/core/input.js";
 import { randomItem, removeItem } from "../../modules/lib/array-utils.js";
 import { EventChain } from "../../modules/lib/event-chain.js";
 import { Ball, Brick, GameHud, Paddle } from "./entities.js";
-import { PowerupBase, SafetyNet, SafetyNetPowerup } from "./powerups.js";
+import {
+  MultiBallPowerup,
+  NoCollisionPowerup,
+  PowerupBase,
+  SafetyNet,
+  SafetyNetPowerup,
+} from "./powerups.js";
 import { level1 } from "./level-1.js";
 import { level2 } from "./level-2.js";
+import { Timer } from "../../modules/lib/timer.js";
 
 export class BreakoutGame extends Game {
   playing = false;
@@ -13,11 +20,13 @@ export class BreakoutGame extends Game {
   initialBallVel = { x: 200, y: -200 };
   currentSpeedIncrease = 0;
   ballSpeedIncrease = 0.1;
-  static levels = [level1, level2];
-  static Powerups = [SafetyNetPowerup];
-  static MultiBallSpawnAmount = 2;
+  noCollisionTimer;
+  static Levels = [level1, level2];
+  static Powerups = [SafetyNetPowerup, NoCollisionPowerup, MultiBallPowerup];
   static PowerupDropChance = 0.25;
+  static MultiBallSpawnAmount = 2;
   static SafetyNetDuration = 5;
+  static NoCollisionDuration = 5;
 
   constructor(opts) {
     super(opts);
@@ -30,6 +39,8 @@ export class BreakoutGame extends Game {
     this.input.bind(Input.KEY.N, "nextLevel");
     this.input.bind(Input.KEY.LEFT_ARROW, "left");
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
+
+    this.noCollisionTimer = new Timer();
   }
 
   initChain() {
@@ -105,9 +116,10 @@ export class BreakoutGame extends Game {
         }
         break;
       case "SafetyNetPowerup":
-        console.log("Here");
         this.getEntitiesByType(SafetyNet)[0].setActiveFor(BreakoutGame.SafetyNetDuration);
-        console.log(this.getEntitiesByType(SafetyNet));
+        break;
+      case "NoCollisionPowerup":
+        this.noCollisionTimer.set(BreakoutGame.NoCollisionDuration);
         break;
       default:
         break;
@@ -115,14 +127,14 @@ export class BreakoutGame extends Game {
   }
 
   loadLevel() {
-    super.loadLevel(BreakoutGame.levels[this.currentLevel]);
+    super.loadLevel(BreakoutGame.Levels[this.currentLevel]);
     this.hud = this.spawnEntity(GameHud, 0, 0, {});
     if (this.mainChain) this.mainChain.reset();
   }
 
   nextLevel() {
     this.currentLevel++;
-    const next = BreakoutGame.levels[this.currentLevel];
+    const next = BreakoutGame.Levels[this.currentLevel];
     if (!next) this.hud.showEndGameMessage = true;
     else this.levelToLoad = next;
   }

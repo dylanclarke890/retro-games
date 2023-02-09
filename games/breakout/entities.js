@@ -35,7 +35,20 @@ export class Ball extends Entity {
   maxVel = { x: 1000, y: 1000 };
   collides = Entity.COLLIDES.PASSIVE;
   bounciness = 1;
-  poweredUp = false;
+
+  get noCollisionActive() {
+    return this.game.noCollisionTimer.delta() < 0;
+  }
+
+  separateOnXAxis(left, right, weak) {
+    if (this.noCollisionActive && !(left instanceof Paddle || right instanceof Paddle)) return;
+    super.separateOnXAxis(left, right, weak);
+  }
+
+  separateOnYAxis(left, right, weak) {
+    if (this.noCollisionActive && !(left instanceof Paddle || right instanceof Paddle)) return;
+    super.separateOnYAxis(left, right, weak);
+  }
 
   constructor(opts) {
     super(opts);
@@ -58,8 +71,23 @@ export class Brick extends Entity {
     this.addAnim("Cracked", 0.4, [1], false);
   }
 
+  get noCollisionActive() {
+    return this.game.noCollisionTimer.delta() < 0;
+  }
+
+  separateOnXAxis(left, right, weak) {
+    if (this.noCollisionActive) return;
+    super.separateOnXAxis(left, right, weak);
+  }
+
+  separateOnYAxis(left, right, weak) {
+    if (this.noCollisionActive) return;
+    super.separateOnYAxis(left, right, weak);
+  }
+
   collideWith() {
     super.collideWith();
+    if (this.noCollisionActive) this.currentAnim = this.anims.Broken;
     switch (this.currentAnim) {
       case this.anims.Default:
         this.currentAnim = this.anims.Cracked;
