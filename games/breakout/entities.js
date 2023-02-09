@@ -54,9 +54,6 @@ export class Ball extends Entity {
     super(opts);
     this.createAnimationSheet("assets/images/breakout/ball.png");
     this.addAnim("Default", 0.4, [0], false);
-    this.addAnim("PoweredUp", 0.4, [1], false);
-    const timeOutSequence = [0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
-    this.addAnim("PowerUpTimingOut", 0.2, timeOutSequence, true);
   }
 }
 
