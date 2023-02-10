@@ -4,10 +4,8 @@ import { Input } from "../../modules/core/input.js";
 export class SnakeGame extends Game {
   constructor(opts) {
     super(opts);
-    this.input.bind(Input.KEY.UP_ARROW, "up");
     this.input.bind(Input.KEY.LEFT_ARROW, "left");
     this.input.bind(Input.KEY.RIGHT_ARROW, "right");
-    this.input.bind(Input.KEY.DOWN_ARROW, "down");
   }
 
   draw() {
